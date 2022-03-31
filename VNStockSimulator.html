@@ -1,0 +1,406 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+    <div class="box left_bar">
+        <h1 style="margin-block-start: 0; margin-block-end: 0; text-align: center;"
+            onclick="get_stock_info(prompt('Nhập mã cổ phiếu:', ''));" title="Xem thông tin cổ phiếu">VNS 10+</h1>
+        <!-- VNS = Vistsim = Vietnam Stock Simulator -->
+        <div class="box money_bar"
+            onclick="do_action(prompt('Nhập mã cổ phiếu:', ''), prompt('Nhập số cổ phiếu muốn mua/bán:', ''));"
+            title="Mua/bán cổ phiếu">0</div>
+        <div class="box money_bar" id="totalpal_bar" onclick="document.querySelector('#log').style.display = 'block';"
+            title="Xem nhật kí">0</div>
+        <div id="stocks"></div>
+        <div class="box action_box" style="display: none;">
+            <div class="header" onclick="document.querySelector('#logs').style.display = 'block';">BUY/SELL</div>
+            <input id="action_stock_name" placeholder="ID">
+            <input id="action_stock_amount" type="number" placeholder="Amount" value="0">
+            <input id="action_stock_price" type="number" placeholder="Price" value="0" style="display: none">
+            <button onclick="do_action();">Try it!</button>
+        </div>
+        <div class="box action_box" id="log" style="display: none;">
+            <div class="header">LOGS</div>
+            <div id="logs"></div>
+        </div>
+    </div>
+
+    <div class="box right_bar">
+        <iframe src="https://banggia.vndirect.com.vn/chung-khoan/danh-muc"
+            style="border: none; margin: -10px; width: calc(100% + 20px); height: calc(100% + 20px);"></iframe>
+    </div>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #030303;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            cursor: default;
+            overflow: hidden;
+        }
+
+        .box {
+            border: 1px solid #555;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .box:hover,
+        .action_box input:hover,
+        .action_box button:hover {
+            border-color: white !important;
+        }
+
+        .left_bar {
+            background-color: #333333;
+            padding: 10px;
+            width: 400px;
+            height: 100%;
+            overflow: auto;
+            margin-top: 0;
+        }
+
+        .right_bar {
+            background-color: #333333;
+            padding: 10px;
+            width: calc(100% - 410px);
+            height: 100%;
+            overflow: auto;
+            margin-top: 0;
+            float: right;
+        }
+
+        .stock_info {
+            background-color: #333333;
+            padding: 20px;
+            width: 400px;
+            height: calc(100% - 16px);
+            overflow: auto;
+            float: right;
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            text-align: justify;
+        }
+
+        .liveboard {
+            width: calc(100% - 220px - 10px);
+            margin-left: 5px;
+            height: 100%;
+        }
+
+        .stock_bar {
+            width: calc(50% - 2.3px);
+            display: inline-block;
+            padding: 10px;
+            margin: 5px 0 0 0;
+        }
+
+        .money_bar {
+            width: calc(50% - 2.3px);
+            display: inline-block;
+            border-color: #d6db12;
+            color: #d6db12;
+            padding: 10px;
+            margin: 15px 0 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .action_box {
+            width: 100%;
+            padding: 10px;
+            margin: 25px 0 5px 0;
+        }
+
+        .action_box .header {
+            font-weight: bold;
+            background-color: #333333;
+            margin: 0 auto;
+            width: fit-content;
+            margin-top: -20px;
+            padding: 0 10px;
+        }
+
+        .action_box input,
+        .action_box button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            outline: none;
+            background-color: #333333;
+            color: white;
+            cursor: pointer;
+        }
+
+        .action_box button:active {
+            background-color: #414141;
+        }
+
+        table {
+            border: none !important;
+        }
+
+        tr,
+        td {
+            padding: 5px;
+        }
+
+        .mainheader {
+            font-size: 25px;
+        }
+
+        .margin-top-30 {
+            margin-top: 30px;
+        }
+
+        .margin-top-20 {
+            margin-top: 20px;
+        }
+
+        .margin-top-10 {
+            margin-top: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 15px;
+            height: 15px;
+            background-color: transparent;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: transparent;
+            border-radius: 0 20px 20px 0;
+            /*border-left: 1px solid #ccc;*/
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #ddd;
+            border-radius: 20px;
+            border: 4px solid transparent;
+            background-clip: content-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: grey;
+        }
+
+        .button {
+            cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            border-color: red;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let
+            start_money = 100000000,
+            user_data = {
+                current_money: start_money,
+                stocks: {},
+                logs: []
+            },
+            pal = {}, /* profit and loss */
+            stocks_price = {},
+            stocks_color = {},
+            stocks_rate = {};
+
+        function save_user_data() {
+            localStorage.setItem("vistsim_userdata", JSON.stringify(user_data));
+        }
+
+        function load_user_data() {
+            let temp = JSON.parse(localStorage.getItem("vistsim_userdata"));
+            if (temp) user_data = temp;
+        }
+
+        function do_action(stock_name, stock_amount) {
+            //let stock_name = document.querySelector("#action_stock_name").value;
+            //stock_amount = parseInt(document.querySelector("#action_stock_amount").value);
+            if (stock_name == null || stock_amount == null || stock_name == "" || stock_amount == "") return null;
+            stock_amount = parseInt(stock_amount);
+            const func = stock_price => {
+                if (user_data.current_money - stock_price * stock_amount < 0) {
+                    alert("Số tiền vượt quá số tiền hiện tại!");
+                    return undefined;
+                }
+
+                if (!user_data.stocks[stock_name]) user_data.stocks[stock_name] = 0;
+
+                if (user_data.stocks[stock_name] + stock_amount < 0) {
+                    alert("Số cổ phiếu vượt quá số cổ phiếu hiện tại!");
+                    return undefined;
+                }
+
+                user_data.current_money = user_data.current_money - stock_price * stock_amount;
+                user_data.stocks[stock_name] += stock_amount;
+                user_data.logs.push([new Date().toDateString().replace(/ /g, ""), stock_name, stock_amount, stock_price]);
+
+                if (user_data.stocks[stock_name] == 0)
+                    delete user_data.stocks[stock_name];
+
+                update_display();
+                save_user_data();
+                update_stocks_price();
+            };
+            if (stocks_price[stock_name])
+                func(stocks_price[stock_name] * 1000)
+            else
+                get_stock_price(stock_name, (stock_price) => {
+                    func(stock_price * 1000);
+                })
+
+        }
+
+        function update_display() {
+            update_logs();
+            const
+                format_number = number => Number(number).toLocaleString(),
+                calculate_pal = stock_name => {
+                    let price = stocks_price[stock_name],
+                        total_sell_price = user_data.stocks[stock_name] * price * 1000,
+                        this_pal = (pal[stock_name] + total_sell_price);
+                    return { price, total_sell_price, this_pal };
+                },
+                stock_bar_border_color = (this_pal, real_pal) => {
+                    let rate = this_pal / real_pal;
+                    if(rate >= 0.2) return "lime";
+                    else if (rate <= -0.2) return "red";
+                    else return "#555";
+                };
+            document.querySelector(".money_bar").innerHTML = format_number(user_data.current_money);
+            document.querySelector("#stocks").innerHTML = "";
+            let stocks_total_sell_price = 0;
+            let stocks = Object.entries(user_data.stocks);
+            stocks = stocks.sort((a, b) => calculate_pal(b[0]).this_pal - calculate_pal(a[0]).this_pal);
+            stocks.forEach((stock, index) => {
+                let
+                    pal = calculate_pal(stock[0]),
+                    this_pal = pal.this_pal;
+                stocks_total_sell_price += pal.total_sell_price;
+            });
+            let real_pal = 0 - start_money + user_data.current_money + stocks_total_sell_price;
+            stocks.forEach((stock, index) => {
+                let
+                    pal = calculate_pal(stock[0]),
+                    this_pal = pal.this_pal;
+                if (stock[1] > 0)
+                    document.querySelector("#stocks").innerHTML +=
+                        `<div class="box stock_bar" id="${stock[0]}" onclick="do_action('${stock[0]}', prompt('Nhập số cổ phiếu muốn mua/bán:', ''));" style="${(index + 1) % 2 == 0 ? "float: right;" : ""}; border: 1px solid ${stock_bar_border_color(this_pal, real_pal)}">`
+                        + `<b>${stock[0]} (<span id="price" style="color: ${stocks_color[stock[0]]}" title="${stocks_rate[stock[0]]}%">${stocks_price[stock[0]] ? stocks_price[stock[0]] : "0"}</span>)</b>`
+                        + `<span style="float: right;">${stock[1]}</span><br/>`
+                        + `PAL each: <span id="paleach" style="color: ${this_pal >= 0 ? "lime" : "red"};">${parseInt(this_pal / user_data.stocks[stock[0]]).toLocaleString()}</span><br/>`
+                        + `PAL total: <span id="paltotal" style="color: ${this_pal >= 0 ? "lime" : "red"};">${parseInt(this_pal).toLocaleString()}</span>`
+                        + `</div>`;
+            });
+            document.querySelector("#totalpal_bar").innerHTML = format_number(real_pal);
+        }
+
+        function update_logs() {
+            let stocks_amount = {}
+            document.querySelector("#logs").innerHTML = "";
+            pal = {};
+            user_data.logs.reverse().forEach(log => {
+                document.querySelector("#logs").innerHTML += `<div class="box stock_bar" title="On ${log[0]} bought ${log[2]} ${log[1]} shares at the price of ${log[3]} VND"><b>${log[1]}</b><span style="float: right;"><font color="${log[2] >= 0 ? "lime" : "red"}">${log[2]}</font> × <font color="blue">${log[3] / 1000}</font></span></div>`;
+                if (stocks_amount[log[1]] == undefined) stocks_amount[log[1]] = 0;
+                stocks_amount[log[1]] += log[2];
+                if (pal[log[1]] == undefined) pal[log[1]] = 0;
+                pal[log[1]] -= (log[2] * log[3]);
+                if (stocks_amount[log[1]] == 0) pal[log[1]] = 0;
+            });
+        }
+
+        function get_stock_info(code) {
+            if (code != null && code != "")
+                fetch("https://api.allorigins.win/get?url=https://www.bsc.com.vn/Companies/Overview/" + code + "?timestamp=" + new Date().getTime())
+                    .then(res => res.json())
+                    .then(json => {
+                        $.parseHTML(json.contents).forEach(elm => {
+                            if (elm.className == "container") {
+                                let popup = document.createElement("div");
+                                popup.classList.add("stock_info", "box");
+                                popup.innerHTML = "<div class='button box' onclick='this.parentElement.style.display = \"none\";'>Đóng hộp thoại này</div>";
+                                popup.innerHTML += elm.querySelector("div.content-page > div.row.margin-0 > div.col-md-9.col-sm-8.col-xs-12.content-right > div:nth-child(1)").innerHTML;
+                                document.body.appendChild(popup);
+                            }
+                        });
+                    });
+        }
+
+        function get_stock_price(code, callback) {
+            fetch("https://api.allorigins.win/get?url=https://www.bsc.com.vn/Companies/Overview/" + code + "?timestamp=" + new Date().getTime())
+                .then(res => res.json())
+                .then(json => {
+                    let
+                        stock_ex = json.contents.replace(/\r|\n| /g, "").split("<td>S&#224;n</td><tdclass=\"text-right\">").pop().split("</td>")[0],
+                        temp = json.contents.replace(/\r|\n| /g, "").split("<td>Gi&#225;hiệntại</td><tdclass=\"text-right\"><fontcolor='").pop().split("</font>")[0],
+                        price = temp.split("(")[0].split(">")[1].replace(",", "."),
+                        color = temp.split("(")[0].split(">")[0].replace("'", ""),
+                        rate = undefined,
+                        min_max_rate = (stock_ex == "HOSE" ? 7 : (stock_ex == "HNX" ? 9 : 14));
+
+                    rate = parseFloat(temp.split("/")[1].replace("%)", "").replace(",", ".")) || 0;
+                    rate = parseFloat(rate.toFixed(0));
+
+                    if (price == "<!--[ifIE9]")
+                        price = json.contents.replace(/\r|\n| /g, "").split("<td>Gi&#225;hiệntại</td><tdclass=\"text-right\"><div>").pop().split("</div>")[0].split("(")[0].replace(",", ".");
+                    price = Number(price);
+
+                    if (rate >= min_max_rate)
+                        color = "rebeccapurple";
+                    else if (rate <= 0 - min_max_rate)
+                        color = "aqua";
+                    else if (color == "#990000")
+                        color = "red";
+                    else if (color == "#009900")
+                        color = "lime";
+                    else if (color == "<!DOCTYPEhtml")
+                        color = "yellow";
+
+                    callback(price, color, rate);
+                });
+        }
+
+        function update_logs_and_display() {
+            update_logs();
+            update_display();
+        }
+
+        function update_stocks_price() {
+            update_logs_and_display();
+            Object.keys(user_data.stocks).forEach(stock => {
+                get_stock_price(stock, (price, color, rate) => {
+                    stocks_price[stock] = price;
+                    stocks_color[stock] = color;
+                    stocks_rate[stock] = rate;
+                    update_logs_and_display();
+                });
+            });
+            update_logs_and_display();
+        }
+
+        load_user_data();
+        setTimeout(() => update_logs_and_display(), 1000);
+        update_stocks_price();
+        update_logs_and_display();
+        setInterval(() => update_stocks_price(), 10000);
+    </script>
+</body>
+
+</html>
