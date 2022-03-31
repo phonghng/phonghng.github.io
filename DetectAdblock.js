@@ -2,7 +2,7 @@
 * Method: DetectAdblock
 * Version: 1.4
 * Author: PhongHNg
-* Source: https://github.com/phonglan123/archive/blob/main/DetectAdblock.js
+* Source: https://github.com/phonghng/phonghng.github.io/blob/main/DetectAdblock.js
 */
 
 class DetectAdblock {
