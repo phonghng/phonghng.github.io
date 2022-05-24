@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../index.css">
+
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .interval_item {
+            margin-bottom: 15px;
+        }
+
+        .interval_item span {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+
+        .interval_item span:first-child {
+            margin-top: 0;
+        }
+
+        .interval_item .work_counter,
+        .interval_item .break_counter {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 0px 10px;
+            grid-template-areas:
+                ". . .";
+        }
+
+        .interval_item .work_counter .lv3_box,
+        .interval_item .break_counter .lv3_box {
+            color: white;
+            transition: background 1s;
+            text-align: center;
+        }
+
+        .interval_item .break_checklist {
+            margin: 10px 0 0 0;
+            text-align: left;
+        }
+
+        .interval_item .break_checklist label input {
+            margin: 10px 3px 10px 4px;
+        }
+
+        .interval_item .review {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px 10px;
+            grid-template-areas:
+                ". ."
+                ". .";
+        }
+
+        .interval_item .review .text_wrapper {
+            display: table;
+        }
+
+        .interval_item .review .text {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        .interval_item .delete_button {
+            color: var(--CHERRY);
+        }
+
+        #add_more {
+            color: var(--LIME);
+            width: fit-content;
+        }
+
+        #add_more:hover {
+            background-color: var(--BLACKWHITE_1);
+        }
+
+        #interval_goal {
+            transition: background 1s;
+        }
+
+        #example_item {
+            display: none;
+        }
+
+        #delete_button {
+            margin-top: 10px;
+            color: var(--CHERRY);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" style="margin-bottom: 15px;" id="interval_goal">Mục tiêu làm việc: <span
+            id="interval_goal_number"></span> vòng</div>
+
+    <div class="box interval_item" id="example_item">
+        <span>Làm việc</span>
+        <div class="lv2_box">
+            <input type="text" placeholder="Tên công việc..." id="work_name" style="margin-bottom: 10px;" />
+
+            <div class="work_counter">
+                <button style="color: var(--LIME);" id="work_counter_start_button">Bắt đầu</button>
+                <div class="lv3_box" id="work_counter_timer">50:00</div>
+                <button style="color: var(--TOMATO);" id="work_counter_end_button" disabled>Kết thúc</button>
+            </div>
+
+            <div class="review">
+                <div class="text_wrapper">
+                    <div class="text">Số lần bị sao nhãng</div>
+                </div>
+                <input type="number" id="distraction_number" min="0" value="0" />
+                <div class="text_wrapper">
+                    <div class="text">Tỉ lệ hoàn thành công việc (%)</div>
+                </div>
+                <input type="number" id="complete_percent" min="0" max="100" value="0" />
+            </div>
+        </div>
+
+        <span>Nghỉ ngơi</span>
+        <div class="lv2_box">
+            <div class="break_counter">
+                <button style="color: var(--LIME);" id="break_counter_start_button" disabled>Bắt đầu</button>
+                <div class="lv3_box" id="break_counter_timer">10:00</div>
+                <button style="color: var(--TOMATO);" id="break_counter_end_button" disabled>Kết thúc</button>
+            </div>
+
+            <div class="break_checklist">
+                <label>
+                    <input type="checkbox" id="excerse_check" />
+                    Vận động nhẹ (ngoài trời), uống cốc nước
+                </label><br />
+                <label>
+                    <input type="checkbox" id="review_check" />
+                    Review về công việc đã làm
+                </label><br />
+                <label>
+                    <input type="checkbox" id="prepare_check" />
+                    Chuẩn bị cho công việc tiếp theo
+                </label>
+            </div>
+        </div>
+
+        <button id="delete_button">Xoá vòng này</button>
+    </div>
+
+    <div id="interval_list"></div>
+
+    <button id="add_more" title="Thêm vòng mới" onclick="add_new_interval();">Thêm vòng mới</button>
+
+    <script>
+        class Interval {
+            constructor(delete_callback) {
+                this.element = document.querySelector("#example_item").cloneNode(true);
+                this.element.id = "";
+
+                this.children_element = {
+                    work_name: this.element.querySelector("#work_name"),
+                    work_counter_start_button: this.element.querySelector("#work_counter_start_button"),
+                    work_counter_timer: this.element.querySelector("#work_counter_timer"),
+                    work_counter_end_button: this.element.querySelector("#work_counter_end_button"),
+                    distraction_number: this.element.querySelector("#distraction_number"),
+                    complete_percent: this.element.querySelector("#complete_percent"),
+                    break_counter_start_button: this.element.querySelector("#break_counter_start_button"),
+                    break_counter_timer: this.element.querySelector("#break_counter_timer"),
+                    break_counter_end_button: this.element.querySelector("#break_counter_end_button"),
+                    excerse_check: this.element.querySelector("#excerse_check"),
+                    review_check: this.element.querySelector("#review_check"),
+                    prepare_check: this.element.querySelector("#prepare_check"),
+                    complete_percent: this.element.querySelector("#complete_percent"),
+                    delete_button: this.element.querySelector("#delete_button")
+                };
+
+                this.set_inputs_event();
+                this.set_buttons_event();
+
+                document.querySelector("#interval_list").appendChild(this.element);
+
+                this.counter_logs = {
+                    start_work: undefined,
+                    end_work: undefined,
+                    start_break: undefined,
+                    end_break: undefined
+                };
+
+                this.delete_callback = delete_callback;
+            }
+
+            export_data() {
+                return {
+                    work_name: this.element.querySelector("#work_name").value,
+                    work_time_remaining: this.element.querySelector("#work_counter_timer").innerText,
+                    distraction_number: Number(this.element.querySelector("#distraction_number").value),
+                    complete_percent: Number(this.element.querySelector("#complete_percent").value),
+                    break_time_remaining: this.element.querySelector("#break_counter_timer").innerText,
+                    excerse_check: this.element.querySelector("#excerse_check").checked,
+                    review_check: this.element.querySelector("#review_check").checked,
+                    prepare_check: this.element.querySelector("#prepare_check").checked,
+                    counter_logs: this.counter_logs,
+                    point_info: this.calculate_point()
+                };
+            }
+
+            import_data(data) {
+                this.element.querySelector("#work_name").value = data.work_name;
+                this.element.querySelector("#work_counter_timer").innerText = data.work_time_remaining;
+                this.element.querySelector("#distraction_number").value = data.distraction_number;
+                this.element.querySelector("#complete_percent").value = data.complete_percent;
+                this.element.querySelector("#break_counter_timer").innerText = data.break_time_remaining;
+                this.element.querySelector("#excerse_check").checked = data.excerse_check;
+                this.element.querySelector("#review_check").checked = data.review_check;
+                this.element.querySelector("#prepare_check").checked = data.prepare_check;
+
+                if (data.counter_logs.start_work) {
+                    this.element.querySelector("#work_counter_start_button").disabled = true;
+                    this.element.querySelector("#work_counter_end_button").disabled = false;
+                }
+                if (data.counter_logs.end_work) {
+                    this.element.querySelector("#work_counter_start_button").disabled = true;
+                    this.element.querySelector("#work_counter_end_button").disabled = true;
+                }
+                if (data.counter_logs.start_break) {
+                    this.element.querySelector("#break_counter_start_button").disabled = true;
+                    this.element.querySelector("#break_counter_end_button").disabled = false;
+                }
+                if (data.counter_logs.end_break) {
+                    this.element.querySelector("#break_counter_start_button").disabled = true;
+                    this.element.querySelector("#break_counter_end_button").disabled = true;
+                }
+
+                if (data.counter_logs.start_work && !data.counter_logs.end_work) {
+                    this.start_work_counter();
+                }
+                if (data.counter_logs.start_break && !data.counter_logs.end_break) {
+                    this.start_break_counter();
+                }
+
+                this.counter_logs = data.counter_logs;
+            }
+
+            set_inputs_event() {
+                let elements = ["work_name", "distraction_number", "complete_percent", "excerse_check", "review_check", "prepare_check"];
+                let events = ["change", "keyup", "keydown", "keypress", "input"];
+                for (let i = 0; i < elements.length; i++) {
+                    let element = this.children_element[elements[i]];
+                    for (let j = 0; j < events.length; j++) {
+                        element.addEventListener(events[j], () => {
+                            this.onchange();
+                        });
+                    }
+                }
+            }
+
+            set_buttons_event() {
+                let buttons_and_events = {
+                    work_counter_start_button: ["click", "start_work_counter"],
+                    work_counter_end_button: ["click", "end_work_counter"],
+                    break_counter_start_button: ["click", "start_break_counter"],
+                    break_counter_end_button: ["click", "end_break_counter"],
+                    delete_button: ["click", "delete_interval"]
+                };
+
+                for (let key in buttons_and_events) {
+                    let button = this.children_element[key];
+                    let event = buttons_and_events[key][0];
+                    let method = buttons_and_events[key][1];
+                    button.addEventListener(event, () => {
+                        this[method]();
+                    });
+                }
+            }
+
+            start_work_counter() {
+                this.onchange();
+
+                this.play_sound();
+
+                this.children_element.work_counter_start_button.disabled = true;
+                this.children_element.work_counter_end_button.disabled = false;
+
+                this.counter_logs.start_work = Date.now();
+
+                this.work_counter_interval = setInterval(() => {
+                    let time_remaining = this.children_element.work_counter_timer.innerText;
+                    let time_array = time_remaining.split(":");
+                    let minutes = parseInt(time_array[0]);
+                    let seconds = parseInt(time_array[1]);
+
+                    if (seconds == 0) {
+                        if (minutes == 0) {
+                            this.end_work_counter(true);
+                        } else {
+                            minutes--;
+                            seconds = 59;
+                        }
+                    } else {
+                        seconds--;
+                    }
+
+                    if (minutes == 3 && seconds == 0) {
+                        this.children_element.work_counter_timer.style.backgroundColor = "var(--LEMON)";
+                        this.play_sound();
+                    } else if (minutes == 0 && seconds <= 15) {
+                        this.children_element.work_counter_timer.style.backgroundColor = "var(--TOMATO)";
+                        this.play_sound(15);
+                    }
+
+                    this.children_element.work_counter_timer.innerText = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+                    this.onchange();
+                }, 1000);
+            }
+
+            end_work_counter(forced) {
+                if (forced || confirm("Bạn có chắc chắn muốn kết thúc phiên làm việc này?")) {
+                    clearInterval(this.work_counter_interval);
+                    this.play_sound();
+                    this.counter_logs.end_work = Date.now();
+                    this.children_element.work_counter_start_button.disabled = true;
+                    this.children_element.work_counter_end_button.disabled = true;
+                    this.children_element.break_counter_start_button.disabled = false;
+                    this.onchange();
+                }
+            }
+
+            start_break_counter() {
+                this.onchange();
+
+                this.play_sound();
+
+                this.children_element.break_counter_start_button.disabled = true;
+                this.children_element.break_counter_end_button.disabled = false;
+
+                this.counter_logs.start_break = Date.now();
+
+                this.break_counter_interval = setInterval(() => {
+                    let time_remaining = this.children_element.break_counter_timer.innerText;
+                    let time_array = time_remaining.split(":");
+                    let minutes = parseInt(time_array[0]);
+                    let seconds = parseInt(time_array[1]);
+
+                    if (seconds == 0) {
+                        if (minutes == 0) {
+                            this.end_break_counter(true);
+                        } else {
+                            minutes--;
+                            seconds = 59;
+                        }
+                    } else {
+                        seconds--;
+                    }
+
+                    if (minutes == 3 && seconds == 0) {
+                        this.children_element.break_counter_timer.style.backgroundColor = "var(--LEMON)";
+                        this.play_sound();
+                    } else if (minutes == 0 && seconds <= 15) {
+                        this.children_element.break_counter_timer.style.backgroundColor = "var(--TOMATO)";
+                        this.play_sound(15);
+                    }
+
+                    this.children_element.break_counter_timer.innerText = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+                    this.onchange();
+                }, 1000);
+            }
+
+            end_break_counter(forced) {
+                if (forced || confirm("Bạn có chắc chắn muốn kết thúc phiên nghỉ này?")) {
+                    clearInterval(this.break_counter_interval);
+                    this.play_sound();
+                    this.counter_logs.end_break = Date.now();
+                    this.children_element.break_counter_start_button.disabled = true;
+                    this.children_element.break_counter_end_button.disabled = true;
+                    this.onchange();
+                }
+            }
+
+            calculate_point() {
+                let work_time = this.counter_logs.end_work - this.counter_logs.start_work;
+                let break_time = this.counter_logs.end_break - this.counter_logs.start_break;
+                let work_time_in_minutes = (work_time || 0) / 1000 / 60;
+                let break_time_in_minutes = (break_time || 0) / 1000 / 60;
+
+                let distraction_number = Number(this.children_element.distraction_number.value);
+                let complete_percent = Number(this.children_element.complete_percent.value);
+
+                let excerse_check = this.children_element.excerse_check.checked;
+                let review_check = this.children_element.review_check.checked;
+                let prepare_check = this.children_element.prepare_check.checked;
+                let break_checklist_check = excerse_check + review_check + prepare_check;
+
+                let work_point = (work_time_in_minutes - 5 * distraction_number) * complete_percent / 100;
+                let break_point = break_checklist_check * break_time_in_minutes / 3;
+
+                let total_point = work_point + break_point;
+
+                data.point_formula = `work_point = (work_time_in_minutes - 5 * distraction_number) * complete_percent / 100\nexcerse_check + review_check + prepare_check\nbreak_point = break_checklist_check * break_time_in_minutes / 3\ntotal_point = work_point + break_point`;
+
+                return total_point;
+            }
+
+            delete_interval() {
+                clearInterval(this.work_counter_interval);
+                clearInterval(this.break_counter_interval);
+                this.element.parentNode.removeChild(this.element);
+                this.delete_callback();
+            }
+
+            toJSON() {
+                return this.export_data();
+            }
+
+            onchange() {
+                info_onchange();
+            }
+
+            play_sound(duration = 1) {
+                tick_sound.play();
+                setTimeout(() => {
+                    tick_sound.pause();
+                }, duration * 1000);
+                tick_sound.loop = true;
+            }
+        }
+
+        let data = {
+            intervals: [],
+            max_point_per_intervals: 60,
+            goal_intervals: 5,
+            point_formula: undefined
+        };
+
+        let tick_sound = new Audio("ticking_sound.mp3");
+
+        document.querySelector("#interval_goal_number").innerText = data.goal_intervals;
+
+        function import_info(exported_info) {
+            let intervals = exported_info.data.intervals;
+            exported_info.data.intervals = [];
+            for (let i = 0; i < data.intervals.length; i++) {
+                data.intervals[i].delete_interval();
+            }
+            data = exported_info.data;
+            document.querySelector("#interval_goal_number").innerText = data.goal_intervals;
+            for (let i = 0; i < intervals.length; i++) {
+                add_new_interval(intervals[i]);
+            }
+        }
+
+        function add_new_interval(exported_data) {
+            let interval = new Interval(() => {
+                let index = data.intervals.indexOf(interval);
+                data.intervals.splice(index, 1);
+                info_onchange();
+            });
+            if (exported_data) {
+                interval.import_data(exported_data);
+            }
+            data.intervals.push(interval);
+            info_onchange();
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: get_total_point(),
+                goal_point: data.max_point_per_intervals * data.goal_intervals,
+                data: data
+            };
+            update_status_bar(exported_info);
+            return exported_info;
+        }
+
+        function get_total_point() {
+            let total_point = 0;
+            for (let i = 0; i < data.intervals.length; i++) {
+                total_point += data.intervals[i].calculate_point();
+            }
+            return total_point;
+        }
+
+        function update_status_bar(exported_info) {
+            if (!document.querySelector("#status_bar")) {
+                let status_bar = document.createElement("div");
+                status_bar.id = "status_bar";
+                document.body.appendChild(status_bar);
+            }
+
+            let time_full_string = new Date().toISOString();
+            let time_short_string = time_full_string.split("T")[1].split(".")[0];
+            let { point, goal_point } = exported_info;
+
+            let status_bar_text = `<span title="${time_full_string}">[${time_short_string}]</span> Điểm hiện tại: ${point} / ${goal_point} (đạt ~${Math.round(point / goal_point * 100)}% so với mục tiêu)`;
+
+            document.querySelector("#status_bar").innerHTML = status_bar_text;
+            document.querySelector("#status_bar").style.display = "block";
+
+            if (window.status_bar_timeout) {
+                clearTimeout(window.status_bar_timeout);
+            }
+            window.status_bar_timeout = setTimeout(() => {
+                document.querySelector("#status_bar").style.display = "none";
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

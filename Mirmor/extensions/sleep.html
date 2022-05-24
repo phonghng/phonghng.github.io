@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../index.css">
+
+    <style>
+        .box {
+            display: grid;
+            gap: 0px 10px;
+            margin-bottom: 15px;
+            grid-template-areas:
+                ". .";
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 200px;
+        }
+
+        .box .text_wrapper {
+            display: table;
+        }
+
+        .box .text {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        #run_button {
+            color: var(--LIME);
+        }
+
+        #result {
+            background: var(--LEMON);
+            display: grid;
+            gap: 0px 10px;
+            margin-bottom: 15px;
+            grid-template-areas:
+                ". . .";
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="text_wrapper">
+            <div class="text">Thời gian đầu vào</div>
+        </div>
+        <input type="datetime-local" id="input_time" />
+    </div>
+
+    <div class="box">
+        <div class="text_wrapper">
+            <div class="text">Loại thời gian đầu ra</div>
+        </div>
+        <select id="output_type">
+            <option value="wake_up_time">Thời gian thức dậy</option>
+            <option value="go_to_bed_time">Thời gian lên giường</option>
+        </select>
+    </div>
+
+    <div class="box">
+        <div class="text_wrapper">
+            <div class="text">Năm sinh</div>
+        </div>
+        <input type="number" min="0" value="0" id="birth_year" />
+    </div>
+
+    <div class="box">
+        <div class="text_wrapper">
+            <div class="text">Thời gian để đi vào giấc ngủ</div>
+        </div>
+        <input type="number" min="0" value="0" id="fall_asleep_time" />
+    </div>
+
+    <div class="box" id="result">
+        <button></button>
+        <button></button>
+        <button></button>
+    </div>
+
+    <script>
+        const MILISECONDS_PER_MINUTE = 60 * 1000;
+
+        let data = {
+            options: {
+                input_time: get_tomorrow_6_am(),
+                output_type: "go_to_bed_time",
+                birth_year: 2008,
+                fall_asleep_time: 15
+            },
+            output_time: undefined,
+            chosen_time: undefined,
+            // ealier_minutes = Time (in minutes) go to bed earlier than the time needed (output_time)
+            goal_ealier_minutes: 5,
+            point_per_ealier_minutes: 1
+        };
+
+        document.querySelector("#input_time").value = timestamp_to_input_format(data.options.input_time);
+        document.querySelector("#output_type").value = data.options.output_type;
+        document.querySelector("#birth_year").value = data.options.birth_year;
+        document.querySelector("#fall_asleep_time").value = data.options.fall_asleep_time;
+        inputs_onchange();
+
+        document.querySelector("#input_time").onchange = inputs_onchange;
+        document.querySelector("#output_type").onchange = inputs_onchange;
+        document.querySelector("#birth_year").onchange = inputs_onchange;
+        document.querySelector("#fall_asleep_time").onchange = inputs_onchange;
+
+        function import_info(exported_info) {
+            data = exported_info.data;
+
+            document.querySelector("#input_time").value = timestamp_to_input_format(data.options.input_time);
+            document.querySelector("#output_type").value = data.options.output_type;
+            document.querySelector("#birth_year").value = data.options.birth_year;
+            document.querySelector("#fall_asleep_time").value = data.options.fall_asleep_time;
+            inputs_onchange();
+
+            info_onchange();
+        }
+
+        function output_time_choose(button, output_time) {
+            data.output_time = output_time;
+            data.chosen_time = Date.now();
+
+            for (let i = 0; i < 3; i++) {
+                let button = document.querySelector("#result").children[i];
+                let is_chosen_button = button.dataset.timestamp == data.output_time;
+                button.style.backgroundColor = is_chosen_button ? "var(--LIME)" : "";
+            }
+
+            info_onchange();
+        }
+
+        function inputs_onchange() {
+            data.options.input_time = remove_timezone_offset(document.querySelector("#input_time").valueAsNumber);
+            data.options.output_type = document.querySelector("#output_type").value;
+            data.options.birth_year = Number(document.querySelector("#birth_year").value);
+            data.options.fall_asleep_time = Number(document.querySelector("#fall_asleep_time").value);
+
+            calculate_output_time(...Object.values(data.options))
+                .forEach((output_time, index) => {
+                    let button = document.querySelector("#result").children[index];
+                    let date_string = new Date(output_time).toLocaleTimeString();
+
+                    button.dataset.timestamp = output_time;
+                    button.innerHTML = date_string;
+                    button.onclick = () => output_time_choose(button, output_time);
+
+                    for (let i = 0; i < 3; i++) {
+                        let button = document.querySelector("#result").children[i];
+                        let is_chosen_button = button.dataset.timestamp == data.output_time;
+                        button.style.backgroundColor = is_chosen_button ? "var(--LIME)" : "";
+                    }
+                });
+
+            info_onchange();
+        }
+
+        function remove_timezone_offset(timestamp) {
+            let date = new Date(timestamp);
+            let new_date = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000)
+            return new_date.getTime();
+        }
+
+        function timestamp_to_input_format(timestamp) {
+            let date = new Date(timestamp);
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (hour < 10) {
+                hour = "0" + hour;
+            }
+            if (minute < 10) {
+                minute = "0" + minute;
+            }
+
+            return `${year}-${month}-${day}T${hour}:${minute}`;
+        }
+
+        function get_tomorrow_6_am() {
+            let tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(6, 0, 0, 0);
+            return tomorrow;
+        }
+
+        function get_suggested(age) {
+            if (age == 1 || age == 2) {
+                return {
+                    base_time: 800,
+                    min_time: 660,
+                    max_time: 840,
+                    time_per_interval: 50
+                };
+            } else if (age >= 3 && age <= 5) {
+                return {
+                    base_time: 750,
+                    min_time: 600,
+                    max_time: 780,
+                    time_per_interval: 50
+                };
+            } else if (age >= 6 && age <= 13) {
+                return {
+                    base_time: 650,
+                    min_time: 540,
+                    max_time: 660,
+                    time_per_interval: 50
+                };
+            } else if (age >= 14 && age <= 17) {
+                return {
+                    base_time: 600,
+                    min_time: 480,
+                    max_time: 600,
+                    time_per_interval: 50
+                };
+            } else if (age >= 18 && age <= 64) {
+                return {
+                    base_time: 540,
+                    min_time: 420,
+                    max_time: 540,
+                    time_per_interval: 90
+                };
+            } else if (age >= 65) {
+                return {
+                    base_time: 540,
+                    min_time: 420,
+                    max_time: 540,
+                    time_per_interval: 90
+                };
+            }
+        }
+
+        function calculate_sleep_time(age, fall_asleep_time) {
+            let suggested = get_suggested(age);
+            let time_list = [];
+
+            let total_time = suggested.base_time + fall_asleep_time;
+            if (total_time > suggested.max_time) {
+                time_list.push(total_time);
+                total_time -= suggested.time_per_interval;
+            }
+            while (total_time >= suggested.min_time
+                && total_time <= suggested.max_time) {
+                time_list.push(total_time);
+                total_time -= suggested.time_per_interval;
+            }
+
+            return time_list;
+        }
+
+        function calculate_output_time(input_time, output_type, birth_year, fall_asleep_time) {
+            let age = (new Date(input_time)).getFullYear() - birth_year;
+            let sleep_time_list = calculate_sleep_time(age, fall_asleep_time);
+            sleep_time_list = sleep_time_list.map(time => time * MILISECONDS_PER_MINUTE);
+            let output_time_list = sleep_time_list.map(time => {
+                if (output_type == "wake_up_time") {
+                    return input_time + time;
+                } else if (output_type == "go_to_bed_time") {
+                    return input_time - time;
+                }
+            });
+            return output_time_list;
+        }
+
+        function export_info() {
+            let ealier_minutes = Math.round((data.output_time - data.chosen_time) / MILISECONDS_PER_MINUTE);
+            let exported_info = {
+                point: ealier_minutes * data.point_per_ealier_minutes || 0,
+                goal_point: data.goal_ealier_minutes * data.point_per_ealier_minutes,
+                data: data
+            };
+            update_status_bar(exported_info);
+            return exported_info;
+        }
+
+        function update_status_bar(exported_info) {
+            if (!document.querySelector("#status_bar")) {
+                let status_bar = document.createElement("div");
+                status_bar.id = "status_bar";
+                document.body.appendChild(status_bar);
+            }
+
+            let time_full_string = new Date().toISOString();
+            let time_short_string = time_full_string.split("T")[1].split(".")[0];
+            let { point, goal_point } = exported_info;
+
+            let status_bar_text = `<span title="${time_full_string}">[${time_short_string}]</span> Điểm hiện tại: ${point} / ${goal_point} (đạt ~${Math.round(point / goal_point * 100)}% so với mục tiêu)`;
+
+            document.querySelector("#status_bar").innerHTML = status_bar_text;
+            document.querySelector("#status_bar").style.display = "block";
+
+            if (window.status_bar_timeout) {
+                clearTimeout(window.status_bar_timeout);
+            }
+            window.status_bar_timeout = setTimeout(() => {
+                document.querySelector("#status_bar").style.display = "none";
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

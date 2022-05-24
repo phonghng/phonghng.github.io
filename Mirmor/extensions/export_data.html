@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../index.css">
+
+    <style>
+        #data {
+            height: 100px;
+            margin-bottom: 5px;
+            resize: vertical;
+        }
+
+        .box {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <textarea id="data"></textarea>
+        <button id="copy">Sao chép</button>
+    </div>
+    <div class="box">
+        <label>
+            <input type="checkbox" id="saved_confirm" />
+            <span>Xác nhận đã lưu dữ liệu trên vào Notion</span>
+        </label>
+    </div>
+
+    <script>
+        let copy_button = document.querySelector("#copy");
+        let saved_confirm_checkbox = document.querySelector("#saved_confirm");
+        let data_textarea = document.querySelector("#data");
+        let data = {
+            point: 0,
+            point_if_checkbox_checked: 1,
+            checkbox_label: undefined,
+            checkbox_checked: undefined,
+            checkbox_checked_time: undefined
+        };
+
+        info_onchange();
+
+        window.top.export_data_extension_callback = export_data_formatted => {
+            let stringified = JSON.stringify(export_data_formatted);
+            data_textarea.innerHTML = stringified;
+        }
+
+        copy_button.addEventListener("click", () => {
+            let textarea = data_textarea;
+            textarea.select();
+            document.execCommand("copy");
+
+            let old_text = copy_button.innerHTML;
+            copy_button.innerHTML = "Đã sao chép!";
+            setTimeout(() => {
+                copy_button.innerHTML = old_text;
+            }, 1000);
+        });
+
+        saved_confirm_checkbox.addEventListener("change", () => {
+            checkbox_changed();
+        });
+
+        saved_confirm_checkbox.addEventListener("click", () => {
+            checkbox_changed();
+        });
+
+        saved_confirm_checkbox.addEventListener("mousedown", () => {
+            checkbox_changed();
+        });
+
+        saved_confirm_checkbox.addEventListener("mouseup", () => {
+            checkbox_changed();
+        });
+
+        function checkbox_changed() {
+            let checkbox = saved_confirm_checkbox;
+            let label = checkbox.nextElementSibling;
+            data.checkbox_label = label.innerHTML;
+            if (saved_confirm_checkbox.checked) {
+                data.checkbox_checked = true;
+                data.checkbox_checked_time = Date.now();
+                data.point = data.point_if_checkbox_checked;
+            } else {
+                data.checkbox_checked = false;
+                data.checkbox_checked_time = undefined
+                data.point = 0;
+            }
+            info_onchange();
+        }
+
+        function import_info(exported_info) {
+            data = exported_info.data;
+            if (data.checkbox_checked) {
+                saved_confirm_checkbox.checked = true;
+            } else {
+                saved_confirm_checkbox.checked = false;
+            }
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: data.point,
+                goal_point: 1,
+                data: data
+            };
+            update_status_bar(exported_info);
+            return exported_info;
+        }
+
+        function update_status_bar(exported_info) {
+            if (!document.querySelector("#status_bar")) {
+                let status_bar = document.createElement("div");
+                status_bar.id = "status_bar";
+                document.body.appendChild(status_bar);
+            }
+
+            let time_full_string = new Date().toISOString();
+            let time_short_string = time_full_string.split("T")[1].split(".")[0];
+            let { point, goal_point } = exported_info;
+
+            let status_bar_text = `<span title="${time_full_string}">[${time_short_string}]</span> Điểm hiện tại: ${point} / ${goal_point} (đạt ~${goal_point == 0 ? 100 : Math.round(point / goal_point * 100)}% so với mục tiêu)`;
+
+            document.querySelector("#status_bar").innerHTML = status_bar_text;
+            document.querySelector("#status_bar").style.display = "block";
+
+            if (window.status_bar_timeout) {
+                clearTimeout(window.status_bar_timeout);
+            }
+            window.status_bar_timeout = setTimeout(() => {
+                document.querySelector("#status_bar").style.display = "none";
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

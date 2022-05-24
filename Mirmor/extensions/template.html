@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../index.css">
+</head>
+
+<body>
+    <script>
+        let data = {};
+        // sẽ cần return về formula và cả timestamp
+
+        function import_info(exported_info) {
+            data = exported_info.data;
+            console.log("imported!", export_info());
+        }
+
+        info_onchange();
+
+        function export_info() {
+            let exported_info = {
+                point: 0,
+                goal_point: 100,
+                data: data
+            };
+            update_status_bar(exported_info);
+            return exported_info;
+        }
+
+        function update_status_bar(exported_info) {
+            if (!document.querySelector("#status_bar")) {
+                let status_bar = document.createElement("div");
+                status_bar.id = "status_bar";
+                document.body.appendChild(status_bar);
+            }
+
+            let time_full_string = new Date().toISOString();
+            let time_short_string = time_full_string.split("T")[1].split(".")[0];
+            let { point, goal_point } = exported_info;
+
+            let status_bar_text = `<span title="${time_full_string}">[${time_short_string}]</span> Điểm hiện tại: ${point} / ${goal_point} (đạt ~${Math.round(point / goal_point * 100)}% so với mục tiêu)`;
+
+            document.querySelector("#status_bar").innerHTML = status_bar_text;
+            document.querySelector("#status_bar").style.display = "block";
+
+            if (window.status_bar_timeout) {
+                clearTimeout(window.status_bar_timeout);
+            }
+            window.status_bar_timeout = setTimeout(() => {
+                document.querySelector("#status_bar").style.display = "none";
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

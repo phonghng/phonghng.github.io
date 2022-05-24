@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirmor</title>
+
+    <script src="./settings.js"></script>
+    <script src="./javascript/data_storage.js"></script>
+    <script src="./javascript/habits.js"></script>
+    <script src="./javascript/extension.js"></script>
+    <script src="./javascript/ui.js"></script>
+
+    <script src="../javascript/jquery-3.6.0.min.js"></script>
+    <script src="../javascript/jquery-ui-1.13.1.js"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="./index.css">
+
+    <style>
+        .item {
+            display: grid;
+            grid-template-columns: 1fr 50px;
+            grid-template-rows: 1fr;
+            gap: 0 10px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                "info item_button";
+            margin-bottom: 15px;
+        }
+
+        .item.group .item_info .item_title {
+            color: var(--BLUE);
+        }
+
+        .item.habit_check .item_info .item_title {
+            color: var(--LIME);
+        }
+
+        .item.habit_ext .item_info .item_title {
+            color: var(--LEMON);
+        }
+
+        .item .item_info {
+            grid-area: info;
+        }
+
+        .item .item_info .item_title {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .item .item_button {
+            grid-area: item_button;
+            text-align: center;
+            height: fit-content;
+            cursor: pointer;
+        }
+
+        .item .item_button.checked {
+            color: var(--LIME);
+        }
+
+        .item .item_button.not_checked {
+            color: var(--CHERRY);
+        }
+
+        .item .item_info .item_title .item_point,
+        #view_name .item_point {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 10px;
+            width: fit-content;
+            vertical-align: bottom;
+            background: var(--CHERRY);
+            color: white;
+        }
+
+        .item .item_info .item_description {
+            margin-top: 5px;
+        }
+
+        #view_name {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-block-end: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="go_back"></button>
+
+    <h2 id="view_name"></h2>
+    <p id="view_description"></p>
+
+    <div id="item_list"></div>
+
+    <script src="./javascript/index.js"></script>
+</body>
+
+</html>

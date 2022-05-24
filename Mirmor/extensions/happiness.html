@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../index.css">
+
+    <style>
+        .box {
+            display: grid;
+            gap: 0px 10px;
+            margin-bottom: 15px;
+            grid-template-areas:
+                ". .";
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 100px;
+            transition: background 1s;
+        }
+
+        .box .text_wrapper {
+            display: table;
+        }
+
+        .box .text {
+            display: table-cell;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        let data = {
+            time_for_family: {
+                name: "Số phút chủ động giành cho gia đình",
+                value: 0,
+                point_per_value: 2,
+                goal_value: 60,
+                last_modified_timestamp: undefined
+            },
+            time_for_outside: {
+                name: "Số phút hoạt động ngoài trời",
+                value: 0,
+                point_per_value: 1,
+                goal_value: 100,
+                last_modified_timestamp: undefined
+            },
+            wrongdoing_friends: {
+                name: "Số lần hành xử không đúng với bạn bè",
+                value: 0,
+                point_per_value: -1,
+                goal_value: 0,
+                last_modified_timestamp: undefined
+            },
+            bad_doing: {
+                name: "Số lần suy nghĩ/phát ngôn tiêu cực",
+                value: 0,
+                point_per_value: -1,
+                goal_value: 0,
+                last_modified_timestamp: undefined
+            }
+        };
+
+        import_html();
+        update_box_color();
+
+        function export_info() {
+            let exported_info = {
+                point: get_point(),
+                goal_point: get_goal_point(),
+                data: data
+            };
+            update_status_bar(exported_info);
+            return exported_info;
+        }
+
+        function get_point() {
+            let point = 0;
+            for (let key in data) {
+                point += data[key].value * data[key].point_per_value;
+            }
+            return point;
+        }
+
+        function get_goal_point() {
+            let point = 0;
+            for (let key in data) {
+                point += data[key].goal_value * data[key].point_per_value;
+            }
+            return point;
+        }
+
+        function update_status_bar(exported_info) {
+            if (!document.querySelector("#status_bar")) {
+                let status_bar = document.createElement("div");
+                status_bar.id = "status_bar";
+                document.body.appendChild(status_bar);
+            }
+
+            let time_full_string = new Date().toLocaleString();
+            let time_short_string = new Date().toLocaleTimeString().replace(" ", "");
+            let { point, goal_point } = exported_info;
+
+            let status_bar_text = `<span title="${time_full_string}">[${time_short_string}]</span> Điểm hiện tại: ${point} / ${goal_point} (đạt ~${Math.round(point / goal_point * 100)}% so với mục tiêu)`;
+
+            document.querySelector("#status_bar").innerHTML = status_bar_text;
+            document.querySelector("#status_bar").style.display = "block";
+
+            if (window.status_bar_timeout) {
+                clearTimeout(window.status_bar_timeout);
+            }
+            window.status_bar_timeout = setTimeout(() => {
+                document.querySelector("#status_bar").style.display = "none";
+            }, 5000);
+        }
+
+        function import_info(exported_info) {
+            data = exported_info.data;
+            import_html();
+        }
+
+        function import_html() {
+            let box_list = document.querySelectorAll(".box");
+            for (let box of box_list) {
+                box.remove();
+            }
+
+            let data_entries = Object.entries(data);
+            for (let i = 0; i < data_entries.length; i++) {
+                let box = document.createElement("div");
+                box.classList.add("box");
+
+                let text_wrapper = document.createElement("div");
+                text_wrapper.classList.add("text_wrapper");
+
+                let text = document.createElement("div");
+                text.classList.add("text");
+                text.innerHTML = `${data_entries[i][1].name}<br/><i>Mục tiêu</i>: ${data_entries[i][1].goal_value}`;
+                text_wrapper.appendChild(text);
+                box.appendChild(text_wrapper);
+
+                let input = document.createElement("input");
+                input.setAttribute("type", "number");
+                input.setAttribute("id", data_entries[i][0]);
+                input.setAttribute("min", "0");
+                input.setAttribute("value", "0");
+                input.value = data_entries[i][1].value;
+                set_event_for_inputs(input);
+                box.appendChild(input);
+
+                document.body.appendChild(box);
+            }
+
+            input_onchange();
+        }
+
+        function set_event_for_inputs(element) {
+            let events = ["change", "keyup", "keydown", "keypress", "input"];
+            for (let i = 0; i < events.length; i++) {
+                element.addEventListener(events[i], () => input_onchange());
+            }
+        }
+
+        function input_onchange() {
+            let box_list = document.querySelectorAll(".box");
+            for (let box of box_list) {
+                let input = box.querySelector("input");
+                let id = input.id;
+
+                if (data[id].value != input.value) {
+                    data[id].last_modified_timestamp = new Date().getTime();
+                }
+
+                data[id].value = parseInt(input.value);
+            }
+            update_box_color();
+            info_onchange();
+        }
+
+        function update_box_color() {
+            let box_list = document.querySelectorAll(".box");
+            for (let box of box_list) {
+                let input = box.querySelector("input");
+                let id = input.id;
+
+                if (
+                    (data[id].point_per_value >= 0 && data[id].value >= data[id].goal_value)
+                    || (data[id].point_per_value < 0 && data[id].value <= data[id].goal_value)
+                ) {
+                    box.style.backgroundColor = "var(--LEMON)";
+                } else {
+                    box.style.backgroundColor = "";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
