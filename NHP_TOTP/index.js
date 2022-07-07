@@ -1,20 +1,4 @@
-const ENCRYPTED = "U2FsdGVkX1/zh5jDn8IHrV3BRuclevX7IShRuWqwmZ73PhyZxup1JeMGFmVDh6trx2Zcy2Hq5FutMKl1qHDkXa/bwshfcdb3SWNDWmVYB15ZzE11hZ87p6qwENNikqNLjanDjBbRglFI4HMKLdJtfSCzDnkd4yWB0nwHBMHAyDmzLNCrPpBElluItnexCl4VHG5kO77ZG59254nNlR3UdraOseIsuIcFfUM34iHW87+Y8IeKdBsN62YYLCV5W+IsaOM4lxEsLzrw6jeLG6s1RmJcxpkifQ+cjIFNU39gzB752dG8wZ1/lCvIn4pp/abD+jx0LdszTZMUhzCsMh615Pb8Ueu21HO5n1mQe/84KHIT6Nn8MBFYsyDdhZtZ74n32rhxIpsZnbEPdqETx2Kft+vJJ7xp1RUSkUivmtI3HX1u9iz07OrJx2uBkdZC+jmKwnwNZ0njyxO5t0Aia/hfjFZm2rS3EcpX/rU2mgeQlX26BDqBBuU274P42ATcZwGI102RCIViiJAl+T9+uiq6hagaYVR4Ri2V++sJBpt8UyQcovkcBWboRVMPk6NTIduI7fGiAkRPcqxnOmIQB1RAsyIIbi9oxMkek64V1sjvGvbM5Ygu551+KQ5P3JOTm2vN7koFPqXY8OCX9PlA4Hc2GpMdCtxkHETDfMEVGfA4g9JejNEtrKbC/7tkIr8zUu3igLXvri2Eh3cT4TjZ70tzokZ5QPX6TDKAlxTL5wVAk4FceDsrCGXGRH1imYgigBIziGeCgPyDYdPDqqpOFxbjCL5qluTZDVSbfnftqSy4dw1DEbB5FexzMxCWquJItNIZnzpwF2YN23dzCDTnWcszXqzyFpmuSZAKYwIm0elX3YhN2PdXet3YfnIri1TNsjTHhOsorqdG/bkWltJIJvybW1cH+/HATQ4rUBxe6E2grOHuj/yJAlKSXw8+yzAxLbuKaL9zZN+7w2tHUvNVmSys5Y3FoMWjIB2SSJaGBAgF+FDw977v5cMyBjjVH2Nb+JeJsuz5YIkDiKZg/6Vmx+UpoQq+eLavEMZct0Qf/uxAqUMXBVH7+w7Gxs4qCNcUljT2+R/XPKk+DUTQx+0ERn1xP19XARbjd6EipEEjf0iIpqZVLK/TQo+eC5icjUUhGkkkjMvyAP6XwsglMEbujNJO518M+tiD2IPKTPfk48uaQmkoY7H0mztdPMkrEZ24yDZfuMyp61AGYi8gIK+oLBjNCc5hSIDPXuGrwRVs595uft8ekqrQlmXl1RNRV05xi52n7NH2d5X2jET2XNIbITK3EvNh6iDuBYTEe7Tdz0zbn5/JRa/9HORfw281ICpv22zFUDS29e6sDrtZGeIeG3baXXKank2igrIztC/nIsOjY6feJimmj7xZaNUB0i4J/lMshQdRtHoV0CBuYxZCLlGfx6weEslX9bSx5DzYv83U9TDkNsy140veQKUDaIR6gjgQybqmCDxLZITo6ay/xcUpS3Z7ksqsBecrBx/+hNias3k2ZxZ1UDHQ4U0HzdWOXarjv4N5wUD/KJ4ajNd1YBLpBQ==";
-
-function encrypt() {
-    let file_input = document.querySelector("#encrypt_file");
-    let file_reader = new FileReader();
-
-    file_reader.onload = function () {
-        let file_content = file_reader.result;
-        let password = document.querySelector("#encrypt_password").value;
-        let encrypted = CryptoJS.AES.encrypt(file_content, password);
-
-        document.querySelector("#encrypt_result").value = encrypted;
-        document.querySelector("#encrypt_password").value = "";
-    }
-
-    file_reader.readAsText(file_input.files[0]);
-}
+const ENCRYPTED = "U2FsdGVkX19N1zu8SETB1+tt+XzCvTXj420vUCV70BR2KLtHBFUc6ROByuRTaxt8lXqCW9tIGrDf2fe86siRj/rOB4KTTU2FkrWyFBHdoZ2EEKtEH2slBRhmDAAYPiqiFQHIFXPPOHCEETNI3icc7Uhzck1ibdlf7rKDCJC/djc3Is4DSJh/qSIzWFK/3HlbM8REavQKQeDfk+xjAFu+985BRcQEcMcXSJnEq4nig4mhOPCwKv1DQ43RfGXliV9ctA4BoMHfoAMv0wIAUqMdHIMHvcPd5Vwij+89aw8ru9OlLh4wRI5c+QVgsN87QCH89Cag3vl3qoQt6ve+dtRd6nZdpshaSibGmzFrxjhFmmFa8bfKLCH1lifmX7ou5ZJFgLvp4VI6HW06bfLTp3CZRP0YB8/Wy9elAk6yO9qe5PqsXDhFQLOyJHDCsam+Mikx9P+9bw+elExXG4Giw8HaJbVHxKxwLbwHZIn6+niAet5+dj6iPm+XGwP5RIGKJFDJqlBacV1ZDpECGwWtm4rTcQus7BtI7e8j3u4CNquKUEx1cF0dhRaIGBK5MyMZq08h+kIuZsUvbhMWkHCnpz6jhrZCmzDd6YiOM+2rB2S3G06FQwp/sT1LtLeyG14Yb067AYSAhtCc0wStES1N3kDmbQAUJ3kVVAJ6uZAiPXGHP9KzTfj4KGjU/Tg4l/Ko2swYIe/Ov80xbiDe1N1Mcffu5vzRHaYYLnunVJLFQ6FxwM8qJgbZJsxrzfsdhO/Z+UIMJbp1MT9yVRMKuS0Uij5slWIkSowPOJ7+hJxSNnqCbA5CJctYUAMZk654A0JxrpHz6dl+IdAIKonuUIj/lDT+f2yBwQ3/RcZt/PzCHxUHKTZX4ZWBr4V8BAj0Ukj7zTe+I/F3zyGe9AXOuG7Gh+j2byptxukV3QdBkixCCC8D/yK+e+m03xSMG45xTP0exJvSceI23sW63Q7LEwjJxSiM5YPtdNdM0v7kHe3vyFkfexKN0ErjQMXWZ8oEGlwwPK51OxNKAQFDTeEvhqJLIAUVzOwTLev35dzsbYaU+MGHuvAdA4JXbL1Ft0OP6FvIAqSOlh/QuPTNPQw/0hdoW3g34Vcn3DTNYhvpjzQY+g9AlDxSVFeXabt5I12z/QpaBCGuV4iiCnsgZR7AHBdj0gIcm7zwXrq/lZ5NG9rhi4R6i3qHNW25vzbiSRm/AHN2K8OgYba5W+es9lb71gMtnjxCKIomt+fF3ArSmcNZpXB82Wq41J/s4GG5n6uSaaB3UHZyeQfrDPLDRq0ek73S1LHt7GlzK5sP1xP3tb7GHm4ypO+w2Vf3RwscNrmZ9EsVbnQZuHDQ9ReoCrulKPHtPTJnBvrg7EQ/unU3OQO7SV+67pb+pxVv2VbX3CirNxszBNKBQEhrah3rl/N7tHCJAPwANcZkBtqUKVi8hd7VHx+zz3ssIJGrNp6JT+MCBU6iPhOia1QF7ctqXMfbvp8lv4z8ThxgFVxDPfzgYS78KB+z/aq1xX/ICj7WKsMTyaO8wur14xNo0LMlIlZdjvFqJ2WYe69fYDDacQmUxtA7Rlgkq0PxyfQWJjIYAhbZpenvMdlU";
 
 function decrypt() {
     let password = document.querySelector("#decrypt_password").value;
@@ -22,10 +6,10 @@ function decrypt() {
         CryptoJS.AES.decrypt(ENCRYPTED, password)
             .toString(CryptoJS.enc.Utf8);
     let json = JSON.parse(decrypted);
-    
+
     let otps = NHP_TOTP(json.totp_secrets)
     let otp_list_element = document.querySelector("#otp_list");
-    while(otp_list_element.firstChild) {
+    while (otp_list_element.firstChild) {
         otp_list_element.removeChild(otp_list_element.firstChild);
     }
     Object.entries(otps).forEach(otp => {
@@ -37,7 +21,7 @@ function decrypt() {
         otp_name_element.classList.add("otp_name");
         otp_name_element.innerHTML = otp_name;
         otp_element.appendChild(otp_name_element);
-        
+
         let otp_code = otp[1];
         let otp_code_element = document.createElement("button");
         otp_code_element.classList.add("otp_code");
@@ -56,10 +40,19 @@ function decrypt() {
             });
         }
         otp_element.appendChild(otp_code_element);
-        
+
         otp_list_element.appendChild(otp_element);
-        
+
     });
-    
+
     document.querySelector("#decrypt_password").value = "";
+}
+
+function encrypt() {
+    let string_need_encrypt = document.querySelector("#string_need_encrypt").value;
+    let password = document.querySelector("#encrypt_password").value;
+    let encrypted = CryptoJS.AES.encrypt(string_need_encrypt, password);
+
+    document.querySelector("#encrypt_result").value = encrypted;
+    document.querySelector("#encrypt_password").value = "";
 }

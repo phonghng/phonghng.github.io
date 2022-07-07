@@ -36,7 +36,7 @@ function NHP_TOTP(secrets) {
     
     function generate_otp(secret_string) {
         let key = base32_to_hex(secret_string.replace(/ /g, "").toUpperCase());
-        let epoch = Math.round(new Date().getTime() / 1000);
+        let epoch = Math.floor(new Date().getTime() / 1000);
         let time = leftpad(dec_to_hex(Math.floor(epoch / 30)), 16, "0");
     
         let sha = new jsSHA("SHA-1", "HEX");

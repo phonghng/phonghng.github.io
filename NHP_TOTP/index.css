@@ -120,13 +120,14 @@ a:active {
     text-decoration: underline;
 }
 
-#encrypt_file,
+#string_need_encrypt,
 #encrypt_password,
 #encrypt_button,
 #decrypt_password {
     margin-bottom: 10px;
 }
 
+#string_need_encrypt,
 #encrypt_result {
     height: 250px;
 }
