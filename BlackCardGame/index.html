@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./BlackCardGame.png" type="image/x-icon">
+    <title>Thẻ đen</title>
+
+    <script src="./game.js"></script>
+
+    <style>
+        :root {
+            --BLUE: #1877F2;
+            --CHERRY: #F3425F;
+            --GRAPE: #9360F7;
+            --LEMON: #F7B928;
+            --LIME: #45BD62;
+            --PINK: #FF66BF;
+            --SEAFOAM: #54C7EC;
+            --TEAL: #2ABBA7;
+            --TOMATO: #FB724B;
+
+            --BLACKWHITE_0: #ffffff;
+            --BLACKWHITE_1: #fafafa;
+            --BLACKWHITE_2: #ebebeb;
+            --BLACKWHITE_3: #d0d0d0;
+            --BLACKWHITE_4: #9e9e9e;
+            --BLACKWHITE_5: #616161;
+            --BLACKWHITE_6: #212121;
+            --BLACKWHITE_7: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-radius: 5px;
+            border-spacing: 10px;
+        }
+
+        th {
+            border: 1px solid black;
+            padding: 10px;
+            background: var(--BLACKWHITE_3);
+            border-radius: 5px;
+        }
+
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="margin-top: 10px; text-align: center; font-style: italic;">Đang tải...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Hãng</th>
+                <th>Dòng</th>
+                <th>Tên</th>
+                <th>Chi phí</th>
+                <th>Giá</th>
+                <th>Lưu hành</th>
+                <th>Tồn kho</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        let game = new Game(onchange_callback);
+
+        let counter = 5;
+
+        let total_adjustment = 0
+
+        setInterval(() => {
+            let div_text = "";
+
+            if (counter > 0) {
+                div_text = `Điều chỉnh sau ${counter--} giây nữa... (tổng ${total_adjustment} lần điều chỉnh)`;
+            } else {
+                div_text = `Đang điều chỉnh... (tổng ${total_adjustment} lần điều chỉnh)`;
+                counter--;
+            }
+
+            document.querySelector("div").innerHTML =
+                `<span
+                    style="cursor: pointer;"
+                    onclick="new_firm(game);"
+                >${div_text}</span>`;
+
+            if (counter == -1) {
+                game.adjustment();
+                total_adjustment++;
+                counter = 5;
+            }
+        }, 1000);
+
+        function onchange_callback(all_products) {
+            let tbody = document.querySelector("tbody");
+
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            all_products.forEach(product => {
+                let firm_index = game.firms.indexOf(product.firm);
+                let series_index = game.firms[firm_index].series.indexOf(product.series);
+                let product_index = game.firms[firm_index].series[series_index].products.indexOf(product);
+
+                let table_row = document.createElement("tr");
+
+                let table_datas = [
+                    [
+                        product.firm.name,
+                        product.firm.color,
+                        product.firm.money
+                    ],
+                    product.series.name,
+                    product.name,
+                    product.cost,
+                    product.price.current,
+                    product.quantity.in_circulation,
+                    product.quantity.in_stock
+                ];
+
+                table_datas.forEach((table_data, index) => {
+                    let element = document.createElement("td");
+
+                    if (index == 0) {
+                        element.innerHTML =
+                            `<span
+                                style="color: ${table_data[1]}; cursor: pointer;"
+                                onclick="new_series(${firm_index}, game);"
+                            >${table_data[0]}</span>
+                            <i>(${table_data[2].toLocaleString()})</i>`;
+                    }
+
+                    else if (index == 1) {
+                        element.innerHTML =
+                            `<span
+                                style="cursor: pointer;"
+                                onclick="new_product(${series_index}, ${firm_index}, game);"
+                            >${table_data}</span>`;
+                    }
+
+                    else if (index == 2) {
+                        element.innerHTML =
+                            `<span
+                                style="cursor: pointer;"
+                                onclick="retire_product(${series_index}, ${firm_index}, ${product_index}, game);"
+                            >${table_data}</span>`;
+                    }
+
+                    else {
+                        element.innerHTML = table_data;
+                    }
+
+                    if (product.retired) {
+                        element.style.textDecoration = "line-through";
+                        element.style.borderColor = "var(--CHERRY)";
+                    }
+
+                    table_row.appendChild(element);
+                });
+
+                tbody.appendChild(table_row);
+            });
+        }
+
+        function new_firm(game) {
+            let firm_name = prompt("Nhập tên hãng:");
+            if (firm_name) {
+                let firm_index = game.new_firm(firm_name) - 1;
+                game.firms[firm_index].money = 1000;
+                new_series(firm_index, game);
+            }
+        }
+
+        function new_series(firm_index, game) {
+            let series_name = prompt("Nhập tên dòng:");
+            if (series_name) {
+                let series_index = game.firms[firm_index].new_series(series_name) - 1;
+                new_product(series_index, firm_index, game);
+            }
+        }
+
+        function new_product(series_index, firm_index, game) {
+            let product_cost = parseInt(prompt("Nhập chi phí:"));
+            let product_price = parseInt(prompt("Nhập giá:"));
+            if (product_cost && product_price) {
+                game.firms[firm_index].series[series_index]
+                    .new_product(undefined, product_cost, product_price);
+            }
+        }
+
+        function retire_product(series_index, firm_index, product_index, game) {
+            game.firms[firm_index].series[series_index].products[product_index].retire();
+        }
+    </script>
+</body>
+
+</html>
