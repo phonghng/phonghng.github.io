@@ -85,9 +85,10 @@
     <script>
         let game = new Game(onchange_callback);
 
-        let counter = 5;
+        const COUNT_SECONDS = 0;
+        let counter = COUNT_SECONDS;
 
-        let total_adjustment = 0
+        let total_adjustment = 0;
 
         setInterval(() => {
             let div_text = "";
@@ -108,7 +109,7 @@
             if (counter == -1) {
                 game.adjustment();
                 total_adjustment++;
-                counter = 5;
+                counter = COUNT_SECONDS;
             }
         }, 1000);
 
@@ -118,6 +119,12 @@
             while (tbody.firstChild) {
                 tbody.removeChild(tbody.firstChild);
             }
+
+            all_products.sort(
+                (a, b) =>
+                    (b.price * b.quantity.in_circulation)
+                    - (a.price * a.quantity.in_circulation)
+            );
 
             all_products.forEach(product => {
                 let firm_index = game.firms.indexOf(product.firm);
@@ -135,7 +142,7 @@
                     product.series.name,
                     product.name,
                     product.cost,
-                    product.price.current,
+                    product.price,
                     product.quantity.in_circulation,
                     product.quantity.in_stock
                 ];
@@ -175,6 +182,7 @@
                     if (product.retired) {
                         element.style.textDecoration = "line-through";
                         element.style.borderColor = "var(--CHERRY)";
+                        table_row.style.opacity = "0.5";
                     }
 
                     table_row.appendChild(element);
@@ -203,10 +211,9 @@
 
         function new_product(series_index, firm_index, game) {
             let product_cost = parseInt(prompt("Nhập chi phí:"));
-            let product_price = parseInt(prompt("Nhập giá:"));
-            if (product_cost && product_price) {
+            if (product_cost) {
                 game.firms[firm_index].series[series_index]
-                    .new_product(undefined, product_cost, product_price);
+                    .new_product(undefined, product_cost);
             }
         }
 

@@ -121,7 +121,7 @@ class Series {
         this.change_money = undefined;
     }
 
-    new_product(name, cost, price) {
+    new_product(name, cost) {
         if (this.is_stop_releasing) {
             return false;
         }
@@ -130,7 +130,7 @@ class Series {
             name = this.products.length + 1;
         }
 
-        let product = new Product(this.firm, this, name, cost, price);
+        let product = new Product(this.firm, this, name, cost);
         product.onchange_callback = this.onchange_callback;
         product.get_all_products_callback = this.get_all_products_callback;
         product.change_money = this.change_money;
@@ -158,10 +158,7 @@ class Product {
         this.name = name;
 
         this.cost = cost;
-        this.price = {
-            release: price,
-            current: price
-        };
+        this.price = undefined;
         this.quantity = {
             in_circulation: 0,
             in_stock: 0
@@ -203,7 +200,7 @@ class Product {
             }
 
             if (product.cost == this.cost) {
-                sum_of_values += product.price.current;
+                sum_of_values += product.price;
                 amount_of_values += 1;
             }
         });
@@ -231,16 +228,21 @@ class Product {
             return false;
         }
 
-        let AAPSC = this.calculate_AAPSC() || this.price.current;
+        if (!this.price) {
+            this.price = this.calculate_AAPSC() || this.cost;
+        }
+
+        let AAPSC = this.calculate_AAPSC() || this.price;
+        let price_rate = (this.price / AAPSC) / 100;
         let highest_cost = this.calculate_highest_cost() || this.cost;
-        let rate =
-            ((1 - (this.price.current / AAPSC) + (this.cost / this.price.current)) / 10)
-            + ((0.5 - Math.random()) / 1000)
-            + ((this.cost / highest_cost) / 20);
-        let price_difference = Math.floor(this.price.current * rate) || 1;
+        let cost_rate = (this.cost / highest_cost) / 100;
+        let random_rate = (0.5 - Math.random()) / 10;
+        let rate = price_rate + cost_rate + random_rate;
+
+        let price_difference = Math.floor(this.price * rate) || 1;
         let quantity_difference = Math.floor(this.quantity.in_circulation * rate) || 1;
 
-        this.price.current += price_difference;
+        this.price += price_difference;
 
         if (quantity_difference < 0) {
             this.quantity.in_circulation += quantity_difference;
@@ -248,7 +250,7 @@ class Product {
             this.quantity.in_circulation += quantity_difference;
             this.quantity.in_stock -= quantity_difference;
 
-            let adjustment_revenue = this.price.current * quantity_difference;
+            let adjustment_revenue = this.price * quantity_difference;
             this.change_money(adjustment_revenue);
         }
 
@@ -275,7 +277,7 @@ class Product {
         }
 
         let AAPSC = this.calculate_AAPSC();
-        let liquidation_price = this.price.current * (1 - this.price.current / AAPSC);
+        let liquidation_price = this.price * (1 - this.price / AAPSC);
         let liquidation_revenue = liquidation_amount * liquidation_price;
 
         this.quantity.in_stock -= liquidation_amount;
@@ -287,10 +289,10 @@ class Product {
 
     retire() {
         this.liquidate();
-        this.change_money(this.quantity.in_circulation * this.price.current);
+        this.change_money(this.quantity.in_circulation * this.price);
 
         this.quantity.in_circulation = 0;
-        this.price.current = 0;
+        this.price = 0;
         this.retired = true;
 
         this.onchange_callback();
