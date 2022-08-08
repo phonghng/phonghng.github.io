@@ -171,9 +171,10 @@
                 let adjustment_rate =
                     (
                         (this.cost / highest_cost)
-                        * (lowest_price_in_same_cost / this.price)
-                        * firm_market_share
-                    ) / 25;
+                        + (lowest_price_in_same_cost / this.price)
+                        + (firm_market_share / 5)
+                        + (Math.random() / 7)
+                    ) / (1 + 1 + 1/5 + 1/7) / 15;
                 let adjustment_amount = Math.floor(this.in_circulation * adjustment_rate) || 1;
 
                 let before_adjustment = this.in_circulation;
@@ -535,7 +536,7 @@
     <table id="firms_table">
         <thead>
             <tr>
-                <th>Tên hãng</th>
+                <th>Tên</th>
                 <th>Tài sản (đ)</th>
                 <th>Hành động</th>
             </tr>
@@ -548,10 +549,10 @@
     <table id="products_table">
         <thead>
             <tr>
-                <th>Tên hãng</th>
-                <th>Tên sản phẩm</th>
-                <th>Chi phí (đ)</th>
-                <th>Giá bán (đ)</th>
+                <th>Hãng</th>
+                <th>Tên</th>
+                <th>Phí (đ)</th>
+                <th>Giá (đ)</th>
                 <th>Lưu hành (Block)</th>
                 <th>Hành động</th>
             </tr>
