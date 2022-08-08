@@ -86,7 +86,8 @@
                 this.firms.forEach(firm => {
                     firms.push({
                         name: firm.name,
-                        money: firm.calculate_money()
+                        money: firm.calculate_money(),
+                        disabled: firm.disabled
                     });
                 });
 
@@ -98,7 +99,8 @@
                         product_name: product.name,
                         cost: product.cost,
                         price: product.price,
-                        in_circulation: product.in_circulation
+                        in_circulation: product.in_circulation,
+                        disabled: product.disabled
                     });
                 });
 
@@ -112,10 +114,16 @@
 
                 this.products = [];
 
+                this.disabled = false;
+
                 this.callbacks = undefined;
             }
 
             new_product(name, cost, price) {
+                if (this.disabled) {
+                    return false;
+                }
+
                 let product = new Product(this, name, cost, price);
                 product.callbacks = this.callbacks;
                 return this.products.push(product);
@@ -140,10 +148,16 @@
 
                 this.in_circulation = 0;
 
+                this.disabled = false;
+
                 this.callbacks = undefined;
             }
 
             adjustment_in_circulation() {
+                if (this.disabled) {
+                    return false;
+                }
+
                 let highest_cost = this.callbacks.get_highest_cost();
                 let lowest_price_in_same_cost =
                     this.callbacks.get_lowest_price_in_same_cost(this.cost);
@@ -192,6 +206,11 @@
                 firms_data.forEach((firm_data, index) => {
                     let tr_element = document.createElement("tr");
 
+                    if (firm_data.disabled) {
+                        tr_element.style.opacity = 0.5;
+                    }
+
+                    /* [START] Basic info */
                     let table_row_datas = [
                         firm_data.name,
                         firm_data.money.toLocaleString()
@@ -202,13 +221,24 @@
                         td_element.innerHTML = data;
                         tr_element.appendChild(td_element);
                     });
+                    /* [END] Basic info */
 
+                    /* [START] Action buttons */
                     let action_buttons_td_element = document.createElement("td");
                     action_buttons_td_element.style.display = "flex";
                     action_buttons_td_element.style.gap = "15px";
-                    this.add_new_product_button(action_buttons_td_element, index);
-                    this.add_remove_firm_button(action_buttons_td_element, index);
+
+                    let action_buttons_function_arguments = [
+                        action_buttons_td_element,
+                        index
+                    ];
+
+                    this.add_new_product_button(...action_buttons_function_arguments);
+                    this.add_remove_firm_button(...action_buttons_function_arguments);
+                    this.add_disable_firm_button(...action_buttons_function_arguments);
+
                     tr_element.appendChild(action_buttons_td_element);
+                    /* [END] Action buttons */
 
                     firms_table_body.appendChild(tr_element);
                 });
@@ -241,6 +271,17 @@
                 td_element.appendChild(button);
             }
 
+            add_disable_firm_button(td_element, firm_index) {
+                let firm_data = this.game.firms[firm_index];
+                let button = document.createElement("button");
+                button.innerHTML = firm_data.disabled ? "Tiếp tục" : "Đình chỉ";
+                button.onclick = () => {
+                    firm_data.disabled = !firm_data.disabled;
+                    this.update();
+                }
+                td_element.appendChild(button);
+            }
+
             display_products() {
                 let products_table_body = document.querySelector("#products_table tbody");
 
@@ -255,6 +296,11 @@
                 products_data.forEach((product_data, product_index) => {
                     let tr_element = document.createElement("tr");
 
+                    if (product_data.disabled) {
+                        tr_element.style.opacity = 0.5;
+                    }
+
+                    /* [START] Basic info */
                     let table_row_datas = [
                         product_data.firm_name,
                         product_data.product_name,
@@ -268,16 +314,24 @@
                         td_element.innerHTML = data;
                         tr_element.appendChild(td_element);
                     });
+                    /* [END] Basic info */
 
+                    /* [START] Action buttons */
                     let action_buttons_td_element = document.createElement("td");
                     action_buttons_td_element.style.display = "flex";
                     action_buttons_td_element.style.gap = "15px";
-                    this.add_remove_product_button(
+
+                    let action_buttons_function_arguments = [
                         action_buttons_td_element,
                         product_data.firm_index,
                         product_index
-                    );
+                    ];
+
+                    this.add_remove_product_button(...action_buttons_function_arguments);
+                    this.add_disable_product_button(...action_buttons_function_arguments);
+
                     tr_element.appendChild(action_buttons_td_element);
+                    /* [END] Action buttons */
 
                     products_table_body.appendChild(tr_element);
                 });
@@ -291,6 +345,17 @@
                         this.game.firms[firm_index].products.splice(product_index, 1);
                         this.update();
                     }
+                }
+                td_element.appendChild(button);
+            }
+
+            add_disable_product_button(td_element, firm_index, product_index) {
+                let product_data = this.game.firms[firm_index].products[product_index];
+                let button = document.createElement("button");
+                button.innerHTML = product_data.disabled ? "Tiếp tục" : "Đình chỉ";
+                button.onclick = () => {
+                    product_data.disabled = !product_data.disabled;
+                    this.update();
                 }
                 td_element.appendChild(button);
             }
