@@ -93,6 +93,7 @@
                 let products = [];
                 this.get_all_product().forEach(product => {
                     products.push({
+                        firm_index: this.firms.indexOf(product.firm),
                         firm_name: product.firm.name,
                         product_name: product.name,
                         cost: product.cost,
@@ -186,12 +187,14 @@
 
                 let firms_data = this.game.generate_data().firms;
 
+                firms_data.sort((a, b) => b.money - a.money);
+
                 firms_data.forEach((firm_data, index) => {
                     let tr_element = document.createElement("tr");
 
                     let table_row_datas = [
                         firm_data.name,
-                        firm_data.money
+                        firm_data.money.toLocaleString()
                     ];
 
                     table_row_datas.forEach(data => {
@@ -200,14 +203,18 @@
                         tr_element.appendChild(td_element);
                     });
 
-                    this.add_new_product_button(tr_element, index);
+                    let action_buttons_td_element = document.createElement("td");
+                    action_buttons_td_element.style.display = "flex";
+                    action_buttons_td_element.style.gap = "15px";
+                    this.add_new_product_button(action_buttons_td_element, index);
+                    this.add_remove_firm_button(action_buttons_td_element, index);
+                    tr_element.appendChild(action_buttons_td_element);
 
                     firms_table_body.appendChild(tr_element);
                 });
             }
 
-            add_new_product_button(tr_element, firm_index) {
-                let td_element = document.createElement("td");
+            add_new_product_button(td_element, firm_index) {
                 let button = document.createElement("button");
                 button.innerHTML = "Thêm sản phẩm";
                 button.onclick = () => {
@@ -220,7 +227,18 @@
                     this.update();
                 }
                 td_element.appendChild(button);
-                tr_element.appendChild(td_element);
+            }
+
+            add_remove_firm_button(td_element, firm_index) {
+                let button = document.createElement("button");
+                button.innerHTML = "Xoá";
+                button.onclick = () => {
+                    if (confirm("Bạn có chắc muốn xoá hãng này?")) {
+                        this.game.firms.splice(firm_index, 1);
+                        this.update();
+                    }
+                }
+                td_element.appendChild(button);
             }
 
             display_products() {
@@ -232,15 +250,17 @@
 
                 let products_data = this.game.generate_data().products;
 
-                products_data.forEach(product_data => {
+                products_data.sort((a, b) => b.in_circulation - a.in_circulation);
+
+                products_data.forEach((product_data, product_index) => {
                     let tr_element = document.createElement("tr");
 
                     let table_row_datas = [
                         product_data.firm_name,
                         product_data.product_name,
-                        product_data.cost,
-                        product_data.price,
-                        product_data.in_circulation
+                        product_data.cost.toLocaleString(),
+                        product_data.price.toLocaleString(),
+                        product_data.in_circulation.toLocaleString()
                     ];
 
                     table_row_datas.forEach(data => {
@@ -249,8 +269,30 @@
                         tr_element.appendChild(td_element);
                     });
 
+                    let action_buttons_td_element = document.createElement("td");
+                    action_buttons_td_element.style.display = "flex";
+                    action_buttons_td_element.style.gap = "15px";
+                    this.add_remove_product_button(
+                        action_buttons_td_element,
+                        product_data.firm_index,
+                        product_index
+                    );
+                    tr_element.appendChild(action_buttons_td_element);
+
                     products_table_body.appendChild(tr_element);
                 });
+            }
+
+            add_remove_product_button(td_element, firm_index, product_index) {
+                let button = document.createElement("button");
+                button.innerHTML = "Xoá";
+                button.onclick = () => {
+                    if (confirm("Bạn có chắc muốn xoá sản phẩm này?")) {
+                        this.game.firms[firm_index].products.splice(product_index, 1);
+                        this.update();
+                    }
+                }
+                td_element.appendChild(button);
             }
 
             update() {
@@ -441,6 +483,7 @@
                 <th>Chi phí (đ)</th>
                 <th>Giá bán (đ)</th>
                 <th>Lưu hành (Block)</th>
+                <th>Hành động</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -452,7 +495,7 @@
         let new_firm_button = document.querySelector("#new_firm_button");
         let ui = new UI(game, new_firm_button);
 
-        setInterval(() => {
+        let game_interval = setInterval(() => {
             game.adjustment_all();
             ui.update();
         }, 1000);
