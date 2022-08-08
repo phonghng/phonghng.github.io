@@ -94,9 +94,13 @@
                 let products = [];
                 this.get_all_product().forEach(product => {
                     products.push({
-                        firm_index: this.firms.indexOf(product.firm),
-                        firm_name: product.firm.name,
-                        product_name: product.name,
+                        firm: {
+                            index: this.firms.indexOf(product.firm),
+                            name: product.firm.name,
+                            disabled: product.firm.disabled,
+                        },
+                        index: this.firms[this.firms.indexOf(product.firm)].products.indexOf(product),
+                        name: product.name,
                         cost: product.cost,
                         price: product.price,
                         in_circulation: product.in_circulation,
@@ -154,7 +158,7 @@
             }
 
             adjustment_in_circulation() {
-                if (this.disabled) {
+                if (this.disabled || this.firm.disabled) {
                     return false;
                 }
 
@@ -293,17 +297,17 @@
 
                 products_data.sort((a, b) => b.in_circulation - a.in_circulation);
 
-                products_data.forEach((product_data, product_index) => {
+                products_data.forEach((product_data) => {
                     let tr_element = document.createElement("tr");
 
-                    if (product_data.disabled) {
+                    if (product_data.disabled || product_data.firm.disabled) {
                         tr_element.style.opacity = 0.5;
                     }
 
                     /* [START] Basic info */
                     let table_row_datas = [
-                        product_data.firm_name,
-                        product_data.product_name,
+                        product_data.firm.name,
+                        product_data.name,
                         product_data.cost.toLocaleString(),
                         product_data.price.toLocaleString(),
                         product_data.in_circulation.toLocaleString()
@@ -323,8 +327,8 @@
 
                     let action_buttons_function_arguments = [
                         action_buttons_td_element,
-                        product_data.firm_index,
-                        product_index
+                        product_data.firm.index,
+                        product_data.index
                     ];
 
                     this.add_remove_product_button(...action_buttons_function_arguments);
