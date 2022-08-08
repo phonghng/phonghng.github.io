@@ -83,8 +83,9 @@
 
             generate_data() {
                 let firms = [];
-                this.firms.forEach(firm => {
+                this.firms.forEach((firm, index) => {
                     firms.push({
+                        index: index,
                         name: firm.name,
                         money: firm.calculate_money(),
                         disabled: firm.disabled
@@ -207,7 +208,7 @@
 
                 firms_data.sort((a, b) => b.money - a.money);
 
-                firms_data.forEach((firm_data, index) => {
+                firms_data.forEach((firm_data) => {
                     let tr_element = document.createElement("tr");
 
                     if (firm_data.disabled) {
@@ -234,7 +235,7 @@
 
                     let action_buttons_function_arguments = [
                         action_buttons_td_element,
-                        index
+                        firm_data.index
                     ];
 
                     this.add_new_product_button(...action_buttons_function_arguments);
