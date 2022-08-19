@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhongHNg</title>
+
+    <link rel="shortcut icon" href="./PhongHNg.png" type="image/x-icon">
+
+    <style>
+        :root {
+            --BLUE: #1877F2;
+            --CHERRY: #F3425F;
+            --GRAPE: #9360F7;
+            --LEMON: #F7B928;
+            --LIME: #45BD62;
+            --PINK: #FF66BF;
+            --SEAFOAM: #54C7EC;
+            --TEAL: #2ABBA7;
+            --TOMATO: #FB724B;
+
+            --BODY_BGCOLOR: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0 auto;
+            padding: 15px;
+            font-size: 18px;
+            background-color: var(--BODY_BGCOLOR);
+            max-width: 500px;
+        }
+
+        a {
+            cursor: pointer;
+            color: var(--BLUE);
+            text-decoration: none;
+        }
+
+        a:active {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: center">
+        <img src="./PhongHNg.png" alt="PhongHNg logo" title="PhongHNg logo"
+            style="height: 150px; width: 150px; border-radius: 10px;" />
+    </div>
+
+    <div id="for_work_purpose">
+        <h1>For-work purpose</h1>
+
+        <p data-item_title="E-mail">
+            <a data-autolink="email">phonghng8420@gmail.com</a>
+        </p>
+
+        <p data-item_title="Zalo">
+            <a data-autolink="link">http://zaloapp.com/qr/p/14q93z8w4415</a>
+        </p>
+
+        <p data-item_title="Paypal">
+        <ul>
+            <li><a data-autolink="email">docdiroingam@gmail.com </a><em>(don&#39;t use to contact me)</em></li>
+            <li><a data-autolink="link">https://www.paypal.com/paypalme/pnh8420</a></li>
+        </ul>
+        </p>
+    </div>
+
+    <div id="for_personal_purpose">
+        <h1>For-personal purpose</h1>
+
+        <p data-item_title="Github">
+            <a data-autolink="link">https://github.com/phonghng/</a>
+        </p>
+    </div>
+
+    <script>
+        /* Auto link a tags */
+        let autolink_a_tags = document.querySelectorAll("a[data-autolink]");
+        autolink_a_tags.forEach(a_tag => {
+            let prefix =
+                a_tag.dataset.autolink == "email" ? "mailto:" : "";
+            a_tag.href = `${prefix}${a_tag.innerHTML}`;
+            a_tag.target = "_blank";
+        });
+
+        /* Append title to items */
+        let items = document.querySelectorAll("p[data-item_title]");
+        items.forEach(item => {
+            let title = document.createElement("strong");
+            title.innerHTML = `${item.dataset.item_title}:`;
+            item.insertBefore(title, item.firstChild);
+        });
+    </script>
+</body>
+
+</html>
