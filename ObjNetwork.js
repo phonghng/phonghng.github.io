@@ -293,10 +293,7 @@ class ObjNetwork {
         let found_links = [];
 
         for (const link_info of this.#links) {
-            let link_objects = Object.values(link_info);
-            let link_ids = link_objects.map(object => this.get_object_id(object));
-            let link_role_names = Object.keys(link_info);
-            if (link_ids.includes(id) && link_role_names.includes(role)) {
+            if (link_info[role] && this.get_object_id(link_info[role]) == id) {
                 found_links.push(link_info);
             }
         }
