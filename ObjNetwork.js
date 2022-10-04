@@ -1,5 +1,8 @@
 class ObjNetwork {
     constructor() {
+        if (!window._) {
+            throw `Required include "underscore" library`;
+        }
     }
 
     objects = {};
