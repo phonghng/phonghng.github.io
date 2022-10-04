@@ -54,6 +54,4 @@ one.add_link(
     "c124235d123"
 );
 
-console.log(one.links);
-
 console.log(one.get_links_by_object_and_role(obj3, "c124235d123"));
