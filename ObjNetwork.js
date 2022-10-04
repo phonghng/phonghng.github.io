@@ -5,7 +5,7 @@ class ObjNetwork {
         }
     }
 
-    objects = {};
+    #objects = {};
 
     /**
      * Generate unique ID for object
@@ -71,7 +71,7 @@ class ObjNetwork {
         return Object.keys(this.objects).find(id => this.objects[id] === object);
     }
 
-    links = [];
+    #links = [];
 
     /**
      * Get link information object
