@@ -6,6 +6,7 @@ class ObjNetwork {
     }
 
     #objects = {};
+    #links = [];
 
     /**
      * Generate unique ID for object
@@ -70,8 +71,6 @@ class ObjNetwork {
     get_object_id(object) {
         return Object.keys(this.#objects).find(id => this.#objects[id] === object);
     }
-
-    #links = [];
 
     /**
      * Get link information object
