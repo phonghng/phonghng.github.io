@@ -42,6 +42,9 @@ class ObjNetwork {
      */
 
     remove_object(id) {
+        if (typeof id === "object") {
+            id = this.get_object_id(id);
+        }
         return delete this.objects[id];
     }
 
@@ -76,7 +79,7 @@ class ObjNetwork {
      * @return Link information object
      */
 
-    get_link_info(
+    generate_link_info(
         first_object_id,
         first_object_role,
         second_object_id,
@@ -115,14 +118,24 @@ class ObjNetwork {
         second_object_id,
         second_object_role
     ) {
-        let link_info = this.get_link_info(
+        if (typeof first_object_id === "object") {
+            first_object_id = this.get_object_id(first_object_id);
+        }
+        if (typeof second_object_id === "object") {
+            second_object_id = this.get_object_id(second_object_id);
+        }
+
+        let link_info = this.generate_link_info(
             first_object_id,
             first_object_role,
             second_object_id,
             second_object_role
         );
 
-        if (this.links.includes(link_info))
+        let is_link_existed = this.links.findIndex(
+            saved_link_info => _.isEqual(saved_link_info, link_info)
+        ) >= 0;
+        if (is_link_existed)
             throw `This link already exists, can't link again`;
 
         this.links.push(link_info);
@@ -145,14 +158,23 @@ class ObjNetwork {
         second_object_id,
         second_object_role
     ) {
-        let link_info = this.get_link_info(
+        if (typeof first_object_id === "object") {
+            first_object_id = this.get_object_id(first_object_id);
+        }
+        if (typeof second_object_id === "object") {
+            second_object_id = this.get_object_id(second_object_id);
+        }
+
+        let link_info = this.generate_link_info(
             first_object_id,
             first_object_role,
             second_object_id,
             second_object_role
         );
 
-        let link_index = this.links.indexOf(link_info);
+        let link_index = this.links.findIndex(
+            saved_link_info => _.isEqual(saved_link_info, link_info)
+        );
         if (link_index > -1) {
             this.links.splice(link_index, 1);
             return true;
@@ -162,24 +184,30 @@ class ObjNetwork {
     }
 
     /**
-     * Remove links from network by object's ID
+     * Remove links from network by object
      * @param {String} id Object's ID
      * @returns Result of deletion
      */
 
-    remove_links_by_id(id) {
-        let deletion_flag = false;
+    remove_links_by_object(id) {
+        if (typeof id === "object") {
+            id = this.get_object_id(id);
+        }
 
-        for (const [index, info] of this.links.entries()) {
-            let link_objects = Object.values(info);
+        let deleted_counter = 0;
+
+        let cloned_links_array = this.links.slice();
+
+        for (const [index, link_info] of cloned_links_array.entries()) {
+            let link_objects = Object.values(link_info);
             let link_ids = link_objects.map(object => this.get_object_id(object));
             if (link_ids.includes(id)) {
-                this.links.splice(index, 1);
-                deletion_flag = true;
+                this.links.splice(index - deleted_counter, 1);
+                deleted_counter++;
             }
         }
 
-        return deletion_flag;
+        return deleted_counter > 0;
     }
 
     /**
@@ -189,16 +217,87 @@ class ObjNetwork {
      */
 
     remove_links_by_role(role) {
-        let deletion_flag = false;
+        let deleted_counter = 0;
 
-        for (const [index, info] of this.links.entries()) {
-            let link_role_names = Object.value(info);
+        let cloned_links_array = this.links.slice();
+
+        for (const [index, link_info] of cloned_links_array.entries()) {
+            let link_role_names = Object.keys(link_info);
             if (link_role_names.includes(role)) {
-                this.links.splice(index, 1);
-                deletion_flag = true;
+                this.links.splice(index - deleted_counter, 1);
+                deleted_counter++;
             }
         }
 
-        return deletion_flag;
+        return deleted_counter > 0;
+    }
+
+    /**
+     * Get links from network by object
+     * @param {String} id Object's ID
+     * @returns Found links
+     */
+
+    get_links_by_object(id) {
+        if (typeof id === "object") {
+            id = this.get_object_id(id);
+        }
+
+        let found_links = [];
+
+        for (const link_info of this.links) {
+            let link_objects = Object.values(link_info);
+            let link_ids = link_objects.map(object => this.get_object_id(object));
+            if (link_ids.includes(id)) {
+                found_links.push(link_info);
+            }
+        }
+
+        return found_links;
+    }
+
+    /**
+     * Get links from network by object's role name
+     * @param {String} role Role name
+     * @return Found links
+     */
+
+    get_links_by_role(role) {
+        let found_links = [];
+
+        for (const link_info of this.links) {
+            let link_role_names = Object.keys(link_info);
+            if (link_role_names.includes(role)) {
+                found_links.push(link_info);
+            }
+        }
+
+        return found_links;
+    }
+
+    /**
+     * Get links from network by object and object's role name
+     * @param {String} id Object's ID
+     * @param {String} role Role name
+     * @return Found links
+     */
+
+    get_links_by_object_and_role(id, role) {
+        if (typeof id === "object") {
+            id = this.get_object_id(id);
+        }
+
+        let found_links = [];
+
+        for (const link_info of this.links) {
+            let link_objects = Object.values(link_info);
+            let link_ids = link_objects.map(object => this.get_object_id(object));
+            let link_role_names = Object.keys(link_info);
+            if (link_ids.includes(id) && link_role_names.includes(role)) {
+                found_links.push(link_info);
+            }
+        }
+
+        return found_links;
     }
 }
