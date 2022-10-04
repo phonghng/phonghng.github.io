@@ -15,13 +15,6 @@ one.add_link(
     "child"
 );
 
-one.remove_link(
-    obj2,
-    "parent",
-    obj3,
-    "child"
-);
-
 one.add_link(
     obj2,
     "parent123",
@@ -34,31 +27,15 @@ one.add_link(
     "parent123",
     obj3,
     "c124235d123"
-);
-
-one.remove_links_by_object(obj2);
-
-one.add_link(
-    obj2,
-    "parent123",
-    obj3,
-    "child123"
 );
 
 one.add_object(obj1);
 
 one.add_link(
     obj2,
-    "parent123",
-    obj3,
-    "c124235d123"
-);
-
-one.add_link(
-    obj2,
     "c124235d123",
-    obj3,
+    obj1,
     "parent123"
 );
 
-console.log(one.get_links_by_object_and_role(obj3, "c124235d123"));
+console.log(one.remove_links(one.get_links_by_object(obj3)));

@@ -147,91 +147,24 @@ class ObjNetwork {
 
     /**
      * Remove a link from network
-     * @param {String} first_object_id First object's ID
-     * @param {String} first_object_role First object's role name
-     * @param {String} second_object_id Second object's ID
-     * @param {String} second_object_role Second object's role name
+     * @param {String} link_info_array Array of link_info needs to remove
      * @returns Result of deletion
      */
 
-    remove_link(
-        first_object_id,
-        first_object_role,
-        second_object_id,
-        second_object_role
-    ) {
-        if (typeof first_object_id === "object") {
-            first_object_id = this.get_object_id(first_object_id);
-        }
-        if (typeof second_object_id === "object") {
-            second_object_id = this.get_object_id(second_object_id);
-        }
+    remove_links(link_info_array) {
+        let deletion_flag = false;
 
-        let link_info = this.generate_link_info(
-            first_object_id,
-            first_object_role,
-            second_object_id,
-            second_object_role
-        );
-
-        let link_index = this.#links.findIndex(
-            saved_link_info => _.isEqual(saved_link_info, link_info)
-        );
-        if (link_index > -1) {
-            this.#links.splice(link_index, 1);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Remove links from network by object
-     * @param {String} id Object's ID
-     * @returns Result of deletion
-     */
-
-    remove_links_by_object(id) {
-        if (typeof id === "object") {
-            id = this.get_object_id(id);
-        }
-
-        let deleted_counter = 0;
-
-        let cloned_links_array = this.#links.slice();
-
-        for (const [index, link_info] of cloned_links_array.entries()) {
-            let link_objects = Object.values(link_info);
-            let link_ids = link_objects.map(object => this.get_object_id(object));
-            if (link_ids.includes(id)) {
-                this.#links.splice(index - deleted_counter, 1);
-                deleted_counter++;
+        for (let link_info of link_info_array) {
+            let link_index = this.#links.findIndex(
+                saved_link_info => _.isEqual(saved_link_info, link_info)
+            );
+            if (link_index > -1) {
+                this.#links.splice(link_index, 1);
+                deletion_flag = true;
             }
         }
 
-        return deleted_counter > 0;
-    }
-
-    /**
-     * Remove links from network by object's role name
-     * @param {String} role Role name
-     * @returns Result of deletion
-     */
-
-    remove_links_by_role(role) {
-        let deleted_counter = 0;
-
-        let cloned_links_array = this.#links.slice();
-
-        for (const [index, link_info] of cloned_links_array.entries()) {
-            let link_role_names = Object.keys(link_info);
-            if (link_role_names.includes(role)) {
-                this.#links.splice(index - deleted_counter, 1);
-                deleted_counter++;
-            }
-        }
-
-        return deleted_counter > 0;
+        return deletion_flag;
     }
 
     /**
