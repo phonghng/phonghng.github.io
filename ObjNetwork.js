@@ -168,6 +168,40 @@ class ObjNetwork {
     }
 
     /**
+     * Get a link from network
+     * @param {String} first_object_id First object's ID
+     * @param {String} first_object_role First object's role name
+     * @param {String} second_object_id Second object's ID
+     * @param {String} second_object_role Second object's role name
+     * @returns Found link
+     */
+
+    get_link(
+        first_object_id,
+        first_object_role,
+        second_object_id,
+        second_object_role
+    ) {
+        if (typeof first_object_id === "object") {
+            first_object_id = this.get_object_id(first_object_id);
+        }
+        if (typeof second_object_id === "object") {
+            second_object_id = this.get_object_id(second_object_id);
+        }
+
+        let link_info = this.generate_link_info(
+            first_object_id,
+            first_object_role,
+            second_object_id,
+            second_object_role
+        );
+
+        return this.#links.find(
+            saved_link_info => _.isEqual(saved_link_info, link_info)
+        );
+    }
+
+    /**
      * Get links from network by object
      * @param {String} id Object's ID
      * @returns Found links
