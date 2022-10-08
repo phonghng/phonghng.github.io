@@ -1,8 +1,34 @@
 <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.6/underscore-umd-min.js"></script>
 <script src="../ObjNetwork.js"></script>
 
-<script src="./javascript/game_error.js"></script>
+<script src="./javascript/names_database.js"></script>
+<script src="./javascript/game_notification.js"></script>
 <script src="./javascript/game_logic/firm.js"></script>
 <script src="./javascript/game_logic/union.js"></script>
+<script src="./javascript/game_logic/game_logic.js"></script>
 
 <script src="./test.js"></script>
+
+<style>
+    table {
+        border-spacing: 0;
+        border: 1px solid;
+        width: 100%;
+    }
+
+    td, tr {
+        padding: 10px;
+        text-align: center;
+    }
+
+    hr {
+        border: none;
+        border-bottom: 1px solid;
+    }
+</style>
+
+<table id="firms"></table>
+
+<hr>
+
+<table id="unions"></table>

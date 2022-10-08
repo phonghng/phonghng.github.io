@@ -1,0 +1,1 @@
+const NAMES_DATABASE = [ "BVN", "LimiBVN", "HAB", "BTN", "VNU", "LMB", "UV Union", "USB", "IIBF", "Intbu", "Bonus", "Calif", "Text", "Newus", "Doclap", "Eco", "Sino", "Alpha", "Beiji", "Shang", "Sea", "Omega", "Midea", "Amer" ];
