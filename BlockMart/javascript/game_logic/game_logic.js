@@ -218,9 +218,10 @@ class Game_Logic {
         for (let firm of this.#firms) {
             let name = firm.name;
             let alpha = parseInt(firm.alpha);
+            let prod_cap = firm.prod_cap;
             let union_name =
                 firm.get_joined_union()?.name || "";
-            firms.push({ name, alpha, union_name });
+            firms.push({ name, alpha, prod_cap, union_name });
         }
         firms.sort((a, b) => b.alpha - a.alpha);
 
