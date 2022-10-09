@@ -131,7 +131,7 @@ class Game_Logic {
         let decision_of_firm = random_firm.consider_join_union(joined_union);
 
         if (!decision_of_firm) {
-            random_firm.leave_union(joined_union);
+            random_firm.leave_joined_union();
             return true;
         }
 
@@ -168,13 +168,6 @@ class Game_Logic {
     }
 
     random_all_events() {
-        if (this.#firms.length <= 0) {
-            this.create_firm();
-        }
-        if (this.#unions.length <= 0) {
-            this.create_union();
-        }
-
         function random_event(data) {
             let temp_counter = 0;
 
@@ -203,9 +196,9 @@ class Game_Logic {
         random_event({
             70.0: () => this.random_firm_produce(),
             29.0: () => this.random_firm_update_prod_cap(),
-            0.35: () => this.create_firm(),
+            0.325: () => this.create_firm(),
             0.3: () => this.random_firm_union_link(),
-            0.15: () => this.create_union(),
+            0.175: () => this.create_union(),
             0.1: () => this.random_leave_union(),
             0.05: () => this.random_remove_member(),
             0.025: () => this.random_remove_firm(),
