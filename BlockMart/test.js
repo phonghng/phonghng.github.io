@@ -33,4 +33,4 @@ let interval = setInterval(() => {
         document.querySelector("#unions"),
         game_logic.data_for_UI.unions
     );
-}, 50);
+}, 1);
