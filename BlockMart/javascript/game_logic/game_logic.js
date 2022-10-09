@@ -210,7 +210,7 @@ class Game_Logic {
         let firms = [];
         for (let firm of this.#firms) {
             let name = firm.name;
-            let alpha = parseInt(firm.alpha);
+            let alpha = parseInt(firm.alpha).toLocaleString();
             let prod_cap = firm.prod_cap.toFixed(3);
             let union_name =
                 firm.get_joined_union()?.name || "";
@@ -221,9 +221,10 @@ class Game_Logic {
         let unions = [];
         for (let union of this.#unions) {
             let name = union.name;
-            let average_alpha = parseInt(union.calculate_average_alpha());
+            let average_alpha =
+                parseInt(union.calculate_average_alpha()).toLocaleString();
             let total_alpha =
-                parseInt(union.calculate_average_alpha() * union.get_members().length);
+                parseInt(union.calculate_average_alpha() * union.get_members().length).toLocaleString();
             let prod_cap = union.calculate_prod_cap().toFixed(3);
             let members_name =
                 union.get_members();
