@@ -218,7 +218,7 @@ class Game_Logic {
         for (let firm of this.#firms) {
             let name = firm.name;
             let alpha = parseInt(firm.alpha);
-            let prod_cap = firm.prod_cap;
+            let prod_cap = firm.prod_cap.toFixed(3);
             let union_name =
                 firm.get_joined_union()?.name || "";
             firms.push({ name, alpha, prod_cap, union_name });
