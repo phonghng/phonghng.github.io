@@ -231,7 +231,7 @@ class Game_Logic {
             let average_alpha = parseInt(union.calculate_average_alpha());
             let total_alpha =
                 parseInt(union.calculate_average_alpha() * union.get_members().length);
-            let prod_cap = union.calculate_prod_cap();
+            let prod_cap = union.calculate_prod_cap().toFixed(3);
             let members_name =
                 union.get_members();
             members_name = members_name.map(member => member.name);
