@@ -98,11 +98,27 @@ class Firm {
         this.#objnetwork.remove_links(union_link_info);
     }
 
+    rank_unions_by_PCD(based_firm) {
+        if (!this.#game_logic.firms.includes(based_firm))
+            return this.#game_notification.throw("Game_Logic__NO_FIRM_FOUND");
+
+        let firm_prod_cap = based_firm.prod_cap;
+
+        let ranked_unions = this.#game_logic.unions.slice();
+        ranked_unions.sort((a, b) => {
+            let a_PCD = firm_prod_cap - a.calculate_prod_cap();
+            let b_PCD = firm_prod_cap - b.calculate_prod_cap();
+            return b_PCD - a_PCD;
+        });
+
+        return ranked_unions;
+    }
+
     consider_join_union(union) {
         let random = Math.random();
 
         if (random < 0.8) {
-            let unions_PR = this.#game_logic.rank_unions_by_PCD(this);
+            let unions_PR = this.rank_unions_by_PCD(this);
             let acceptable_unions = unions_PR.splice(0, this.#minPCDR);
             if (acceptable_unions.includes(union)) {
                 return true;

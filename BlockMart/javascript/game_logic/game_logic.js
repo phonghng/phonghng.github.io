@@ -15,6 +15,14 @@ class Game_Logic {
         this.#game_notification.callback = game_notification_callback;
     }
 
+    get firms() {
+        return this.#firms;
+    }
+
+    get unions() {
+        return this.#unions;
+    }
+
     generate_random_name() {
         let setted_names = [];
         this.#firms.forEach(firm => setted_names.push(firm.name));
@@ -78,38 +86,6 @@ class Game_Logic {
         this.#unions.splice(this.#unions.indexOf(union), 1);
     }
 
-    rank_firms_by_PCD(based_union) {
-        if (!this.#unions.includes(based_union))
-            return this.#game_notification.throw("Game_Logic__NO_UNION_FOUND");
-
-        let union_prod_cap = based_union.calculate_prod_cap();
-
-        let ranked_firms = this.#firms.slice();
-        ranked_firms.sort((a, b) => {
-            let a_PCD = a.prod_cap - union_prod_cap;
-            let b_PCD = b.prod_cap - union_prod_cap;
-            return b_PCD - a_PCD;
-        });
-
-        return ranked_firms;
-    }
-
-    rank_unions_by_PCD(based_firm) {
-        if (!this.#firms.includes(based_firm))
-            return this.#game_notification.throw("Game_Logic__NO_FIRM_FOUND");
-
-        let firm_prod_cap = based_firm.prod_cap;
-
-        let ranked_unions = this.#unions.slice();
-        ranked_unions.sort((a, b) => {
-            let a_PCD = firm_prod_cap - a.calculate_prod_cap();
-            let b_PCD = firm_prod_cap - b.calculate_prod_cap();
-            return b_PCD - a_PCD;
-        });
-
-        return ranked_unions;
-    }
-
     random_firm_produce() {
         if (this.#firms.length <= 0) return false;
         let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
@@ -138,6 +114,41 @@ class Game_Logic {
         if (decision_of_firm && decision_of_union) {
             random_firm.join_union(random_union);
             random_union.add_member(random_firm);
+            return true;
+        }
+
+        return false;
+    }
+
+    random_leave_union() {
+        if (this.#firms.length <= 0) return false;
+        if (this.#unions.length <= 0) return false;
+
+        let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
+        let joined_union = random_firm.get_joined_union();
+        if (!joined_union) return false;
+
+        let decision_of_firm = random_firm.consider_join_union(joined_union);
+
+        if (!decision_of_firm) {
+            random_firm.leave_union(joined_union);
+            return true;
+        }
+
+        return false;
+    }
+
+    random_remove_member() {
+        if (this.#firms.length <= 0) return false;
+        if (this.#unions.length <= 0) return false;
+
+        let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
+        let random_union = this.#unions[Math.floor(Math.random() * this.#unions.length)];
+
+        let decision_of_union = random_union.consider_add_member(random_firm);
+
+        if (!decision_of_union) {
+            random_union.remove_member(random_firm);
             return true;
         }
 
@@ -190,13 +201,15 @@ class Game_Logic {
         }
 
         random_event({
-            55.0: () => this.random_firm_produce(),
-            25.0: () => this.random_firm_update_prod_cap(),
-            10.0: () => this.random_firm_union_link(),
-            3.5: () => this.create_firm(),
-            3.0: () => this.create_union(),
-            3.0: () => this.random_remove_firm(),
-            0.5: () => this.random_remove_union(),
+            70.0: () => this.random_firm_produce(),
+            29.0: () => this.random_firm_update_prod_cap(),
+            0.45: () => this.create_firm(),
+            0.3: () => this.random_firm_union_link(),
+            0.1: () => this.create_union(),
+            0.05: () => this.random_leave_union(),
+            0.05: () => this.random_remove_member(),
+            0.025: () => this.random_remove_firm(),
+            0.025: () => this.random_remove_union()
         });
     }
 
@@ -204,7 +217,7 @@ class Game_Logic {
         let firms = [];
         for (let firm of this.#firms) {
             let name = firm.name;
-            let alpha = firm.alpha.toFixed(3);
+            let alpha = parseInt(firm.alpha);
             let union_name =
                 firm.get_joined_union()?.name || "";
             firms.push({ name, alpha, union_name });
@@ -214,12 +227,15 @@ class Game_Logic {
         let unions = [];
         for (let union of this.#unions) {
             let name = union.name;
-            let average_alpha = union.calculate_average_alpha().toFixed(3);
+            let average_alpha = parseInt(union.calculate_average_alpha());
+            let total_alpha =
+                parseInt(union.calculate_average_alpha() * union.get_members().length);
+            let prod_cap = union.calculate_prod_cap();
             let members_name =
                 union.get_members();
             members_name = members_name.map(member => member.name);
             members_name = members_name.join(", ");
-            unions.push({ name, average_alpha, members: members_name });
+            unions.push({ name, average_alpha, total_alpha, prod_cap, members: members_name });
         }
         unions.sort((a, b) => b.average_alpha - a.average_alpha);
 
