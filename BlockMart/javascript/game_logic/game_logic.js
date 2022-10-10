@@ -5,6 +5,8 @@ class Game_Logic {
      * PCD = production capacity difference (firm's prod_cap - based_union's prod_cap)
      */
 
+    #MIN_FIRM_PROD_CAP = 0.001;
+
     #game_notification = new Game_Notification();
     #objnetwork = new ObjNetwork();
 
@@ -29,7 +31,7 @@ class Game_Logic {
         this.#unions.forEach(union => setted_names.push(union.name));
 
         if (setted_names.length == NAMES_DATABASE.length)
-            throw `Run out of NAMES_DATABASE`;
+            this.#game_notification.throw("Game_Logic__ROO_NAMES_DB");
 
         let random_name = NAMES_DATABASE[Math.floor(Math.random() * NAMES_DATABASE.length)];
         while (setted_names.includes(random_name)) {
@@ -96,7 +98,7 @@ class Game_Logic {
         if (this.#firms.length <= 0) return false;
         let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
         let updated_prod_cap = random_firm.update_prod_cap();
-        if (updated_prod_cap < 0) {
+        if (updated_prod_cap < this.#MIN_FIRM_PROD_CAP) {
             this.remove_firm(random_firm);
         }
     }
@@ -159,12 +161,24 @@ class Game_Logic {
         if (this.#firms.length <= 0) return false;
         let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
         this.remove_firm(random_firm);
+        return true;
     }
 
     random_remove_union() {
         if (this.#unions.length <= 0) return false;
+
         let random_union = this.#unions[Math.floor(Math.random() * this.#unions.length)];
+        let random_ratio = Math.random();
+        if (random_ratio < 0.95) {
+            let no_member_unions =
+                this.#unions.filter(union => union.get_members().length <= 0);
+            random_union =
+                no_member_unions[Math.floor(Math.random() * no_member_unions.length)];
+        }
+
         this.remove_union(random_union);
+
+        return true;
     }
 
     random_all_events() {
@@ -195,14 +209,14 @@ class Game_Logic {
 
         random_event({
             70.0: () => this.random_firm_produce(),
-            29.6: () => this.random_firm_update_prod_cap(),
-            0.125: () => this.create_union(),
+            29.55: () => this.random_firm_update_prod_cap(),
+            0.13: () => this.create_firm(),
+            0.12: () => this.create_union(),
             0.1: () => this.random_firm_union_link(),
-            0.075: () => this.create_firm(),
+            0.05: () => this.random_remove_union(),
             0.025: () => this.random_leave_union(),
-            0.025: () => this.random_remove_member(),
-            0.025: () => this.random_remove_firm(),
-            0.025: () => this.random_remove_union()
+            0.0125: () => this.random_remove_member(),
+            0.0125: () => this.random_remove_firm()
         });
     }
 

@@ -8,7 +8,7 @@ class Firm {
      */
 
     #DEFAULT_PROD_CAP = 1;
-    #PROD_CAP_CHANGE_RANGE = 0.1;
+    #PROD_CAP_CHANGE_RANGE = 0.125;
 
     #game_logic = undefined;
     #game_notification = undefined;
