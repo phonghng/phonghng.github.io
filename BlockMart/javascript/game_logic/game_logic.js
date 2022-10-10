@@ -5,7 +5,15 @@ class Game_Logic {
      * PCD = production capacity difference (firm's prod_cap - based_union's prod_cap)
      */
 
-    #MIN_FIRM_PROD_CAP = 0.001;
+    #configs = {
+        firm: {
+            prod_cap: {
+                default: 5,
+                change_range: 0.1,
+                min: 0.001
+            }
+        }
+    };
 
     #game_notification = new Game_Notification();
     #objnetwork = new ObjNetwork();
@@ -54,7 +62,12 @@ class Game_Logic {
     }
 
     create_firm() {
-        let firm = new Firm(this, this.#game_notification, this.#objnetwork);
+        let firm = new Firm(
+            this,
+            this.#game_notification,
+            this.#objnetwork,
+            this.#configs.firm
+        );
         firm.name = this.generate_random_name();
         firm.minPCDR = this.generate_random_minPCDR(this.#firms);
         this.#firms.push(firm);
@@ -98,7 +111,7 @@ class Game_Logic {
         if (this.#firms.length <= 0) return false;
         let random_firm = this.#firms[Math.floor(Math.random() * this.#firms.length)];
         let updated_prod_cap = random_firm.update_prod_cap();
-        if (updated_prod_cap < this.#MIN_FIRM_PROD_CAP) {
+        if (updated_prod_cap < this.#configs.firm.prod_cap.min) {
             this.remove_firm(random_firm);
         }
     }

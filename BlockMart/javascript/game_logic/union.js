@@ -7,11 +7,11 @@ class Union {
      * minPR = minimum rank by PCD acceptable
      */
 
-    #game_logic = undefined;
-    #game_notification = undefined;
-    #objnetwork = undefined;
+    #game_logic;
+    #game_notification;
+    #objnetwork;
 
-    name = undefined;
+    name;
 
     #minPCDR = 0;
 

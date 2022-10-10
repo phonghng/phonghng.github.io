@@ -7,28 +7,36 @@ class Firm {
      * minPR = minimum rank by PCD acceptable
      */
 
-    #DEFAULT_PROD_CAP = 1;
-    #PROD_CAP_CHANGE_RANGE = 0.125;
+    #configs = {
+        prod_cap: {
+            default: undefined,
+            change_range: undefined
+        }
+    };
 
-    #game_logic = undefined;
-    #game_notification = undefined;
-    #objnetwork = undefined;
+    #game_logic;
+    #game_notification;
+    #objnetwork;
 
-    name = undefined;
+    name;
 
-    #prod_cap = this.#DEFAULT_PROD_CAP;
+    #prod_cap;
     #alpha = 0;
     #minPCDR = 0;
 
     constructor(
         game_logic,
         game_notification,
-        objnetwork
+        objnetwork,
+        configs
     ) {
         this.#game_logic = game_logic;
         this.#game_notification = game_notification;
         this.#objnetwork = objnetwork;
         this.#objnetwork.add_object(this);
+
+        this.#configs = configs;
+        this.#prod_cap = this.#configs.prod_cap.default;
     }
 
     get prod_cap() {
@@ -59,8 +67,8 @@ class Firm {
         let union_prod_cap = this.get_joined_union()?.calculate_prod_cap();
         let change_rate =
             random(
-                this.#PROD_CAP_CHANGE_RANGE,
-                0 - this.#PROD_CAP_CHANGE_RANGE
+                this.#configs.prod_cap.change_range,
+                0 - this.#configs.prod_cap.change_range
             ) * (
                 this.prod_cap && union_prod_cap
                     ? (this.prod_cap / union_prod_cap)
