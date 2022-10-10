@@ -8,7 +8,7 @@ class Game_Logic {
     #configs = {
         firm: {
             prod_cap: {
-                default: 10,
+                default: 0.5,
                 change_range: 0.1,
                 min: 0.001
             }
@@ -225,8 +225,8 @@ class Game_Logic {
             29.50: () => this.random_firm_update_prod_cap(),
             0.13: () => this.create_firm(),
             0.12: () => this.create_union(),
-            0.1: () => this.random_firm_union_link(),
-            0.1: () => this.random_remove_union(),
+            0.125: () => this.random_firm_union_link(),
+            0.075: () => this.random_remove_union(),
             0.025: () => this.random_leave_union(),
             0.0125: () => this.random_remove_member(),
             0.0125: () => this.random_remove_firm()
