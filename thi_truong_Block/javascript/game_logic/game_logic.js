@@ -8,7 +8,7 @@ class Game_Logic {
     #configs = {
         firm: {
             prod_cap: {
-                default: 5,
+                default: 10,
                 change_range: 0.1,
                 min: 0.001
             }
