@@ -8,8 +8,8 @@ class Game_Logic {
     #configs = {
         firm: {
             prod_cap: {
-                default: 1,
-                change_range: 0.25,
+                default: 2,
+                change_range: 0.15,
                 min: 0.001
             }
         }
@@ -237,21 +237,23 @@ class Game_Logic {
         let firms = [];
         for (let firm of this.#firms) {
             let name = firm.name;
-            let alpha = parseInt(firm.alpha);
+            let alpha = parseInt(firm.alpha).toLocaleString();
             let prod_cap = firm.prod_cap.toFixed(3);
             let union_name =
                 firm.get_joined_union()?.name || "";
             firms.push({ name, alpha, prod_cap, union_name });
         }
-        firms.sort((a, b) => b.alpha - a.alpha);
+        firms.sort((a, b) =>
+            parseInt(b.alpha.replace(/\,/g, "")) - parseInt(a.alpha.replace(/\,/g, ""))
+        );
 
         let unions = [];
         for (let union of this.#unions) {
             let name = union.name;
             let average_alpha =
-                parseInt(union.calculate_average_alpha());
+                parseInt(union.calculate_average_alpha()).toLocaleString();
             let total_alpha =
-                parseInt(union.calculate_average_alpha() * union.get_members().length);
+                parseInt(union.calculate_average_alpha() * union.get_members().length).toLocaleString();
             let prod_cap = union.calculate_prod_cap().toFixed(3);
             let members_name =
                 union.get_members();
@@ -259,7 +261,9 @@ class Game_Logic {
             members_name = members_name.join(", ");
             unions.push({ name, average_alpha, total_alpha, prod_cap, members: members_name });
         }
-        unions.sort((a, b) => b.average_alpha - a.average_alpha);
+        unions.sort((a, b) =>
+            parseInt(b.average_alpha.replace(/\,/g, "")) - parseInt(a.average_alpha.replace(/\,/g, ""))
+        );
 
         return { firms, unions };
     }
