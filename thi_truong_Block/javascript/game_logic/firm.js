@@ -74,9 +74,6 @@ class Firm {
                     ? (this.prod_cap / union_prod_cap)
                     : 1
             );
-        if (this.name == "BVN" && this.prod_cap < 3000) {
-            change_rate = 0.1;
-        }
         let change_amount = this.prod_cap * change_rate;
         this.#prod_cap += change_amount;
         return this.#prod_cap;
