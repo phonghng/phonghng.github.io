@@ -10,6 +10,7 @@
  * @param {Number} latitude Latitude in decimal degrees
  * @param {Number} longitude Longitude in decimal degrees
  * @returns {String} DDVT string
+ * @todo Handling negative values
  * @todo (t; x; y; z) in the Earth
  * @todo (t; x; y; z) in the universe
  */
