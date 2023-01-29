@@ -1,4 +1,193 @@
-<textarea style="width: 100%; height: 300px;"></textarea>
+<!-- <textarea style="width: 100%; height: 300px;"></textarea>
 
 <script src="./DDVT.js"></script>
-<script src="./test.js"></script>
+<script src="./test.js"></script> -->
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+    <style>
+        body {
+            background-color: black;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+    </style>
+
+    <script>
+        const fireworks =
+            new Fireworks.default(
+                document.querySelector("body"),
+                {
+                    sound: {
+                        enabled: true,
+                        files: [
+                            "https://fireworks.js.org/sounds/explosion0.mp3",
+                            "https://fireworks.js.org/sounds/explosion1.mp3",
+                            "https://fireworks.js.org/sounds/explosion2.mp3"
+                        ],
+                        volume: {
+                            min: 50,
+                            max: 100
+                        }
+                    }
+                }
+            );
+
+        function run_script(script_array, fireworks_class, canvas, index = 0) {
+            const MILLISECONDS_IN_SECOND = 1000;
+
+            let timeout = script_array[index][0];
+            let argument = script_array[index][1];
+
+            setTimeout(
+                () => {
+                    switch (argument) {
+                        case "show":
+                            canvas.style.display = "block";
+                            break;
+                        case "start":
+                            fireworks_class.start();
+                            break;
+                        case "stop":
+                            fireworks_class.waitStop();
+                            break;
+                        case "hide":
+                            canvas.style.display = "none";
+                            break;
+                        default:
+                            if (typeof argument == "number")
+                                fireworks_class.launch(argument);
+                            else if (typeof argument == "object")
+                                fireworks_class.updateOptions(argument);
+                            break;
+                    }
+
+                    if (index < script_array.length - 1)
+                        run_script(script_array, fireworks_class, canvas, index + 1);
+                },
+                timeout * MILLISECONDS_IN_SECOND
+            );
+        }
+
+        run_script(
+            [
+                [0, "show"],
+                [1, 100],
+                [0, "stop"],
+                [8, "start"],
+                [15, "stop"],
+                [0, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [3, 50],
+                [5, 1],
+                [1, 1],
+                [1, 1],
+                [1, 1],
+                [1, 1],
+                [0, "stop"],
+                [5, "start"],
+                [0, {
+                    intensity: 100,
+                    explosion: 10,
+                    gravity: 1,
+                    decay: {
+                        min: 0.01,
+                        max: 0.01
+                    },
+                    rocketsPoint: {
+                        min: 0,
+                        max: 100
+                    }
+                }],
+                [60, {
+                    intensity: 100,
+                    explosion: 10,
+                    gravity: 1,
+                    decay: {
+                        min: 0.01,
+                        max: 0.01
+                    },
+                    rocketsPoint: {
+                        min: 0,
+                        max: 0
+                    }
+                }],
+                [60, {
+                    intensity: 100,
+                    explosion: 10,
+                    gravity: 1,
+                    decay: {
+                        min: 0.01,
+                        max: 0.01
+                    },
+                    rocketsPoint: {
+                        min: 100,
+                        max: 100
+                    }
+                }],
+                [60, {
+                    intensity: 100,
+                    explosion: 10,
+                    gravity: 1,
+                    decay: {
+                        min: 0.01,
+                        max: 0.01
+                    },
+                    rocketsPoint: {
+                        min: 0,
+                        max: 100
+                    }
+                }],
+                [60, "stop"],
+                [1, 25],
+                [1, 25],
+                [1, 25],
+                [1, 25],
+                [5, 50],
+                [0, "stop"],
+                [10, {
+                    intensity: 30,
+                    explosion: 50,
+                    gravity: 1,
+                    decay: {
+                        min: 0.0005,
+                        max: 0.0005
+                    },
+                    rocketsPoint: {
+                        min: 0,
+                        max: 100
+                    },
+                    lineWidth: {
+                        explosion: {
+                            min: 7,
+                            max: 10
+                        },
+                        trace: {
+                            min: 7,
+                            max: 10
+                        }
+                    },
+                }],
+                [0, 1],
+                [1, 1],
+                [1, 1],
+                [1, 1],
+                [1, 1],
+                [5, 30],
+                //[0, "hide"],
+            ],
+            fireworks,
+            document.querySelector("canvas")
+        );
+    </script>
+</body>
