@@ -79,9 +79,28 @@
         run_script(
             [
                 [0, "show"],
-                [1, 100],
+                [1, {
+                    rocketsPoint: {
+                        min: 0,
+                        max: 0
+                    }
+                }],
+                [0, 100],
+                [0, {
+                    rocketsPoint: {
+                        min: 100,
+                        max: 100
+                    }
+                }],
+                [0, 100],
+                [0, {
+                    rocketsPoint: {
+                        min: 50,
+                        max: 50
+                    }
+                }],
                 [0, "stop"],
-                [8, "start"],
+                [15, "start"],
                 [15, "stop"],
                 [0, 15],
                 [1, 15],
@@ -149,13 +168,59 @@
                     }
                 }],
                 [60, "stop"],
-                [1, 25],
-                [1, 25],
-                [1, 25],
-                [1, 25],
-                [5, 50],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
+                [1, 15],
                 [0, "stop"],
-                [10, {
+                [15, {
+                    friction: 0.75,
+                    gravity: 0,
+                    traceLength: 1,
+                    rocketsPoint: {
+                        min: 0,
+                        max: 100
+                    },
+                    lineWidth: {
+                        explosion: {
+                            min: 7,
+                            max: 10
+                        },
+                        trace: {
+                            min: 7,
+                            max: 10
+                        }
+                    }
+                }],
+                [0, 100],
+                [3, {
+                    friction: 0.75,
+                    gravity: 5,
+                    rocketsPoint: {
+                        min: 0,
+                        max: 100
+                    },
+                    traceLength: 3,
+                    lineWidth: {
+                        explosion: {
+                            min: 1,
+                            max: 4
+                        },
+                        trace: {
+                            min: 0.1,
+                            max: 1
+                        }
+                    }
+                }],
+                [0, 100],
+                [7, {
+                    friction: 1,
                     intensity: 30,
                     explosion: 50,
                     gravity: 1,
@@ -176,14 +241,17 @@
                             min: 7,
                             max: 10
                         }
-                    },
+                    }
                 }],
                 [0, 1],
                 [1, 1],
                 [1, 1],
                 [1, 1],
                 [1, 1],
-                [5, 30],
+                [5, {
+                    friction: 0.95
+                }],
+                [0, 50],
                 //[0, "hide"],
             ],
             fireworks,
