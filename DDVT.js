@@ -1,20 +1,20 @@
 /**
  * @file DDVT string generator and some utils
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 /**
  * DDVT string generator
- * @version 1.1
+ * @version 2.0
  * @param {Number} timestamp Time in milliseconds
  * @param {Number} latitude Latitude in decimal degrees
  * @param {Number} longitude Longitude in decimal degrees
  * @returns {String} DDVT string
+ * @todo Handling big number
  * @todo Handling negative values
- * @todo (t; x; y; z) in the Earth
  * @todo (t; x; y; z) in the universe
  */
-function DDVT(timestamp, latitude, longitude) {
+function DDVT(timestamp, latitude, longitude, altitude) {
     const split_by_dot = number => {
         if (parseInt(number) == number)
             return [number, 0];
@@ -22,7 +22,7 @@ function DDVT(timestamp, latitude, longitude) {
             return number.toString().split(".");
     };
 
-    const DDVT_VERSION = 1;
+    const DDVT_VERSION = 2;
 
     let DDVT_array =
         []
@@ -30,7 +30,8 @@ function DDVT(timestamp, latitude, longitude) {
             .concat(timestamp.toString())
             .concat(split_by_dot(latitude))
             .concat(split_by_dot(longitude))
-            .map(item => parseInt(item).toString(32));
+            .concat(split_by_dot(altitude))
+            .map(item => parseInt(item).toString(36));
 
     let DDVT_string = DDVT_array.join(".").toUpperCase();
 
