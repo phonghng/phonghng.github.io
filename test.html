@@ -21,24 +21,7 @@
     </style>
 
     <script>
-        const fireworks =
-            new Fireworks.default(
-                document.querySelector("body"),
-                {
-                    sound: {
-                        enabled: true,
-                        files: [
-                            "https://fireworks.js.org/sounds/explosion0.mp3",
-                            "https://fireworks.js.org/sounds/explosion1.mp3",
-                            "https://fireworks.js.org/sounds/explosion2.mp3"
-                        ],
-                        volume: {
-                            min: 50,
-                            max: 100
-                        }
-                    }
-                }
-            );
+        const fireworks = new Fireworks.default(document.querySelector("body"));
 
         function run_script(script_array, fireworks_class, canvas, index = 0) {
             const MILLISECONDS_IN_SECOND = 1000;
@@ -79,6 +62,20 @@
         run_script(
             [
                 [0, "show"],
+                [0, {
+                    sound: {
+                        enabled: true,
+                        files: [
+                            "https://fireworks.js.org/sounds/explosion0.mp3",
+                            "https://fireworks.js.org/sounds/explosion1.mp3",
+                            "https://fireworks.js.org/sounds/explosion2.mp3"
+                        ],
+                        volume: {
+                            min: 5,
+                            max: 10
+                        }
+                    }
+                }],
                 [1, {
                     rocketsPoint: {
                         min: 0,
@@ -168,7 +165,7 @@
                     }
                 }],
                 [60, "stop"],
-                [1, 15],
+                [5, 15],
                 [1, 15],
                 [1, 15],
                 [1, 15],
@@ -240,6 +237,12 @@
                         trace: {
                             min: 7,
                             max: 10
+                        }
+                    },
+                    sound: {
+                        volume: {
+                            min: 99,
+                            max: 100
                         }
                     }
                 }],
