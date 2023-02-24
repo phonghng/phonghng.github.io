@@ -215,9 +215,15 @@ class UI {
 
     #Game = undefined;
 
+    #cached = {
+        persons: []
+    };
+
     update() {
         this.#add_missing_person();
         this.#update_persons();
+
+        this.#cached.persons = this.#Game.persons;
     }
 
     #add_missing_person() {
@@ -251,7 +257,9 @@ class UI {
             let person_elm =
                 this.#persons_elm.querySelector(`#person_${person.index}`);
             let person_elm_width_percent = this.#calc_person_elm_width(person.Tinh);
-            person_elm.style = `--rank: ${rank}; width: calc(${person_elm_width_percent}% - 60px);`;
+            let person_elm_color = this.#get_person_elm_color(person, person_elm.style.backgroundColor);
+            person_elm.style =
+                `--rank: ${rank}; width: calc(${person_elm_width_percent}% - 60px); background-color: ${person_elm_color}`;
 
             let person_name_ele = person_elm.querySelector(".name");
             person_name_ele.innerText = person.name;
@@ -266,5 +274,27 @@ class UI {
         let max_Tinh = Math.max(...Tinhs);
         let person_elm_width_percent = Tinh / max_Tinh * 100;
         return person_elm_width_percent;
+    }
+
+    #get_person_elm_color(person, current_color) {
+        let cached_person =
+            this.#cached.persons.filter(
+                cached_person => cached_person.index == person.index
+            )[0];
+
+        if (!cached_person) {
+            return `#FFFFFF`;
+        }
+
+        let current_Tinh = person.Tinh;
+        let cached_Tinh = cached_person.Tinh;
+
+        if (current_Tinh > cached_Tinh) {
+            return `#45BD62`;
+        } else if (current_Tinh == cached_Tinh) {
+            return current_color;
+        } else if (current_Tinh < cached_Tinh) {
+            return `#F3425F`;
+        }
     }
 }
