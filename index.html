@@ -72,59 +72,52 @@
             style="height: 150px; width: 150px; border-radius: 10px;" />
     </div>
 
-    <div id="basic_info">
-        <h1>Basic info</h1>
+    <div id="basic">
+        <h1>Thông tin cơ bản</h1>
 
-        <p data-item_title="Account name">
-            PhongHNg, PHONGHNG
+        <p data-item_title="Họ tên">
+            Nguyễn Hải Phong
         </p>
 
-        <p data-item_title="Full name">
-            Nguyễn Hải Phong, Phong Nguyen
+        <p data-item_title="Biệt danh">
+            PhongHNg
         </p>
 
-        <p data-item_title="Gender">
-            <i class="fa-solid fa-mars"></i> Male
-        </p>
-
-        <p data-item_title="Country">
-            Việt Nam <em>(Vietnam)</em>
+        <p data-item_title="Số CCCD">
+            019.208.XXXXXX
         </p>
     </div>
 
-    <div id="for_work_purpose">
-        <h1>For-work purpose</h1>
+    <div id="contact">
+        <h1>Thông tin liên hệ</h1>
 
-        <p data-item_title="E-mail">
+        <p data-item_title="Email">
             <a data-autolink="email">phonghng8420@gmail.com</a>
         </p>
 
         <p data-item_title="Zalo">
-            <a data-autolink="link">https://zalo.me/0562165940</a>
+            <a data-autolink="zalo">0562165940</a>
         </p>
-
-        <p data-item_title="Paypal">
-        <ul>
-            <li><a data-autolink="email">docdiroingam@gmail.com</a> <em>(don&#39;t use to contact me)</em></li>
-            <li><a data-autolink="link">https://www.paypal.com/paypalme/pnh8420</a></li>
-        </ul>
-        </p>
-    </div>
-
-    <div id="for_personal_purpose">
-        <h1>For-personal purpose</h1>
-
+        
         <p data-item_title="Github">
             <a data-autolink="link">https://github.com/phonghng/</a>
+        </p>
+        
+        <p data-item_title="Facebook">
+            <a data-autolink="link">https://facebook.com/phonghng102/</a>
         </p>
     </div>
 
     <script>
         /* Auto link a tags */
+        const LINK_PREFIXES = {
+            "email": "mailto:",
+            "link": "",
+            "zalo": "https://zalo.me/"
+        };
         let autolink_a_tags = document.querySelectorAll("a[data-autolink]");
         autolink_a_tags.forEach(a_tag => {
-            let prefix =
-                a_tag.dataset.autolink == "email" ? "mailto:" : "";
+        let prefix = LINK_PREFIXES[a_tag.dataset.autolink];
             a_tag.href = `${prefix}${a_tag.innerHTML}`;
             a_tag.target = "_blank";
         });
