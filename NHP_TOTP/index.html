@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHP_TOTP</title>
+    <link rel="shortcut icon" href="./NHP_TOTP.png" type="image/x-icon">
+
+    <script src="./sha.js"></script>
+    <script src="../crypto-js.min.js"></script>
+
+    <script>
+        function NHP_TOTP(secrets) {
+            function dec_to_hex(string) {
+                let zero_leftpad = (string < 15.5) ? ("0") : ("");
+                let hex = Math.round(string).toString(16);
+                return zero_leftpad + hex;
+            }
+
+            function hex_to_dec(string) {
+                return parseInt(string, 16);
+            }
+
+            function leftpad(string, length, padding) {
+                if (length + 1 >= string.length) {
+                    string = Array(length + 1 - string.length).join(padding) + string;
+                }
+                return string;
+            }
+
+            function base32_to_hex(base32) {
+                let base32_charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+                let bits = "";
+                let hex = "";
+
+                for (let i = 0; i < base32.length; i++) {
+                    let val = base32_charset.indexOf(base32.charAt(i).toUpperCase());
+                    bits += leftpad(val.toString(2), 5, "0");
+                }
+
+                for (let i = 0; i + 4 <= bits.length; i += 4) {
+                    let chunk = bits.substring(i, i + 4);
+                    hex += parseInt(chunk, 2).toString(16);
+                }
+
+                return hex;
+            }
+
+            function generate_otp(secret_string) {
+                let key = base32_to_hex(secret_string.replace(/ /g, "").toUpperCase());
+                let epoch = Math.floor(new Date().getTime() / 1000);
+                let time = leftpad(dec_to_hex(Math.floor(epoch / 30)), 16, "0");
+
+                let sha = new jsSHA("SHA-1", "HEX");
+                sha.setHMACKey(key, "HEX");
+                sha.update(time);
+
+                let hmac = sha.getHMAC("HEX");
+                let offset = hex_to_dec(hmac.substr(hmac.length - 1));
+                let otp = (hex_to_dec(hmac.substr(offset * 2, 8)) & hex_to_dec("7fffffff")) + "";
+                otp = (otp).substring(otp.length - 6, otp.length);
+
+                return otp;
+            }
+
+            function generate_all_otp(secrets) {
+                let otps = {};
+                /* otps_example = {
+                    "SERVICE_PROVIDER (ACCOUNT_NAME)": "ABCD EFGH IKLM NOPQ RSTU VWXY"
+                } */
+
+                Object.entries(secrets).forEach(secret => {
+                    let secret_name = secret[0];
+                    let secret_string = secret[1];
+                    otps[secret_name] = generate_otp(secret_string);
+                });
+
+                return otps;
+            }
+
+            return generate_all_otp(secrets);
+        }
+    </script>
+
+    <style>
+        :root {
+            --BLUE: #1877F2;
+            --CHERRY: #F3425F;
+            --GRAPE: #9360F7;
+            --LEMON: #F7B928;
+            --LIME: #45BD62;
+            --PINK: #FF66BF;
+            --SEAFOAM: #54C7EC;
+            --TEAL: #2ABBA7;
+            --TOMATO: #FB724B;
+
+            --BLACKWHITE_0: #ffffff;
+            --BLACKWHITE_1: #fafafa;
+            --BLACKWHITE_2: #ebebeb;
+            --BLACKWHITE_3: #d0d0d0;
+            --BLACKWHITE_4: #9e9e9e;
+            --BLACKWHITE_5: #616161;
+            --BLACKWHITE_6: #212121;
+            --BLACKWHITE_7: #000000;
+
+            --popup_boxShadow: 0 5px 10px rgb(0 0 0 / 20%);
+            ;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 15px;
+            font-size: 18px;
+        }
+
+        .box {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: justify;
+            background-color: var(--BLACKWHITE_2);
+        }
+
+        .lv0_box {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: var(--BLACKWHITE_0);
+        }
+
+        .lv2_box {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: var(--BLACKWHITE_3);
+        }
+
+        .lv3_box {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: var(--BLACKWHITE_4);
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 10px;
+            border-radius: 5px;
+            color: var(--BLACKWHITE_7);
+            background-color: var(--BLACKWHITE_0);
+        }
+
+        textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 10px;
+            border-radius: 5px;
+            color: var(--BLACKWHITE_7);
+            background-color: var(--BLACKWHITE_0);
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            color: var(--BLACKWHITE_7);
+            background-color: var(--BLACKWHITE_0);
+        }
+
+        button:hover {
+            background-color: var(--BLACKWHITE_1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+        }
+
+        button[disabled]:active {
+            transform: none !important;
+        }
+
+        a {
+            cursor: pointer;
+            color: var(--BLUE);
+            text-decoration: none;
+        }
+
+        a:active {
+            text-decoration: underline;
+        }
+
+        #string_need_encrypt,
+        #encrypt_password,
+        #encrypt_button,
+        #decrypt_password {
+            margin-bottom: 10px;
+        }
+
+        #string_need_encrypt,
+        #encrypt_result {
+            height: 250px;
+        }
+
+        .otp {
+            margin-top: 10px;
+        }
+
+        .otp .otp_name {
+            top: 1px;
+            font-weight: bold;
+            position: relative;
+            display: inline-block;
+        }
+
+        .otp .otp_code {
+            margin-left: 5px;
+            width: fit-content;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <h1>
+            NHP_TOTP
+        </h1>
+    </div>
+
+    <h2>Giải mã</h2>
+    <div class="box" id="decrypt">
+        <input type="password" id="decrypt_password" placeholder="Nhập mật khẩu để giải mã..." />
+        <button onclick="javascript:decrypt();" id="decrypt_button">Giải mã</button>
+        <div id="otp_list"></div>
+    </div>
+
+    <h2>Mã hoá</h2>
+    <div class="box" id="encrypt">
+        <textarea id="string_need_encrypt" placeholder="Chuỗi cần mã hoá..."></textarea>
+        <input type="password" id="encrypt_password" placeholder="Nhập mật khẩu để giải mã..." />
+        <button onclick="javascript:encrypt();" id="encrypt_button">Mã hoá</button>
+        <textarea id="encrypt_result" placeholder="Chuỗi đã mã hoá..."></textarea>
+    </div>
+
+    <script>
+        const ENCRYPTED = "U2FsdGVkX19Ytkt3QqMjdVffWIJPgRm6nKPZIY90X01lUsD50R0hXwLggXeYSiPpKaxaQHBV696YpUewacxxu/aQMCwVzJjLxEPKARbni9rNbeooovR8n59xp9WOsRiJE/42X2PJPNNyKuX8P8a1WSzrafykX+j+pFYE3A8NdQi6WTlhqdaoulfJRDtD5bfYpDtHDteMcfO9ca3iGz2HXg+gSq2YxbOsf6B+4oJ9goNPQW/ow9mE46oVMiMCL/kdZ4R7OKKL7Lt0gLMNsABgTAyd8jXKEh8PMAp2/2/IedKT8VLdyA2ZEUQiS4zRi8em/EmvV1Vx74GlNBxbU6RdW7J5YfttL1diq28wrq3MkJ/sw9HQqPZFk2eIdSakMAAdoEfxeYqGf4GvTJIdd9SSkorFjoJTrju81cafzCsgkZi+ZhZmgxr1xJWe8cAftfn3vk8Q5ZO/3HrYeQyffiTbzzEHwstq7hHkCMo/vme/4gQA1li4oE0cN6rR5rsb8sEZXZQlkgzT7FYeOTSAhPdzcV6SACzULSEaw6I/LbRR40I6j4MDBWVrVYRTSuxAQWc/yz844Q7rxiucMvZPzRJ0i+PWTwcDO/zH5YRst6dmt+NPKiIGIGEoNvLx0NcH8C5p32spC2MJFWcSauynWV2AUj6odoMtLtf1Kd9A8JmCh4FSgL+bG5qUkVnOqi3uMrz+u4DcUMuZjmIXVy1uqKB5iSFr1gkT9vzOpYiZNCFN1prog+lew8L91bxZMGCNMyAgEA233QfUQlgIIeLts/XDx6f2kTJx7z9sAH+NZrBYIgl82UoiblMeDqqgmiugQa3PDdJXYqeEwiW4ocbh9diBEJnEv6/+l6Di1f1FDWgDTnOuphTd5LiRjr5XERCh2Ea2hXtXDelvNZAbicTihAzefgmTPoiEvI75iuXFqDSwg+DjwS/XjL7eez7YuQlB8b6j62iwkVLLzvkmOTZeh7RNnKslZuqoH3NDXAIlEBYTL/WNIfE1zs29/nyrrHoGKv17htWeRJUM08GsW4xmVk8pBGw41Uss3GQ8qkzdGP3aCTRl77NqWze4+jtWcxRVXIMAQbX3fYnXhcrY5ezWdB/Sma2adHGoLF1czX9EYiyL72M0VMCFjI2LwjozFWzpgXhXHmjfvubPjOwP8b6SDvm6PNDPq1TmSow7xWjdBFYCRSYNeUc25iRlYA09tYlCuS3T1mszXqe0IKgZljWXUGh7JIOjT7VlUHjn2yzCp2/H9T+TkwzV8c1C/6Cr2MkrwReN8HaxTZkyqLaZI7WdsdBad+7QDbhi3umV0R6vCVyLLFOps6Rs/IzA7Tz4XSFOGvHZ/3U7hZZN2Lb9zthU+7LC4e/KWx53yBnfSkuBPlWqBaXE5gcaXimlyEP/KHYDHdpO0/4hTm4sTtov5H5OAveHRB2bfpIMVXa4daVTf67taWgx8I3ob572sOi/LrHcbF6qr4SlSOfOoDGgL0H2YY+Ig7/Y9FDRX/xP+HBRfhNtoYeleBvnRFWZ/uQqR7/uvifn2HxNua/QY6NW8bvO04nSnqv1d0ily3CpApSWN28gTitVxKG8jL4cDCMp1AOyVCPPN3rdZQuHC8JIVVbVBNfyTIN7CO7rcul1zaenO7FkRUUBpwyTeztn4ZhguCgiEndGs3LA7dnL76V9OQvXYrNo9HNg4VTH1XRDgcLEs9bvyCNudOiNYlZlBRK+SaDxwdcuvwFq+2s77Bf2F4/Jv1368Q==";
+
+        function decrypt() {
+            let password = document.querySelector("#decrypt_password").value;
+            let decrypted =
+                CryptoJS.AES.decrypt(ENCRYPTED, password)
+                    .toString(CryptoJS.enc.Utf8);
+            let json = JSON.parse(decrypted);
+
+            let otps = NHP_TOTP(json.totp_secrets)
+            let otp_list_element = document.querySelector("#otp_list");
+            while (otp_list_element.firstChild) {
+                otp_list_element.removeChild(otp_list_element.firstChild);
+            }
+            Object.entries(otps).forEach(otp => {
+                let otp_element = document.createElement("div");
+                otp_element.classList.add("lv2_box", "otp");
+
+                let otp_name = otp[0];
+                let otp_name_element = document.createElement("div");
+                otp_name_element.classList.add("otp_name");
+                otp_name_element.innerHTML = otp_name;
+                otp_element.appendChild(otp_name_element);
+
+                let otp_code = otp[1];
+                let otp_code_element = document.createElement("button");
+                otp_code_element.classList.add("otp_code");
+                otp_code_element.innerHTML = otp_code;
+                otp_code_element.onclick = () => {
+                    navigator.clipboard.writeText(otp_code).then(() => {
+                        otp_code_element.innerHTML = "Đã sao chép!";
+                        setTimeout(() => {
+                            otp_code_element.innerHTML = otp_code;
+                        }, 1000);
+                    }, function (err) {
+                        otp_code_element.innerHTML = "Chưa sao chép!";
+                        setTimeout(() => {
+                            otp_code_element.innerHTML = otp_code;
+                        }, 1000);
+                    });
+                }
+                otp_element.appendChild(otp_code_element);
+
+                otp_list_element.appendChild(otp_element);
+
+            });
+
+            document.querySelector("#decrypt_password").value = "";
+        }
+
+        function encrypt() {
+            let string_need_encrypt = document.querySelector("#string_need_encrypt").value;
+            let password = document.querySelector("#encrypt_password").value;
+            let encrypted = CryptoJS.AES.encrypt(string_need_encrypt, password);
+
+            document.querySelector("#encrypt_result").value = encrypted;
+            document.querySelector("#encrypt_password").value = "";
+        }
+    </script>
+</body>
+
+</html>

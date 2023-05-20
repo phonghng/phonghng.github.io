@@ -8,6 +8,8 @@
     <title>PhongHNg</title>
     <link rel="shortcut icon" href="./PhongHNg.png" type="image/x-icon">
 
+    <script src="../crypto-js.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
     <style>
@@ -52,6 +54,7 @@
             font-size: 18px;
             background-color: var(--BODY_BGCOLOR);
             max-width: 500px;
+            text-align: justify;
         }
 
         a {
@@ -62,6 +65,10 @@
 
         a:active {
             text-decoration: underline;
+        }
+
+        a.reveal_info {
+            color: var(--CHERRY);
         }
     </style>
 </head>
@@ -75,60 +82,160 @@
     <div id="basic">
         <h1>Thông tin cơ bản</h1>
 
-        <p data-item_title="Họ tên">
+        <p _item_title="Họ tên">
             Nguyễn Hải Phong
         </p>
 
-        <p data-item_title="Biệt danh">
+        <p _item_title="Biệt danh">
             PhongHNg
         </p>
 
-        <p data-item_title="Số CCCD">
+        <p _item_title="Số CCCD cơ bản">
             019.208.XXXXXX
         </p>
     </div>
 
-    <div id="contact">
-        <h1>Thông tin liên hệ</h1>
+    <div id="basic_contact">
+        <h1>Liên hệ cơ bản</h1>
 
-        <p data-item_title="Email">
-            <a data-autolink="email">phonghng8420@gmail.com</a>
+        <p _item_title="Email">
+            <a _link_type="email">phonghng8420@gmail.com</a>
         </p>
 
-        <p data-item_title="Zalo">
-            <a data-autolink="zalo">0562165940</a>
+        <p _item_title="Zalo">
+            <a _link_type="zalo">0562165940</a>
         </p>
-        
-        <p data-item_title="Github">
-            <a data-autolink="link">https://github.com/phonghng/</a>
+
+        <p _item_title="Github">
+            <a _link_type="link">https://github.com/phonghng/</a>
         </p>
-        
-        <p data-item_title="Facebook">
-            <a data-autolink="link">https://facebook.com/phonghng102/</a>
+
+        <p _item_title="Facebook">
+            <a _link_type="link">https://facebook.com/phonghng102/</a>
+        </p>
+    </div>
+
+    <div id="emergency_contact">
+        <h1>Liên hệ khẩn cấp</h1>
+
+        <p _item_title="Số CCCD đầy đủ">
+            <a class="reveal_info"></a>
+            <span></span>
+        </p>
+
+        <p _item_title="SĐT bố">
+            <a class="reveal_info"></a>
+            <a _link_type="phone"></a>
+        </p>
+
+        <p _item_title="SĐT mẹ">
+            <a class="reveal_info"></a>
+            <a _link_type="phone"></a>
+        </p>
+
+        <p _item_title="Chỗ ở hiện tại">
+            <a class="reveal_info"></a>
+            <a _link_type="geohack" _geohack_latitude _geohack_longitude></a>
+        </p>
+
+        <p _item_title="Trường học hiện tại">
+            <a class="reveal_info"></a>
+            <a _link_type="geohack" _geohack_latitude _geohack_longitude></a>
         </p>
     </div>
 
     <script>
-        /* Auto link a tags */
-        const LINK_PREFIXES = {
-            "email": "mailto:",
-            "link": "",
-            "zalo": "https://zalo.me/"
-        };
-        let autolink_a_tags = document.querySelectorAll("a[data-autolink]");
-        autolink_a_tags.forEach(a_tag => {
-        let prefix = LINK_PREFIXES[a_tag.dataset.autolink];
-            a_tag.href = `${prefix}${a_tag.innerHTML}`;
-            a_tag.target = "_blank";
-        });
+        const EMERGENCY_CONTACT_ENCRYPTED = `U2FsdGVkX18XcwPFx+pi4Nhv4pDk6+QSSQ+ii3KDupGih2LhzS6EUQ/AkPcEeISVxvSaioAhIOpatCu5EnIGDwxaM05CERpsY4+zdt41yBp+2cqm+3r9lrHu06kO/vJUqfuB/BsASwUofMcBxm90epViMBo7aETHlqlaEI6FcHp0WlSTZISR34VLrrppdHzYf9TIUOvPXOQp5N3SAAGVpnl77LWRr8JBBeD9DclQ6nRgKWN5LqxAbtcmMzWCk6yRtMZUkNT19uLctOLhF3Mbja2h2Oheh29dhgBK0/VMAeoauammsjbMxHJmb5SItgXLvTi9KWvioCuHy3g7qH+E4Ug6r6xeuHkK0chJrTsVvE3lpncVjtv3CfLVpGJt9C3kkfI3IrCQXtaDSXew2ozjLXdsDJT6ed4OMt+v296PBfZHP/YoiL4lxs2gFkKeKBYOGhoS6VmTFIshlNTk41K60XndZZluGhiUhwWe5LpN3FhFAUs1iCPMyYQBNIe4oBwDXibN3JBwHH9HjkV4MqWMtE8xTdkjbKb1xMnBWrkq+D1qA+srT2I3hZSGiTfLgcro26qYb8fyqLM94/u0QKsaak3AQKLwV7XrSskYtpgmwy/2b8i/t5d7GqNTwOuh9O2jVl8ayhOmzj6kK4SGxosVQQNpnWDj0RYsCtVDxmygwalYjqvKa588rTtkqj6/PYQl`;
 
-        /* Append title to items */
-        let items = document.querySelectorAll("p[data-item_title]");
-        items.forEach(item => {
-            let title = document.createElement("strong");
-            title.innerHTML = `${item.dataset.item_title}:`;
-            item.insertBefore(title, item.firstChild);
-        });
+        function link_anchor_tags() {
+            let elements = document.querySelectorAll("a[_link_type]");
+            for (const element of elements) {
+                let link_type = element.getAttribute("_link_type");
+                switch (link_type) {
+                    case "email":
+                        element.href = `mailto:${element.innerHTML}`;
+                        break;
+                    case "link":
+                        element.href = `${element.innerHTML}`;
+                        break;
+                    case "zalo":
+                        element.href = `https://zalo.me/${element.innerHTML}`;
+                        break;
+                    case "phone":
+                        element.href = `tel:${element.innerHTML}`;
+                        break;
+                    case "geohack":
+                        let latitude = element.getAttribute("_geohack_latitude");
+                        let longitude = element.getAttribute("_geohack_longitude");
+                        element.href = `https://geohack.toolforge.org/geohack.php?language=vi&pagename=${element.innerHTML}&params=${latitude};${longitude}`;
+                        break;
+                }
+
+                element.target = "_blank";
+            }
+        }
+
+        function append_items_title() {
+            let items = document.querySelectorAll("p[_item_title]");
+            for (const item of items) {
+                let title = document.createElement("strong");
+                title.innerHTML = `${item.getAttribute("_item_title")}:`;
+                item.insertBefore(title, item.firstChild);
+            }
+        }
+
+        function emergency_contact_encrypt(json, password) {
+            let json_stringified = JSON.stringify(json);
+            return CryptoJS.AES.encrypt(json_stringified, password).toString();
+        }
+
+        function emergency_contact_decrypt(encrypted_json, password, reveal_info_anchor) {
+            reveal_info_anchor.style.display = "none";
+
+            let json =
+                JSON.parse(
+                    CryptoJS.AES.decrypt(
+                        encrypted_json || EMERGENCY_CONTACT_ENCRYPTED,
+                        password
+                    ).toString(CryptoJS.enc.Utf8)
+                );
+
+            let item_title = reveal_info_anchor.parentElement.getAttribute("_item_title")
+
+            let element =
+                document.querySelector(`p[_item_title="${item_title}"] a[_link_type]`)
+                || document.querySelector(`p[_item_title="${item_title}"] span`);
+
+            let element_attributes = json[item_title];
+            for (const name in element_attributes) {
+                const value = element_attributes[name];
+                if (name.startsWith("_")) {
+                    element.setAttribute(name, value);
+                } else {
+                    element[name] = value;
+                }
+            }
+
+            link_anchor_tags();
+        }
+
+        function assign_emergency_contact_reveal_info_anchor() {
+            let anchors = document.querySelectorAll("p[_item_title] a.reveal_info");
+            for (const anchor of anchors) {
+                anchor.innerHTML = "Bấm vào đây để hiện thông tin...";
+                anchor.onclick = (event) => {
+                    emergency_contact_decrypt(
+                        EMERGENCY_CONTACT_ENCRYPTED,
+                        prompt('Nhập mật khẩu:'),
+                        event.target
+                    );
+                };
+            }
+        }
+
+        link_anchor_tags();
+        append_items_title();
+        assign_emergency_contact_reveal_info_anchor();
     </script>
 </body>
 
