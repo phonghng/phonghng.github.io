@@ -5,11 +5,553 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block</title>
+    <title>Block 1.0</title>
+
+    <script>
+        const PLOCKS_AMOUNT = 5;
+        const DEFAULT_PLOCKS = 0.1;
+        const MAX_BPCR = 0.25;
+        const MIN_BPCR = -0.15;
+        const NEW_BLOCK_COST = 1 / 3;
+        const MAX_RANDOM_NEW_BLOCK_AMOUNT = 5;
+        const GAME_TICK_SPEED = 100;
+        const MAX_BLOCK_PER_USER = 5;
+        const EVENTS_RANDOM_STOCK = [
+            /* Create new firm */ 100,
+            /* Create new user */ 500,
+            /* Create new Blocks */ 1000,
+            /* Remove firm */ 1,
+            /* Remove user */ 5,
+            /* Remove Blocks */ 10,
+            /* Choose and add Block to user */ 3000,
+        ];
+
+        const stock_style_random = (options) => {
+            options = options.filter(option => option[0]);
+            let sum = 0;
+            for (let i = 0; i < options.length; i++) {
+                sum += Number(options[i][0]);
+                options[i][0] = sum;
+            }
+            let random_number = Math.floor(Math.random() * (sum + 1));
+            let largest_smaller_number = Number.POSITIVE_INFINITY;
+            for (let i = 0; i < options.length; i++)
+                if (random_number <= options[i][0])
+                    largest_smaller_number = Math.min(largest_smaller_number, options[i][0]);
+            return Object.fromEntries(options)[largest_smaller_number];
+        };
+
+        class Block {
+            constructor(firm) {
+                this.firm = firm;
+                this.user = null;
+                this.Plocks = this.get_random_Plocks();
+            }
+
+            get_random_Plocks() {
+                let base_Plocks = this.firm.get_average_Plocks();
+
+                if (!base_Plocks) {
+                    return Array(PLOCKS_AMOUNT).fill(DEFAULT_PLOCKS);
+                }
+
+                let Plocks = [];
+                for (let base_Plock of base_Plocks) {
+                    let bPcr; // bPcr = "base Plock change rate (to create random Plock)"
+                    let Plock;
+                    while (isNaN(Plock) || Plock < 0 || Plock > 1) {
+                        bPcr = Math.random() * (MAX_BPCR - MIN_BPCR) + MIN_BPCR + 1;
+                        Plock = base_Plock * bPcr;
+                    }
+                    Plocks.push(Plock);
+                }
+                return Plocks;
+            }
+
+            destroy() {
+                this.firm.remove_Block(this);
+                if (this.user)
+                    this.user.remove_Block(this);
+            }
+        }
+
+        class Firm {
+            constructor(game) {
+                this.Blocks = [];
+                this.game = game;
+            }
+
+            new_Block(amount) {
+                let random_Blocks = this.get_random_Blocks(parseInt(amount * NEW_BLOCK_COST));
+                for (let random_Block of random_Blocks)
+                    random_Block.destroy();
+                let added_Blocks = [];
+                for (let i = 0; i < amount; i++) {
+                    let added_Block = new Block(this);
+                    this.Blocks.push(added_Block);
+                    added_Blocks.push(added_Block);
+                }
+                return added_Blocks;
+            }
+
+            remove_Block(Block) {
+                let index = this.Blocks.indexOf(Block);
+                if (index < 0)
+                    return false;
+                this.Blocks.splice(index, 1);
+                Block.firm = null;
+                this.game.UI.remove_Block(Block);
+                return true;
+            }
+
+            get_average_Plocks() {
+                if (this.Blocks.length <= 0)
+                    return false;
+
+                const transpose_matrix =
+                    (matrix) => matrix[0].map(
+                        (_, column_index) => matrix.map(row => row[column_index])
+                    );
+
+                let Plocks_matrix = this.Blocks.map(Block => Block.Plocks);
+                let average_Plocks =
+                    transpose_matrix(Plocks_matrix)
+                        .map(column =>
+                            column.reduce((a, b) => a + b) / column.length
+                        );
+
+                return average_Plocks;
+            }
+
+            get_random_Blocks(amount) {
+                amount = Math.min(amount, this.Blocks.length);
+
+                let random_indexes = [];
+
+                for (let i = 0; i < amount; i++) {
+                    let random_index;
+                    while (isNaN(random_index)
+                        || random_indexes.includes(random_index))
+                        random_index = Math.floor(Math.random() * this.Blocks.length);
+
+                    random_indexes.push(random_index);
+                }
+
+                return amount == 0 ? [] : this.Blocks.slice(random_indexes);
+            }
+        }
+
+        class User {
+            constructor(game) {
+                this.Blocks = [];
+                this.game = game;
+                this.favourite_Plock_index = Math.floor(Math.random() * PLOCKS_AMOUNT);
+            }
+
+            add_Block(Block) {
+                while (this.Blocks.length >= MAX_BLOCK_PER_USER) {
+                    let random_Block =
+                        this.Blocks[Math.floor(Math.random() * this.Blocks.length)];
+                    this.remove_Block(random_Block);
+                }
+                this.Blocks.push(Block);
+                Block.user = this;
+                return Block;
+            }
+
+            remove_Block(Block) {
+                let index = this.Blocks.indexOf(Block);
+                if (index < 0)
+                    return false;
+                this.Blocks.splice(index, 1);
+                Block.user = null;
+
+                if (Block.firm)
+                    this.game.UI.move_Block(Block, "firm", Block.firm);
+                else
+                    this.game.UI.remove_Block(Block);
+
+                return true;
+            }
+
+            choose_Block_to_add() {
+                let Blocks = this.game.firms.map(Firm => Firm.Blocks).flat();
+                Blocks = Blocks.filter(Block => !Block.user);
+                Blocks = Blocks.sort(
+                    (a, b) => b.Plocks[this.favourite_Plock_index] - a.Plocks[this.favourite_Plock_index]
+                );
+                return Blocks[0];
+            }
+        }
+
+        class Game {
+            constructor(UI) {
+                this.UI = UI;
+                this.firms = [];
+                this.users = [];
+            }
+
+            new_firm() {
+                let added_firm = new Firm(this);
+                this.firms.push(added_firm);
+                return added_firm;
+            }
+
+            remove_firm(firm) {
+                let index = this.firms.indexOf(firm, this);
+                if (index < 0)
+                    return false;
+                for (let Block of firm.Blocks)
+                    Block.destroy();
+                this.firms.splice(index, 1);
+            }
+
+            new_Blocks(firm, amount) {
+                if (!this.firms.includes(firm))
+                    return false;
+                return firm.new_Block(amount);
+            }
+
+            user_choose_add_Block(user) {
+                if (!this.users.includes(user))
+                    return false;
+                let choosen_Block = user.choose_Block_to_add();
+                if (!choosen_Block)
+                    return false;
+                return user.add_Block(choosen_Block);
+            }
+
+            new_user() {
+                let added_user = new User(this);
+                this.users.push(added_user);
+                return added_user;
+            }
+
+            remove_user(user) {
+                let index = this.users.indexOf(user);
+                if (index < 0)
+                    return false;
+                for (let Block of user.Blocks)
+                    user.remove_Block(Block);
+                this.users.splice(index, 1);
+            }
+
+            random_object(object_name) {
+                switch (object_name) {
+                    case "firm":
+                        return this.firms[Math.floor(Math.random() * this.firms.length)];
+
+                    case "user":
+                        return this.users[Math.floor(Math.random() * this.users.length)];
+
+                    case "Block":
+                        let Blocks = this.firms.map(Firm => Firm.Blocks).flat();
+                        return Blocks[Math.floor(Math.random() * Blocks.length)];
+
+                    case "new Block amount":
+                        return Math.floor(Math.random() * (MAX_RANDOM_NEW_BLOCK_AMOUNT + 1));
+                }
+            }
+
+            random_event() {
+                const events_function = [
+                    /* Create new firm */ () => this.UI.new_firm(this.new_firm()),
+                    /* Create new user */ () => this.UI.new_user(this.new_user()),
+                    /* Create new Blocks */ () => {
+                        let firm = this.random_object("firm");
+                        let amount = this.random_object("new Block amount");
+                        let added_Blocks = this.new_Blocks(firm, amount);
+                        if (added_Blocks)
+                            for (let added_Block of added_Blocks)
+                                this.UI.new_Block(added_Block);
+                    },
+                    /* Remove firm */ () => {
+                        let firm = this.random_object("firm");
+                        if (firm) {
+                            this.UI.remove_firm(firm);
+                            this.remove_firm(firm);
+                        }
+                    },
+                    /* Remove user */ () => {
+                        let user = this.random_object("user");
+                        if (user) {
+                            this.UI.remove_user(user);
+                            this.remove_user(user);
+                        }
+                    },
+                    /* Remove Blocks */ () => {
+                        let Block = this.random_object("Block");
+                        if (Block) {
+                            this.UI.remove_Block(Block);
+                            Block.destroy();
+                        }
+                    },
+                    /* Choose and add Block to user */ () => {
+                        let user = this.random_object("user");
+                        let Block = this.user_choose_add_Block(user);
+                        if (Block)
+                            this.UI.move_Block(Block, "user", user);
+                    }
+                ];
+
+                let random_options =
+                    Array(events_function.length).fill(null).map(
+                        (option, index) => [EVENTS_RANDOM_STOCK[index], events_function[index]]
+                    );
+                let random_function = stock_style_random(random_options);
+                random_function();
+            }
+        }
+
+        class UI {
+            constructor(main_element) {
+                this.main_element = main_element;
+                this.firm_UIs = [];
+                this.user_UIs = [];
+                this.Block_UIs = [];
+            }
+
+            move_Block(Block, target_name, target_object) {
+                let Block_element = this.search_object("Block", Block).element;
+                let target_element = this.search_object(target_name, target_object).element;
+
+                let { left: x0, top: y0 } = Block_element.getBoundingClientRect();
+                target_element.append(Block_element);
+                let { left: x1, top: y1 } = Block_element.getBoundingClientRect();
+
+                let dx = x0 - x1;
+                let dy = y0 - y1;
+                if (dx === 0 && dy === 0)
+                    return;
+
+                let transform_from = `translate3d(${dx}px, ${dy}px, 0)`;
+                let transform_to = `translate3d(0, 0, 0)`;
+
+                Block_element.animate([
+                    { transform: transform_from },
+                    { transform: transform_to },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+
+                return true;
+            }
+
+            random_unique_firm_color() {
+                const hex_characters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+
+                let used_color = this.firm_UIs.map(object => object.color);
+
+                let color = "#";
+                for (let i = 0; i < 6; i++)
+                    color += hex_characters[Math.floor(Math.random() * 16)];
+
+                while (
+                    color === "#000000"
+                    || color === "#ffffff"
+                    || (
+                        color[0] === color[2]
+                        && color[0] === color[4]
+                        && color[1] === color[3]
+                        && color[1] === color[5]
+                    )
+                    || used_color.includes(color)
+                ) {
+                    color = "#";
+                    for (let i = 0; i < 6; i++)
+                        color += hex_characters[Math.floor(Math.random() * 16)];
+                }
+
+                return color;
+            }
+
+            new_firm(firm) {
+                let color = this.random_unique_firm_color();
+                let element = document.createElement("div");
+                element.classList.add("firm");
+                element.style.borderColor = color;
+                this.main_element.appendChild(element);
+                this.firm_UIs.push({ element, firm, color });
+
+                element.animate([
+                    { opacity: 0 },
+                    { opacity: 1 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+
+                return true;
+            }
+
+            new_Block(Block) {
+                let firm_object = this.search_object("firm", Block.firm);
+                let element = document.createElement("div");
+                element.classList.add("Block");
+                element.style.backgroundColor = firm_object.color;
+                element.title = Block.Plocks.map(Plock => Plock.toFixed(5)).join("\n");
+                firm_object.element.appendChild(element);
+                this.Block_UIs.push({ element, Block });
+
+                element.animate([
+                    { opacity: 0 },
+                    { opacity: 1 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+
+                return true;
+            }
+
+            new_user(user) {
+                let element = document.createElement("div");
+                element.classList.add("user");
+                this.main_element.appendChild(element);
+                this.user_UIs.push({ element, user });
+
+                element.animate([
+                    { opacity: 0 },
+                    { opacity: 1 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+
+                return true;
+            }
+
+            remove_firm(firm) {
+                let object = this.search_object("firm", firm);
+                let index = this.firm_UIs.indexOf(object);
+                if (index < 0)
+                    return false;
+                this.firm_UIs.splice(index, 1);
+
+                object.element.animate([
+                    { opacity: 1 },
+                    { opacity: 0 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+                setTimeout(
+                    () => this.main_element.removeChild(object.element),
+                    GAME_TICK_SPEED
+                );
+
+                return true;
+            }
+
+            remove_Block(Block) {
+                let Block_object = this.search_object("Block", Block);
+                let Block_index = this.Block_UIs.indexOf(Block_object);
+                if (Block_index < 0)
+                    return false;
+                this.Block_UIs.splice(Block_index, 1);
+
+                Block_object.element.animate([
+                    { opacity: 1 },
+                    { opacity: 0 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+                setTimeout(
+                    () =>
+                        Block_object.element.parentElement
+                            .removeChild(Block_object.element),
+                    GAME_TICK_SPEED
+                );
+
+                return true;
+            }
+
+            remove_user(user) {
+                let object = this.search_object("user", user);
+                let index = this.user_UIs.indexOf(object);
+                if (index < 0)
+                    return false;
+                this.user_UIs.splice(index, 1);
+
+                object.element.animate([
+                    { opacity: 1 },
+                    { opacity: 0 },
+                ], {
+                    duration: GAME_TICK_SPEED
+                });
+                setTimeout(
+                    () => this.main_element.removeChild(object.element),
+                    GAME_TICK_SPEED
+                );
+
+                return true;
+            }
+
+            search_object(object_name, object_class) {
+                let results =
+                    this[`${object_name}_UIs`]
+                        .filter(object => object[object_name] == object_class);
+                return results[0];
+            }
+        }
+    </script>
+
+    <style>
+        .firm,
+        .user {
+            min-width: 30px;
+            min-height: 30px;
+            margin: 10px;
+            border: 1px dashed black;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .user {
+            border: 1px solid black;
+        }
+
+        .Block {
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+            margin: 10px;
+        }
+    </style>
 </head>
 
 <body>
+    <script>
+        let _UI = new UI(document.body);
+        let _Game = new Game(_UI);
+        let _Interval =
+            setInterval(() => {
+                _Game.random_event();
+                best_Block();
+            }, GAME_TICK_SPEED);
 
+        function best_Block() {
+            let Blocks = _Game.firms.map(Firm => Firm.Blocks).flat();
+            if (Blocks.length <= 0)
+                return false;
+            let best_Block =
+                Blocks.sort((a, b) =>
+                    b.Plocks.reduce((a, b) => a + b)
+                    - a.Plocks.reduce((a, b) => a + b)
+                )[0];
+
+            let best_Block_element = _UI.search_object("Block", best_Block).element;
+            let best_Block_firm_element = _UI.search_object("firm", best_Block.firm).element;
+            for (let element of document.querySelectorAll("body *"))
+                element.classList.remove("best_mark");
+            best_Block_element.classList.add("best_mark");
+            best_Block_firm_element.classList.add("best_mark");
+
+            return { best_Block, best_Block_element };
+        }
+    </script>
+
+    <style>
+        .best_mark {
+            box-shadow: 0 0 10px 10px #cccccc;
+        }
+    </style>
 </body>
 
 </html>
