@@ -190,15 +190,22 @@
         }
 
         function emergency_contact_decrypt(encrypted_json, password, reveal_info_anchor) {
-            reveal_info_anchor.style.display = "none";
+            let decrypted;
 
-            let json =
-                JSON.parse(
+            try {
+                decrypted =
                     CryptoJS.AES.decrypt(
                         encrypted_json || EMERGENCY_CONTACT_ENCRYPTED,
                         password
-                    ).toString(CryptoJS.enc.Utf8)
-                );
+                    ).toString(CryptoJS.enc.Utf8);
+            } catch (error) {
+                alert(`Đã xảy ra lỗi: "${error.message}". Có thể là do mật khẩu bị sai. Vui lòng kiểm tra lại!`);
+                return;
+            }
+
+            reveal_info_anchor.style.display = "none";
+
+            let json = JSON.parse(decrypted);
 
             let item_title = reveal_info_anchor.parentElement.getAttribute("_item_title")
 
