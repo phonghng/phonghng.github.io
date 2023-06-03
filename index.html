@@ -103,7 +103,7 @@
         </p>
 
         <p _item_title="Zalo">
-            <a _link_type="zalo">0562165940</a>
+            <a _link_type="zalo">0562.165.940</a>
         </p>
 
         <p _item_title="Github">
@@ -164,7 +164,7 @@
                         element.href = `${element.innerHTML}`;
                         break;
                     case "zalo":
-                        element.href = `https://zalo.me/${element.innerHTML}`;
+                        element.href = `https://zalo.me/${element.innerHTML.replace(/\./g, "")}`;
                         break;
                     case "phone":
                         element.href = `tel:${element.innerHTML.replace(/\./g, "")}`;
