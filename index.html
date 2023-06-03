@@ -145,7 +145,12 @@
     </div>
 
     <script>
-        const EMERGENCY_CONTACT_ENCRYPTED = `U2FsdGVkX18XcwPFx+pi4Nhv4pDk6+QSSQ+ii3KDupGih2LhzS6EUQ/AkPcEeISVxvSaioAhIOpatCu5EnIGDwxaM05CERpsY4+zdt41yBp+2cqm+3r9lrHu06kO/vJUqfuB/BsASwUofMcBxm90epViMBo7aETHlqlaEI6FcHp0WlSTZISR34VLrrppdHzYf9TIUOvPXOQp5N3SAAGVpnl77LWRr8JBBeD9DclQ6nRgKWN5LqxAbtcmMzWCk6yRtMZUkNT19uLctOLhF3Mbja2h2Oheh29dhgBK0/VMAeoauammsjbMxHJmb5SItgXLvTi9KWvioCuHy3g7qH+E4Ug6r6xeuHkK0chJrTsVvE3lpncVjtv3CfLVpGJt9C3kkfI3IrCQXtaDSXew2ozjLXdsDJT6ed4OMt+v296PBfZHP/YoiL4lxs2gFkKeKBYOGhoS6VmTFIshlNTk41K60XndZZluGhiUhwWe5LpN3FhFAUs1iCPMyYQBNIe4oBwDXibN3JBwHH9HjkV4MqWMtE8xTdkjbKb1xMnBWrkq+D1qA+srT2I3hZSGiTfLgcro26qYb8fyqLM94/u0QKsaak3AQKLwV7XrSskYtpgmwy/2b8i/t5d7GqNTwOuh9O2jVl8ayhOmzj6kK4SGxosVQQNpnWDj0RYsCtVDxmygwalYjqvKa588rTtkqj6/PYQl`;
+        /**
+         * - - - ABBRAVIATION - - -
+         * ECI = emergency contact information
+         */
+
+        const ECI_ENCRYPTED = `U2FsdGVkX1+tJn+R9Kk1tIXcimBDivDbiI5syYquYYHdKhartoHCyjAQNVJKK5aAS+gDOz7zh0r4OqgVyeYbMWuv+fTGqk2kEvc1aGkH/Fc+htZGNGXQdWKl/AMucOrp5d9eKHv9Pnk8o/wfgPIBh/UI4QahsGWfn1k+ADQf1BTBH8OH6YX8XJ+2Feimep3nxK3B0z987yc3cgtgz+4JRERhQfOCic3VeAk4RkVKJzvGFSpPH+RlZgRD3bS4mWFsWqnDO+bWlJIU5PqKsLIW39T7yo3tC7ojstJV3jvPLAihSLd91T7HyHbi+/1pPxXG7VSWBHBC86rp7RS2J1DK6LsN/n2soBXcBIeQl8+0h8voiP7hUF8U/zSJ0r49TJSKlj9x9FDVJQFAX0QUqojCV8hRjxxwRJBdC1mq/oRcwG2pvlt36da3ImXVSw4J2CeT0WaSkWEmYY++VEbHqhxU0OAvc04fqgFD4aLKn2hic3xcwnhGnIKc8JrUGBZtOiztEjEalOqGuSzIm6hDbAR28w9L+Mq4qaQTHMHnBhb36BkBi1HlM6AAa/XV6oKgCSCICOL+v8gkCCT/eKqx294DEQbf0ulZWn1GtmNl/SL94N6yMJb/BQM3ar2airGpF7mrrvbdFDUVsZ6DGbSUgjtZ9EUGG//E3AWOvO5J7vdD7Q63H4FmiePwAe0UnvyinJjRVOD6ApJK6j3rIcgPOb6K5dtYg5g+nv9NIrJmpaimtno=`;
 
         function link_anchor_tags() {
             let elements = document.querySelectorAll("a[_link_type]");
@@ -162,7 +167,7 @@
                         element.href = `https://zalo.me/${element.innerHTML}`;
                         break;
                     case "phone":
-                        element.href = `tel:${element.innerHTML}`;
+                        element.href = `tel:${element.innerHTML.replace(/\./g, "")}`;
                         break;
                     case "geohack":
                         let latitude = element.getAttribute("_geohack_latitude");
@@ -184,18 +189,18 @@
             }
         }
 
-        function emergency_contact_encrypt(json, password) {
+        function eci_encrypt(json, password) {
             let json_stringified = JSON.stringify(json);
             return CryptoJS.AES.encrypt(json_stringified, password).toString();
         }
 
-        function emergency_contact_decrypt(encrypted_json, password, reveal_info_anchor) {
+        function eci_decrypt(encrypted_json, password, reveal_info_anchor) {
             let decrypted;
 
             try {
                 decrypted =
                     CryptoJS.AES.decrypt(
-                        encrypted_json || EMERGENCY_CONTACT_ENCRYPTED,
+                        encrypted_json || ECI_ENCRYPTED,
                         password
                     ).toString(CryptoJS.enc.Utf8);
             } catch (error) {
@@ -226,13 +231,13 @@
             link_anchor_tags();
         }
 
-        function assign_emergency_contact_reveal_info_anchor() {
+        function assign_eci_reveal_info_anchor() {
             let anchors = document.querySelectorAll("p[_item_title] a.reveal_info");
             for (const anchor of anchors) {
                 anchor.innerHTML = "Bấm vào đây để hiện thông tin...";
                 anchor.onclick = (event) => {
-                    emergency_contact_decrypt(
-                        EMERGENCY_CONTACT_ENCRYPTED,
+                    eci_decrypt(
+                        ECI_ENCRYPTED,
                         prompt('Nhập mật khẩu:'),
                         event.target
                     );
@@ -242,7 +247,7 @@
 
         link_anchor_tags();
         append_items_title();
-        assign_emergency_contact_reveal_info_anchor();
+        assign_eci_reveal_info_anchor();
     </script>
 </body>
 
