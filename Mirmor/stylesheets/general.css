@@ -1,0 +1,220 @@
+:root {
+    --BLUE: #1877F2;
+    --CHERRY: #F3425F;
+    --GRAPE: #9360F7;
+    --LEMON: #F7B928;
+    --LIME: #45BD62;
+    --PINK: #FF66BF;
+    --SEAFOAM: #54C7EC;
+    --TEAL: #2ABBA7;
+    --TOMATO: #FB724B;
+
+    --DARKMODE_WHITE: #FFFFFF;
+    --DARKMODE_GREY_0: #3E3E3E;
+    --DARKMODE_GREY_1: #3A3B3C;
+    --DARKMODE_GREY_2: #242526;
+    --DARKMODE_GREY_3: #212121;
+    --DARKMODE_GREY_4: #18191A;
+    --DARKMODE_BLACK: #000000;
+
+    --popup_boxShadow: 0 0px 15px rgb(0 0 0 / 20%);
+    --status_bar_boxShadow: 0px 0px 15px rgb(0 0 0 / 50%);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 15px;
+    font-size: 18px;
+    background-color: var(--DARKMODE_GREY_4);
+    color: var(--DARKMODE_WHITE);
+}
+
+.box {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: justify;
+    background-color: var(--DARKMODE_GREY_2);
+}
+
+.lv0_box {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--DARKMODE_WHITE);
+}
+
+.lv2_box {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--DARKMODE_GREY_1);
+}
+
+.lv3_box {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--DARKMODE_GREY_3);
+}
+
+input,
+select {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--DARKMODE_WHITE);
+    background-color: var(--DARKMODE_GREY_0);
+}
+
+textarea {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--DARKMODE_WHITE);
+    background-color: var(--DARKMODE_GREY_0);
+}
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+button {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    color: var(--DARKMODE_WHITE);
+    background-color: var(--DARKMODE_GREY_0);
+}
+
+button:hover {
+    background-color: var(--DARKMODE_GREY_3);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+button[disabled]:active {
+    transform: none !important;
+}
+
+a {
+    cursor: pointer;
+    color: var(--BLUE);
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: underline;
+}
+
+#status_bar {
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 10px;
+    display: none;
+    position: fixed;
+    font-size: 13px;
+    text-align: left;
+    font-weight: bold;
+    border-radius: 0 5px 0 0;
+    max-width: calc(100% - 20px);
+    background-color: var(--DARKMODE_GREY_0);
+    box-shadow: var(--status_bar_boxShadow);
+}
+
+.extension_popup_wrapper {
+    top: 0;
+    left: 0;
+    display: none;
+    position: absolute;
+}
+
+.extension_popup_wrapper.focus {
+    z-index: 2;
+}
+
+.extension_popup_wrapper.not_focus {
+    z-index: 1;
+    opacity: 0.75;
+}
+
+.extension_popup_wrapper .popup {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    padding: 10px;
+    gap: 10px 0px;
+    overflow: auto;
+    border-radius: 5px;
+    grid-template-areas:
+        "."
+        ".";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    background-color: var(--DARKMODE_GREY_2);
+    box-shadow: var(--popup_boxShadow);
+}
+
+.extension_popup_wrapper .popup .header {
+    display: grid;
+    gap: 0px 10px;
+    user-select: none;
+    grid-template-areas:
+        ". .";
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 50px;
+}
+
+.extension_popup_wrapper .popup .header .title_wrapper {
+    display: table;
+}
+
+.extension_popup_wrapper .popup .header .title {
+    cursor: grab;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    display: table-cell;
+    vertical-align: middle;
+    background-color: var(--DARKMODE_GREY_0);
+}
+
+.extension_popup_wrapper .popup .header .title:active {
+    cursor: grabbing;
+}
+
+.extension_popup_wrapper .popup .header .close_button {
+    font-size: 20px;
+    color: var(--CHERRY);
+}
+
+.extension_popup_wrapper .popup iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--DARKMODE_GREY_4);
+}
+
+.checkbox_input {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.checkbox_input input[type="checkbox"] {
+    margin-right: 10px;
+}

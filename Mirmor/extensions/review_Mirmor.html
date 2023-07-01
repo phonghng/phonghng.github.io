@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../javascripts/ui/status_bar.js"></script>
+    <script src="../javascripts/lib/crypto-js.min.js"></script>
+    
+    <link rel="stylesheet" href="../stylesheets/general.css">
+
+    <style>
+        textarea {
+            height: 100px;
+            margin-bottom: 5px;
+            resize: vertical;
+        }
+
+        .box {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        Các nội dung nào đã xử lí, đánh giá thì xóa dòng đấy đi.
+    </div>
+    <div class="box">
+        <textarea></textarea>
+    </div>
+    <div class="box">
+        <button>Đặt lại</button>
+    </div>
+
+    <script>
+        let StatusBar_class = new StatusBar(document.body);
+
+        let textarea = document.querySelector("textarea");
+        let reset_button = document.querySelector("button");
+
+        let data = {
+            textarea_value: undefined
+        };
+
+        textarea.onchange = () => {
+            data.textarea_value = textarea.value;
+            info_onchange();
+        };
+        textarea.onkeyup = () => {
+            data.textarea_value = textarea.value;
+            info_onchange();
+        };
+
+        reset_button.onclick = () => {
+            data.textarea_value = undefined;
+            info_onchange();
+        };
+
+        function update_textarea(export_data_formatted) {
+            if (data.textarea_value === undefined) {
+                let prettied = JSON.stringify(export_data_formatted, null, 5);
+                textarea.value = prettied;
+                data.textarea_value = textarea.value;
+            }
+        }
+
+        function import_info(exported_data) {
+            data.textarea_value = exported_data.textarea_value;
+            textarea.value = data.textarea_value;
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: (data.textarea_value?.trim() == "") ? 50 : 0,
+                goal_point: (XDate_function().is_last_day_of.month) ? 50 : 0,
+                data: data
+            };
+            StatusBar_class.show_status_extension(exported_info);
+            return exported_info;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../javascripts/ui/status_bar.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="../stylesheets/general.css">
+
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas style="width: 100%; height: 100%;"></canvas>
+
+    <script>
+        let StatusBar_class = new StatusBar(document.body);
+
+        let data = {
+            phnotion_midinfo_return: [],
+            last_updated: undefined
+        };
+
+        let ctx = document.querySelector("canvas");
+        let chartjs = new Chart(ctx, {
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "MID",
+                    data: [],
+                    type: "bar"
+                }, {
+                    label: "MID luỹ kế",
+                    data: [],
+                    type: "line"
+                }]
+            },
+            options: {
+                maintainAspectRatio: false
+            }
+        });
+
+        function update_data(phnotion_midinfo_return) {
+            data.phnotion_midinfo_return = phnotion_midinfo_return;
+            data.last_updated = Date.now();
+            info_onchange();
+
+            let mid_info = data.phnotion_midinfo_return;
+            mid_info.reverse();
+            let mapped_mid_info = {
+                date: mid_info.map(date_mid_info => date_mid_info.date),
+                MID: mid_info.map(date_mid_info => date_mid_info.MID),
+                accumulated_MID: mid_info.map(date_mid_info => date_mid_info.accumulated_MID)
+            };
+
+            update_chart(mapped_mid_info);
+        }
+
+        function update_chart(mapped_mid_info) {
+            chartjs.data = {
+                labels: mapped_mid_info.date,
+                datasets: [{
+                    label: "MID",
+                    data: mapped_mid_info.MID,
+                    type: "bar"
+                }, {
+                    label: "MID luỹ kế",
+                    data: mapped_mid_info.accumulated_MID,
+                    type: "line"
+                }]
+            };
+            chartjs.update();
+        }
+
+        function import_info(exported_data) {
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: 0,
+                goal_point: 0,
+                data: data
+            };
+            StatusBar_class.show_status_extension(exported_info);
+            return exported_info;
+        }
+    </script>
+</body>
+
+</html>

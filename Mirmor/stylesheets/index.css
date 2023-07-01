@@ -1,0 +1,77 @@
+.item {
+    display: grid;
+    grid-template-columns: 1fr min-content 50px;
+    grid-template-rows: 1fr;
+    gap: 0 10px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "item_title item_point item_button";
+    margin-bottom: 15px;
+}
+
+.item .item_title {
+    grid-area: item_title;
+    font-size: 25px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.item .item_point {
+    grid-area: item_point;
+}
+
+.item .item_button {
+    grid-area: item_button;
+    text-align: center;
+    height: fit-content;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.item.group .item_title {
+    color: var(--BLUE);
+}
+
+.item.habit_ext .item_title {
+    color: var(--LIME);
+}
+
+.item.habit_check .item_title {
+    color: var(--CHERRY);
+}
+
+.item.habit_number .item_title {
+    color: var(--LEMON);
+}
+
+.item .item_button.checked {
+    color: var(--LIME);
+}
+
+.item .item_button.not_checked {
+    color: var(--CHERRY);
+}
+
+#view_name {
+    font-weight: bold;
+    text-align: center;
+}
+
+.item .item_point,
+#view_name .item_point {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 12px;
+    width: fit-content;
+    height: fit-content;
+    background: var(--CHERRY);
+    color: var(--DARKMODE_WHITE);
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+#view_name .item_point {
+    margin-left: 10px;
+    position: relative;
+    top: -7px;
+}

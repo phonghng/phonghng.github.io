@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../javascripts/ui/status_bar.js"></script>
+    <script src="../javascripts/ui/checkbox_input.js"></script>
+    
+    <link rel="stylesheet" href="../stylesheets/general.css">
+
+    <style>
+        .box.grid {
+            display: grid;
+            gap: 0px 10px;
+            margin-bottom: 15px;
+            grid-template-areas:
+                ". .";
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 200px;
+        }
+
+        .box .text_wrapper {
+            display: table;
+        }
+
+        .box .text {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        #run_button {
+            color: var(--LIME);
+        }
+
+        #result {
+            background: var(--LEMON);
+            display: grid;
+            gap: 10px 10px;
+            margin-bottom: 15px;
+            grid-template-areas:
+                ". . .";
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box grid">
+        <div class="text_wrapper">
+            <div class="text">Thời gian đầu vào</div>
+        </div>
+        <input type="datetime-local" id="input_time" />
+    </div>
+
+    <div class="box grid">
+        <div class="text_wrapper">
+            <div class="text">Loại thời gian đầu ra</div>
+        </div>
+        <select id="output_type">
+            <option value="wake_up_time">Thời gian thức dậy</option>
+            <option value="go_to_bed_time">Thời gian lên giường</option>
+        </select>
+    </div>
+
+    <div class="box grid">
+        <div class="text_wrapper">
+            <div class="text">Năm sinh</div>
+        </div>
+        <input type="number" min="0" value="0" id="birth_year" />
+    </div>
+
+    <div class="box grid">
+        <div class="text_wrapper">
+            <div class="text">Thời gian để đi vào giấc ngủ</div>
+        </div>
+        <input type="number" min="0" value="0" id="fall_asleep_time" />
+    </div>
+
+    <div class="box grid" id="result"></div>
+
+    <div id="sleep_confirm_checkbox_wrapper"></div>
+
+    <script>
+        let StatusBar_class = new StatusBar(document.body);
+
+        const MILISECONDS_PER_MINUTE = 60 * 1000;
+
+        const DEFAULT_OPTIONS = {
+            input_time: get_tomorrow_5_am(),
+            output_type: "go_to_bed_time",
+            birth_year: 2008,
+            fall_asleep_time: 15
+        };
+
+        let data = {
+            options: DEFAULT_OPTIONS,
+            output_timestamps: [],
+            chosen_sleep_timestamp: undefined,
+            sleep_confirm_checkbox: {
+                name: "Xác nhận bắt đầu đi ngủ với tâm trạng vui vẻ, thoải mái và theo đúng giờ đã chọn phía trên",
+                point_if_checked: 1,
+                required: true
+            },
+            goal_ealier_minutes: 5,
+            point_per_ealier_minutes: 5,
+            explain_names_above: [
+                `The user sets options (data.options). Then, the system will calculate some reasonable time (data.output_timestamps) according to the option. The user will choose one of those times (data.chosen_sleep_timestamp).`,
+                `The user ticks the checkbox (data.sleep_confirm_checkbox) to confirm that he/she starts going to bed at the selected time above (data.chosen_sleep_timestamp), the timestamp the user ticks this checkbox is saved (data.sleep_confirm_checkbox.checked_time).`,
+                `The earlier sleep time (data.goal_ealier_minutes, data.point_per_ealier_minutes) and the final point is explained/calculated in the function: \`${calculate_point.toString()}\``
+            ]
+        };
+
+        let CheckboxInput_class = new CheckboxInput(
+            { sleep_confirm_checkbox: data.sleep_confirm_checkbox },
+            document.querySelector("#sleep_confirm_checkbox_wrapper"),
+            function () {
+                data.sleep_confirm_checkbox = this.data.sleep_confirm_checkbox;
+                info_onchange();
+            }
+        );
+
+        const RESULT_BOX_ELEMENT = document.getElementById("result");
+        const INPUT_TIME_INPUT = document.querySelector("#input_time");
+        const OUTPUT_TYPE_INPUT = document.querySelector("#output_type");
+        const BIRTH_YEAR_INPUT = document.querySelector("#birth_year");
+        const FALL_ASLEEP_TIME_INPUT = document.querySelector("#fall_asleep_time");
+        const SLEEP_CONFIRM_CHECKBOX_WRAPPER = document.querySelector("#sleep_confirm_checkbox_wrapper");
+
+        INPUT_TIME_INPUT.value = timestamp_to_input_format(data.options.input_time);
+        OUTPUT_TYPE_INPUT.value = data.options.output_type;
+        BIRTH_YEAR_INPUT.value = data.options.birth_year;
+        FALL_ASLEEP_TIME_INPUT.value = data.options.fall_asleep_time;
+        inputs_onchange();
+
+        INPUT_TIME_INPUT.onchange = inputs_onchange;
+        OUTPUT_TYPE_INPUT.onchange = inputs_onchange;
+        BIRTH_YEAR_INPUT.onchange = inputs_onchange;
+        FALL_ASLEEP_TIME_INPUT.onchange = inputs_onchange;
+
+        function import_info(exported_data) {
+            if(!exported_data) {
+                return false;
+            }
+            
+            data.output_timestamps = exported_data.output_timestamps;
+            data.chosen_sleep_timestamp = exported_data.chosen_sleep_timestamp;
+            data.sleep_confirm_checkbox = exported_data.sleep_confirm_checkbox;
+            data.options = exported_data.options || DEFAULT_OPTIONS;
+
+            INPUT_TIME_INPUT.value = timestamp_to_input_format(data.options.input_time);
+            OUTPUT_TYPE_INPUT.value = data.options.output_type;
+            BIRTH_YEAR_INPUT.value = data.options.birth_year;
+            FALL_ASLEEP_TIME_INPUT.value = data.options.fall_asleep_time;
+            inputs_onchange();
+
+            CheckboxInput_class.import_data({ sleep_confirm_checkbox: data.sleep_confirm_checkbox });
+
+            info_onchange();
+        }
+
+        function sleep_timestamp_choose(button, timestamp) {
+            data.chosen_sleep_timestamp = timestamp;
+
+            for (let i = 0; i < RESULT_BOX_ELEMENT.children.length; i++) {
+                let button = RESULT_BOX_ELEMENT.children[i];
+                let is_chosen_button = button.dataset.timestamp == data.chosen_sleep_timestamp;
+                button.style.backgroundColor = is_chosen_button ? "var(--LIME)" : "";
+            }
+
+            info_onchange();
+        }
+
+        function inputs_onchange() {
+            data.options.input_time = remove_timezone_offset(INPUT_TIME_INPUT.valueAsNumber);
+            data.options.output_type = OUTPUT_TYPE_INPUT.value;
+            data.options.birth_year = Number(BIRTH_YEAR_INPUT.value);
+            data.options.fall_asleep_time = Number(FALL_ASLEEP_TIME_INPUT.value);
+
+            while (RESULT_BOX_ELEMENT.firstChild) {
+                RESULT_BOX_ELEMENT.removeChild(RESULT_BOX_ELEMENT.firstChild);
+            }
+
+            let output_timestamps = calculate_output_timestamps(...Object.values(data.options));
+            data.output_timestamps = output_timestamps;
+            output_timestamps.forEach((timestamp, index) => {
+                let button = document.createElement("button");
+                let date_string = new Date(timestamp).toLocaleTimeString();
+
+                button.dataset.timestamp = timestamp;
+                button.innerHTML = date_string;
+                button.onclick = () => sleep_timestamp_choose(button, timestamp);
+
+                RESULT_BOX_ELEMENT.appendChild(button);
+
+                for (let i = 0; i < RESULT_BOX_ELEMENT.children.length; i++) {
+                    let button = RESULT_BOX_ELEMENT.children[i];
+                    let is_chosen_button = button.dataset.timestamp == data.chosen_sleep_timestamp;
+                    button.style.backgroundColor = is_chosen_button ? "var(--LIME)" : "";
+                }
+            });
+
+            info_onchange();
+        }
+
+        function remove_timezone_offset(timestamp) {
+            let date = new Date(timestamp);
+            let new_date = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000)
+            return new_date.getTime();
+        }
+
+        function timestamp_to_input_format(timestamp) {
+            let date = new Date(timestamp);
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (hour < 10) {
+                hour = "0" + hour;
+            }
+            if (minute < 10) {
+                minute = "0" + minute;
+            }
+
+            return `${year}-${month}-${day}T${hour}:${minute}`;
+        }
+
+        function get_tomorrow_5_am() {
+            let tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(5, 0, 0, 0);
+            return tomorrow;
+        }
+
+        function get_suggested(age) {
+            if (age == 1 || age == 2) {
+                return {
+                    base_time: 800,
+                    min_time: 660,
+                    max_time: 840,
+                    time_per_interval: 50
+                };
+            } else if (age >= 3 && age <= 5) {
+                return {
+                    base_time: 750,
+                    min_time: 600,
+                    max_time: 780,
+                    time_per_interval: 50
+                };
+            } else if (age >= 6 && age <= 13) {
+                return {
+                    base_time: 650,
+                    min_time: 540,
+                    max_time: 660,
+                    time_per_interval: 50
+                };
+            } else if (age >= 14 && age <= 17) {
+                return {
+                    base_time: 600,
+                    min_time: 480,
+                    max_time: 600,
+                    time_per_interval: 50
+                };
+            } else if (age >= 18 && age <= 64) {
+                return {
+                    base_time: 540,
+                    min_time: 420,
+                    max_time: 540,
+                    time_per_interval: 90
+                };
+            } else if (age >= 65) {
+                return {
+                    base_time: 540,
+                    min_time: 420,
+                    max_time: 540,
+                    time_per_interval: 90
+                };
+            }
+        }
+
+        function calculate_sleep_time(age, fall_asleep_time) {
+            let suggested = get_suggested(age);
+            const SKEWED_MINS = suggested.time_per_interval * 2;
+            let time_list = [];
+
+            let total_time = suggested.base_time + fall_asleep_time;
+            if (total_time > suggested.max_time + SKEWED_MINS) {
+                time_list.push(total_time);
+                total_time -= suggested.time_per_interval;
+            }
+            while (total_time >= suggested.min_time - SKEWED_MINS
+                && total_time <= suggested.max_time + SKEWED_MINS) {
+                time_list.push(total_time);
+                total_time -= suggested.time_per_interval;
+            }
+
+            return time_list;
+        }
+
+        function calculate_output_timestamps(input_time, output_type, birth_year, fall_asleep_time) {
+            let age = (new Date(input_time)).getFullYear() - birth_year;
+            let sleep_time_list = calculate_sleep_time(age, fall_asleep_time);
+            sleep_time_list = sleep_time_list.map(time => time * MILISECONDS_PER_MINUTE);
+            let output_timestamps = sleep_time_list.map(time => {
+                if (output_type == "wake_up_time") {
+                    return input_time + time;
+                } else if (output_type == "go_to_bed_time") {
+                    return input_time - time;
+                }
+            });
+            return output_timestamps;
+        }
+
+        function calculate_point() {
+            let latest_output_time = Math.max(...data.output_timestamps);
+            let chosen_sleep_time = data.chosen_sleep_timestamp;
+            let sleep_confirm_checked_time = data.sleep_confirm_checkbox.checked_time;
+
+            let ealier_minutes = 0;
+
+            if (sleep_confirm_checked_time) {
+                let ealier_from_latest_time = latest_output_time - chosen_sleep_time;
+                let ealier_from_sleep_time = chosen_sleep_time - sleep_confirm_checked_time;
+                let total_ealier_ms = (ealier_from_latest_time) + (ealier_from_sleep_time) / 2;
+                ealier_minutes = Math.round(total_ealier_ms / MILISECONDS_PER_MINUTE);
+            }
+
+            return ealier_minutes * data.point_per_ealier_minutes;
+        }
+
+        function calculate_goal_point() {
+            return data.goal_ealier_minutes * data.point_per_ealier_minutes;
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: calculate_point(),
+                goal_point: calculate_goal_point(),
+                data: data
+            };
+            StatusBar_class.show_status_extension(exported_info);
+            return exported_info;
+        }
+    </script>
+</body>
+
+</html>

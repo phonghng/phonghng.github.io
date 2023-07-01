@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../javascripts/ui/status_bar.js"></script>
+    
+    <link rel="stylesheet" href="../stylesheets/general.css">
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: calc(100% - 30px);
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: min-content 1fr;
+            gap: 10px 10px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                "."
+                ".";
+            height: 100%;
+        }
+
+        #controller {
+            display: grid;
+            grid-template-columns: 1fr min-content;
+            grid-template-rows: 1fr;
+            gap: 10px 10px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                ". .";
+        }
+
+        #random_button {
+            width: fit-content;
+            white-space: nowrap;
+        }
+
+        #quote {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            align-self: center;
+        }
+
+        #quote h3 {
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div class="box" id="controller">
+            <select id="category_select">
+                <option value="" disabled>Chọn chủ đề...</option>
+            </select>
+            <button id="random_button">Quay ngẫu nhiên!</button>
+        </div>
+        <div id="quote">
+            <h1>Chọn chủ đề phía trên rồi bấm nút "Quay ngẫu nhiên!"</h1>
+            <h3>Mirmor</h3>
+        </div>
+    </div>
+
+    <script>
+        let quote_database = {
+            "Truyền động lực": [
+                ["Một thói quen xấu làm hỏng cả tá thói quen tốt", "Napoleon Hill"],
+                ["Sông sâu tĩnh lặng, lúa chín cúi đầu", "Tục ngữ"],
+                ["Sự cám dỗ lớn nhất vào đêm hôm trước của ngày chiến thắng"],
+                ["Nói hay đấy, nhưng anh định làm gì?", "Shimon Peres nói với Shai Agassi"],
+                ["Tôi sống ngày nào, cũng là vì đất nước ngày đó", "Võ Nguyên Giáp"],
+                ["Đừng chọn sống an nhàn vào những năm tháng còn có thể chịu khổ được"],
+                ["Nếu bạn thực sự muốn thành công, một là bạn giỏi nhất, hai là bạn phải là đứa đứng cạnh người giỏi nhất."],
+                ["Đứng trên đỉnh núi, trên đầu bạn là cả trời sao"],
+                ["Đại dương mênh mông sẽ không thể đánh chìm một con tàu nếu nước không tràn vào bên trong nó"],
+                ["Đừng sợ đi chậm. Chỉ sợ đứng yên"],
+                ["Quan điểm cho rằng nên tích luỹ năng lực kinh nghiệm trước khi mở một doanh nghiệp hoàn toàn không tồn tại", "Quốc gia khởi nghiệp"],
+                ["Cuộc đời đa số mọi người đều thua bởi chữ: ĐỢI", "Giới hạn của bạn chỉ là xuất phát điểm của tôi"],
+            ],
+            "Tâm lí học": [
+                ["Mồi tiềm thức không có tác dụng nếu bạn nhận thức được nó", "Bạn không thông minh lắm đâu"],
+                ["Hầu hết mọi người đều đã thấy màu đỏ, nhưng không thể nào giải thích màu đỏ là gì", "Bạn không thông minh lắm đâu"],
+                ["Hãy biết cách nghi ngờ về câu chuyện của chính bản thân mình một chút", "Bạn không thông minh lắm đâu"],
+                ["Bạn săn tìm những thông tin xác thực niềm tin của mình", "Bạn không thông minh lắm đâu"],
+                ["\"Thấy chưa, biết ngay mà!\"", "Vietcetera"],
+                ["Đối phương thực sự tin rằng họ chưa bao giờ sai cả, và bạn cũng vậy", "Bạn không thông minh lắm đâu"],
+                ["Nếu thiên lệch nhận thức muộn và thiên kiến xác nhận có một đứa con, chắc chắn nó có tên là sự nguỵ biện của tay thiện xạ Texas", "Bạn không thông minh lắm đâu"],
+                ["Những cái tặc lưỡi nho nhỏ đã đánh giục ý chí quyết tâm của bạn", "Bạn không thông minh lắm đâu"],
+                ["Cảm xúc khó nói thành lời", "Nguyễn Hải Phong (PhongHNg)"],
+                ["Thông tin càng quen thuộc, càng có sẵn thì bạn sẽ càng xử lí nhanh", "Bạn không thông minh lắm đâu"],
+                ["Càng nhiều người chứng kiến một người gặp tai nạn thì khả năng ai đó ra tay giúp đỡ càng nhỏ", "Bạn không thông minh lắm đâu"],
+                ["Bạn càng biết ít về một vấn đề gì đó thì bạn càng dễ tin là vấn đề đó chả có gì mấy để mà tìm hiểu cả", "Bạn không thông minh lắm đâu"],
+                ["Ảo quan không chỉ đơn thuần là nhìn thấy trật tự trong một đám hỗn độn, đó còn là niềm tin rằng bạn được số mệnh xếp đặt cho nhìn thấy điều đó", "Bạn không thông minh lắm đâu"],
+                ["Sự sở hữu gắn thêm giá trị tinh thần đặc biệt vào vật chất, kể cả khi vật đó là miễn phí", "Bạn không thông minh lắm đâu"],
+                ["Nguỵ biện chi phí chìm (...) xảy ra khi bạn đã tiên tiền vào một thứ gì đó mà bạn không sự muốn nhưng cũng không thể đòi lại được", "Bạn không thông minh lắm đâu"],
+                ["Nếu bạn chỉ có một số lượng có hạn những phương án lựa chọn thì sau này bạn sẽ ít đắn đo về quyết định của mình hơn", "Bạn không thông minh lắm đâu"],
+                ["Bạn đang hợp lí hoá những lựa chọn trong quá khứ của mình để bảo vệ ý thúc hệ của bản thân", "Bạn không thông minh lắm đâu"],
+                ["Địa vị và uy tín của một người ảnh hưởng rất lớn tới cách mà bạn nhận thức về thông điẹp của họ", "Bạn không thông minh lắm đâu"],
+                ["Bạn quyết định một thứ gì đó đúng hay sai bởi vì bạn không thể tìm được bằng chứng chứng minh luận điểm ngược lại", "Bạn không thông minh lắm đâu"],
+                ["\"Vậy theo ý kiến của bạn thì chúng ta cần phải ...\", (...), bạn có thể chắc chắn một tên bù nhìn sắp được mang ra", "Bạn không thông minh lắm đâu"],
+                ["Đánh giá tính cách đã là một công cụ quá hữu hiệu trong lịch sử tiến hoá của loài người nên đôi lúc nó có thể lấn át lập luận logic của bạn", "Bạn không thông minh lắm đâu"],
+                ["Không phải ai chịu cơ cực cũng là kẻ xấu và không phải ai sống trong nhung lụa cũng là thánh nhân", "Bạn không thông minh lắm đâu"],
+                ["Trước khi tìm hiểu về trò chơi lợi ích chung (...), bạn cần phải nắm được về bi kịch tài nguyên chung (...)", "Bạn không thông minh lắm đâu"],
+                ["(...) Nếu chấp nhận mức chia dưới 20%, họ sẽ cảm thấy thua kém và không được tôn trọng", "Bạn không thông minh lắm đâu"],
+                ["Ranh giới giữa hội nhóm và giáo phái rất mờ nhạt. Chính sự không rõ ràng này khiến cho bạn dễ bị rơi vào một giáo phái hơn là bạn thưởng", "Bạn không thông minh lắm đâu"],
+                ["Bạn chỉ có khả năng duy trì và chăm chút cho các mối quan hệ với khoảng 150 người trong cùng một thời điểm", "Bạn không thông minh lắm đâu"],
+                ["Khi một công ty có lượng nhân sự vượt quá con số 150, năng suất lao động sẽ giảm sút rõ rệt cho tới khi công ty này tự chia thành những phòng ban nhỏ hơn", "Bạn không thông minh lắm đâu"],
+                ["Bạn luôn tìm lí do biện hộ cho sự thất bại của bản thân, và tự cho mình là thành đạt hơn, thông minh hơn, giỏi giang hơn so với con người thực", "Bạn không thông minh lắm đâu"],
+                ["Khi làm tốt thì đó là công sức của bạn. Nhưng khi mà mọi thứ trở nên tồi tệ thì đó lại là lỗi của cả thế giới", "Bạn không thông minh lắm đâu"],
+                ["Bạn cho rằng con người trong quá khứ của mình là một tên khờ có gu tồi tệ, nhưng con người hiện tại thì lại rất tuyệt vời (...)", "Bạn không thông minh lắm đâu"],
+                ["(...) đa số mọi người cũng tin rằng mình khó bị mắc lừa hơn số đông. Nhưng hãy nhớ rằng bạn không thể thuộc thiểu số trong tất cả mọi mặt được", "Bạn không thông minh lắm đâu"],
+                ["Chỉ cần có một chút áp lực từ xã hội hoặc từ một nhân vật có thẩm quyền là đã có thể khiến bạn bị khuất phục (..)", "Bạn không thông minh lắm đâu"],
+                ["Trước khi dừng một việc quen thuộc, sẽ xảy ra sự bùng phát cuối cùng", "Nguyễn Hải Phong (PhongHNg)"],
+                ["(...) nỗ lực bạn bỏ ra khi làm việc nhóm sẽ ít nỗ lực bỏ ra khi làm việc độc lập", "Bạn không thông minh lắm đâu"],
+                ["Tất nhiên là nếu để ý thật kỹ, đối phương có thể độc vị được bạn, nhưng cũng chỉ ở mức độ nào đó thôi", "Bạn không thông minh lắm đâu"],
+                ["Khi cảm thấy không thể điều khiển vận mệnh của chính mình, bạn sẽ bỏ cuộc và chấp nhận an phận thủ thường", "Bạn không thông minh lắm đâu"],
+                ["Cảm nhận của bạn qua xúc giác thường được chuyển thành cảm nhận tình cảm", "Bạn không thông minh lắm đâu"],
+                ["Liệu rằng những mỏ neo vô hình cũ có đang điều khiển cuộc sống hiện tại của bạn?", "Bạn không thông minh lắm đâu"],
+                ["Bạn chỉ có khả năng nhận biết được một phần rất nhỏ trong toàn bộ lượng thông tin mắt thu vào. Trong đó, phần được lý trí xử lí và lưu vào bộ thì còn ít hơn nữa", "Bạn không thông minh lắm đâu"],
+                ["Nếu bạn tung đồng xu và năm lần liên tiếp đều ra mặt ngửa, bạn sẽ có một cảm giác rất mạnh mẽ rằng lần tung tiếp theo sẽ ra mặt sấp", "Bạn không thông minh lắm đâu"],
+                ["Cả các chuyên gia về rượu vang cũng như người tiêu dùng đều có thể bị đánh lừa khi sự trông đợi của họ bị thay đổi", "Bạn không thông minh lắm đâu"],
+                ["Khi bạn đồng ý sẽ làm gì đó, nhưng sau này lại cảm thấy không hứng thú nữa, bạn vẫn rất thực hiện việc đó để tránh cảm giác thiếu nhất quán (...)", "Bạn không thông minh lắm đâu"],
+                ["Trừ khi bạn ghi chép lại một cách có ý thức và chi tiết về sự phát triển của bản thân, bạn sẽ luôn cho rằng cảm xúc và con người hiện tại của bạn từ xưa đến nay vẫn vậy", "Bạn không thông minh lắm đâu"],
+                ["Bạn cần phải cảm thấy hạnh phúc ngay cả trong hiện tại và đồng thời phải tạo ra những kỷ niệm đáng để nhìn lại sau này", "Bạn không thông minh lắm đâu"],
+                ["(...) hãy đơn giản hóa và tưởng tượng rằng luôn có hai bản ngã tồn tại đồng thời trong đầu bạn - bản ngã hiện tại và bản ngã ghi nhớ", "Bạn không thông minh lắm đâu"],
+                ["(...) những thứ mà bạn cho là đúng sẽ trở thành hiện thực nếu nó được lên men đủ lâu", "Bạn không thông minh lắm đâu"],
+                ["Bạn rất lắm chiêu trong việc tự đặt ra những bối cảnh để dẫn tới sự thất bại trong tương lai (...) trong trường hợp việc không thành, bạn lại có thể đổ thừa (...)", "Bạn không thông minh lắm đâu"],
+                ["Hành vi của con người phần nhiều là kết quả của tình huống cụ thể, hơn là do tính cách", "Bạn không thông minh lắm đâu"]
+            ],
+            "Kinh tế": [
+                ["Nắm thông tin là nắm đằng chuôi", "Nguyễn Hải Phong (PhongHNg)"],
+                ["Mãi mãi tinh thần khởi nghiệp", "Vingroup"],
+                ["..., \"mọi chuyên gia chỉ là chuyên gia trong những chuyện đã có tiền lệ, không có chuyên gia cho những điều chưa xảy đến\". Để trở thành \"chuyên gia\" tương lai, tầm nhìn phải thay thế kinh nghiệm...", "Quốc gia khởi nghiệp"],
+                ["Chúng tôi đã làm theo cách của người Israel: chúng tôi tranh cãi đến khi thắng mới thôi"],
+                ["Một binh nhì có thể nói với vị tướng trong lúc luyện tập, rằng cách ông ta đang làm là sai, phải làm như thế này mới đúng", "Quốc gia khởi nghiệp"],
+                ["Mức độ trao quyền hạn vượt cấp trong quân đội Israel thậm chí từng làm lãnh đạo các quốc gia ngạc nhiên", "Quốc gia khởi nghiệp"],
+                ["Những người khác luôn giới thiệu về công ty của họ. Những người Israel luôn giới thiệu về đất nước Israel", "Quốc gia khởi nghiệp"],
+                ["Và mỗi ngày đều kết thúc bằng một buổi họp căng thẳng khi mà mọi binh sĩ trong đơn vị - thuộc mọi cấp bậc - cùng ngồi lại để phân tích ngày hôm đó", "Quốc gia khởi nghiệp"],
+                ["Nhiều sĩ quan cấp cao đã bị sa thải sau một cuộc chiến thành công", "Quốc gia khởi nghiệp"],
+                ["Cách các thương hiệu đẳng cấp xây dựng thương hiệu: logo quả táo Apple, dòng chữ Supreme, giấy nháp Đại học Thanh Hoa"],
+                ["Không phải loài mạnh nhất sẽ sống sót, cũng không phải là loài thông minh nhất, mà là loài thích ứng nhanh nhất với sự thay đổi.", "Charles Darwin"]
+            ],
+            "\"Hố đen cảm xúc\"": [
+                ["Sáng đi học kiểm tra được 5 điểm. Trưa ăn vội bát mì rồi lại vào học. Tối làm thêm đến 11h30 bị đồng nghiệp cà khịa, khách nạt nộ. Về phòng, chuẩn bị ngủ thì mẹ gọi điện thoại đến: \"Hôm nay con có ổn không?\"", "Tiktoker @kiedaoo07"],
+                ["Một ngày nào đó, ba mẹ sẽ không còn hiểu nổi phương hướng cuộc đời bạn. Họ chỉ có thể gọi điện nhắc bạn hãy giữ gìn sức khoẻ, rồi ngày ngày già đi và ngóng bạn về nhà.", "Tiktoker @tusach_tritue"],
+                ["Mai này con cũng chỉ là Khách... Về thăm ngôi nhà từng ở hai mươi mấy năm!"],
+                ["Đôi khi, không phải một người đã thay đổi, chỉ là mặt nạ của họ đã rơi xuống mà thôi"],
+                ["Khi trưởng thành, bạn sẽ phát hiện ban có hai bàn tay, một là để giúp mình, hai là để giúp người"]
+            ],
+            "Hành xử": [
+                ["Nếu họ không mời bạn, đừng hỏi để được tham gia cùng"],
+                ["Đừng chiến thắng bằng cách tranh cãi, hãy đánh bại họ bằng nụ cười của bạn"],
+                ["Mục tiêu của người lãnh đạo (...) là tối đa hoá sự chịu đựng - đồng thời khuyến khích sự bất đồng chính kiến", "Quốc gia khởi nghiệp"],
+                ["Chúng tôi không cổ vũ bạn quá mức khi bạn làm tốt, nhưng cũng không giết chết bạn nếu chẳng may thất bại", "Quốc gia khởi nghiệp"],
+                ["Mỗi khi gặp gỡ (…) tuyệt nhiên, chẳng có ai hỏi xem ta có hạnh phúc hay không?", "Health Ledger"],
+                ["Khen về thứ người ta ít khi được khen", "Nguyễn Hải Phong (PhongHNg)"],
+                ["Có đi với nhau bao lâu đâu", "HieuTV"],
+                ["Người khôn ăn nói nửa chừng, để cho kẻ dại nửa mừng nửa lo"],
+                ["”Một người hoàn hảo đến mức không có gì để chê, người ta thường chỉ cảm thấy ghen tị chứ không có thiện cảm”"]
+            ]
+        };
+        quote_database = Object.assign(
+            { "Tất cả": Object.values(quote_database).flat() },
+            quote_database
+        );
+
+        let StatusBar_class = new StatusBar(document.body);
+
+        let data = {
+            database: quote_database,
+            quotes_displayed: {
+                _example_timestamp: ["quote_content", "author/source"]
+            },
+            point_per_quote_displayed: 5,
+            goal_quote_displayed: 5
+        };
+
+        let category_select = document.querySelector("#category_select");
+        let random_button = document.querySelector("#random_button");
+        let quote_main_content = document.querySelector("#quote h1");
+        let quote_author_souce = document.querySelector("#quote h3");
+
+        Object.keys(quote_database).forEach(category_name => {
+            let category_option = document.createElement("option");
+            category_option.value = category_name;
+            category_option.innerHTML = category_name;
+            category_select.appendChild(category_option);
+        });
+        random_button.onclick = display_random_quote;
+
+        function display_random_quote() {
+            let category_name = category_select.value;
+            if (category_name == "") return;
+            let category_quote = quote_database[category_name];
+            let quote = category_quote[Math.floor(Math.random() * category_quote.length)];
+
+            quote_main_content.innerHTML = `"${quote[0].replace(/\n/g, "<br>")}"`;
+            if (quote[1]) {
+                quote_author_souce.style.display = "block";
+                quote_author_souce.innerHTML = `${quote[1]}`;
+            } else {
+                quote_author_souce.style.display = "none";
+            }
+
+            data.quotes_displayed[Date.now()] = quote;
+
+            info_onchange();
+        }
+
+        function import_info(exported_data) {
+            data.quotes_displayed = exported_data.quotes_displayed;
+        }
+
+        function export_info() {
+            let number_of_quotes_displayed = Object.entries(data.quotes_displayed).length - 1;
+            let exported_info = {
+                point: number_of_quotes_displayed * data.point_per_quote_displayed,
+                goal_point: data.goal_quote_displayed * data.point_per_quote_displayed,
+                data: data
+            };
+            StatusBar_class.show_status_extension(exported_info);
+            return exported_info;
+        }
+    </script>
+</body>
+
+</html>

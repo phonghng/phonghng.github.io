@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../javascripts/ui/status_bar.js"></script>
+    
+    <link rel="stylesheet" href="../stylesheets/general.css">
+
+    <style>
+        textarea {
+            height: 100px;
+            margin-bottom: 5px;
+            resize: vertical;
+        }
+
+        .box {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <textarea></textarea>
+        <button>Sao chép</button>
+    </div>
+
+    <script>
+        let StatusBar_class = new StatusBar(document.body);
+
+        let textarea = document.querySelector("textarea");
+        let copy_button = document.querySelector("button");
+
+        copy_button.onclick = (event) => copy_textarea();
+
+        function update_textarea(string_data) {
+            textarea.innerHTML = string_data;
+        }
+
+        function copy_textarea(type) {
+            textarea.select();
+            document.execCommand("copy");
+
+            let copy_button_old_text = copy_button.innerHTML;
+            copy_button.innerHTML = "Đã sao chép!";
+            setTimeout(() => {
+                copy_button.innerHTML = copy_button_old_text;
+            }, 1000);
+
+            info_onchange();
+        }
+
+        function import_info(exported_data) {
+            return undefined;
+        }
+
+        function export_info() {
+            let exported_info = {
+                point: 0,
+                goal_point: 0,
+                data: {}
+            };
+            StatusBar_class.show_status_extension(exported_info);
+            return exported_info;
+        }
+    </script>
+</body>
+
+</html>
