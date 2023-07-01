@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phinance</title>
+    <link rel="shortcut icon" href="./images/Phinance.png" type="image/x-icon">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="./javascripts/Phinance.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --BLUE: #1877F2;
+            --CHERRY: #F3425F;
+            --GRAPE: #9360F7;
+            --LEMON: #F7B928;
+            --LIME: #45BD62;
+            --PINK: #FF66BF;
+            --SEAFOAM: #54C7EC;
+            --TEAL: #2ABBA7;
+            --TOMATO: #FB724B;
+
+            --DARKMODE_WHITE: #FFFFFF;
+            --DARKMODE_GREY_0: #3E3E3E;
+            --DARKMODE_GREY_1: #3A3B3C;
+            --DARKMODE_GREY_2: #242526;
+            --DARKMODE_GREY_3: #212121;
+            --DARKMODE_GREY_4: #18191A;
+            --DARKMODE_BLACK: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    Phòng chờ Thu nhập chờ phân bổ
+
+    (tiền mặt/trong ngân hàng)
+    Quỹ chi tiêu (bắt buộc, thiết yếu, hưởng thụ): 50%
+    Quỹ dự trữ: 5%
+    Quỹ đầu tư: 5%
+    Quỹ hưởng thụ: 5%
+    Quỹ dự phòng: 15%
+    Quỹ hưu trí: 20%
+
+    TKNH
+        khoản tiết kiệm Vietinbank: 7.000.000đ (chưa bao gồm lãi)
+        khoản tiết kiệm Techcombank: 6.000.000đ (chưa bao gồm lãi)
+        khoản tiết kiệm Mama-bank: 8.000.000đ
+
+    Khoản nợ ABC (nợ qua thanh toán, nợ qua vay)
+
+    <script>
+        let noti = new Notification();
+        let _ = new Data(noti);
+        _.parse_logs();
+        console.log(_)
+    </script>
+</body>
+
+</html>
