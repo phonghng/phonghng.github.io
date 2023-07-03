@@ -44,12 +44,9 @@
         let data = new Data(noti);
         let form = new Action_Form(noti, data, document.querySelector("#action_form"), console.log, console.log);
 
-        data.logs.push([1688382103962, "FCr", "Xin chào", false, 0]);
+        data.logs.push([1688382103962, "FCr", "Xin chào", true, 0]);
         data.parse_logs();
         form.generate_form("O2O");
-
-        // thêm tính năng xóa/sửa obj
-        /* TODO */
     </script>
 </body>
 

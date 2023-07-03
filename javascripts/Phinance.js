@@ -1,9 +1,9 @@
 /**
   * ===== ABBREVIATION =====
   * iwd: income waiting to be distributed into funds
-  * rrid: rate of receiving income distribution (n% out of 100%)
   * anb: allow negative balance
   * args: arguments
+  * rrid: rate of receiving income distribution (n% out of 100%)
   * bacc: bank account
   * elm: element
   */
@@ -44,6 +44,20 @@ const PAYMENT_CATEGORIES = {
     "essential_spending": "Chi tiêu thiết yếu",
     "consumption_spending": "Chi tiêu hưởng thụ",
     "other_payment": "Thanh toán khác"
+};
+
+const NOTIFICATION_TEXTS = {
+    "CANT_FIND_QUEUE": "Không thể tìm thấy hàng đợi!",
+    "CANT_FIND_FUND": "Không thể tìm thấy quỹ!",
+    "CANT_FIND_BACC": "Không thể tìm thấy tài khoản ngân hàng!",
+    "CANT_FIND_DEBT": "Không thể tìm thấy khoản nợ!",
+    "NOT_ENOUGH_BALANCE": "Không đủ số dư!",
+    "FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB": "Không thể liên kết quỹ – tài khoản ngân hàng (do một cái cho phép, một cái không cho phép số dư có thể âm)!",
+    "CANT_FUND_BACC_UNLINK__NOT_LINKING": "Không thể hủy liên kết quỹ – tài khoản ngân hàng (do chúng đang không liên kết với nhau)!",
+    "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
+    "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
+    "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật ký!",
+    "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!"
 };
 
 const format_time =
@@ -679,10 +693,6 @@ class Data {
         return function_return;
     }
 
-    get_logs() {
-        /* TODO */
-    }
-
     parse_logs() {
         for (let log of this.logs) {
             let function_name = log[1];
@@ -700,38 +710,26 @@ class Data {
                 return false;
             }
         }
-        this.Notification.notify("DATA__PARSED_LOG");
         return true;
     }
 
-    set_logs() {
+    async get_logs() {
+        /* TODO */
+    }
+
+    async set_logs() {
         /* TODO */
     }
 }
 
 class Notification {
     constructor() {
-        this.codes = {
-            "CANT_FIND_QUEUE": "Can't find queue",
-            "CANT_FIND_FUND": "Can't find fund",
-            "CANT_FIND_BACC": "Can't find bank account",
-            "CANT_FIND_DEBT": "Can't find debt",
-            "NOT_ENOUGH_BALANCE": "Not enough balance",
-            "FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB": "Unable to link fund and bank account (because ...)",
-            "CANT_FUND_BACC_UNLINK__NOT_LINKING": "Unable to unlink fund and bank account (because ...)",
-            "OUT_OF_RRID_SPACE": "Out of RRID space",
-            "DATA__PARSED_LOG": "Parsed log",
-            "DATA__CANT_PARSE_LOG": "Can't parse log",
-            "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Empty required field",
-            "NO_CHANGE_IN_EDITING": "NO_CHANGE_IN_EDITING"
-        };
-        /* TODO */
+
     }
 
     notify(code) {
-        console.log(this.codes[code]);
-        console.trace();
-        /* TODO */
+        console.log(NOTIFICATION_TEXTS[code]);
+        alert(NOTIFICATION_TEXTS[code]);
     }
 
     validate(code, args) {
@@ -923,8 +921,8 @@ class Action_Form {
                 return PhongHNg_JSL.ADOM(["input", {
                     type: "text",
                     name: name,
-                    placeholder: title,
-                    title: title,
+                    placeholder: `${title} *`,
+                    title: `${title} *`,
                     required: true
                 }, null, null], document);
             }
@@ -933,9 +931,10 @@ class Action_Form {
                 let elm = PhongHNg_JSL.ADOM(["button", {
                     title: title
                 }, title, null], document);
-                elm.onclick = (event) => {
-                    this.submit_form(event);
-                    this.submit_callback(this);
+                elm.onclick = event => {
+                    event.preventDefault();
+                    if (this.submit_form())
+                        this.submit_callback(this);
                 };
                 return elm;
             }
@@ -944,7 +943,10 @@ class Action_Form {
                 let elm = PhongHNg_JSL.ADOM(["button", {
                     title: title
                 }, title, null], document);
-                elm.onclick = () => this.cancel_callback(this);
+                elm.onclick = event => {
+                    event.preventDefault();
+                    this.cancel_callback(this);
+                };
                 return elm;
             }
 
@@ -969,8 +971,8 @@ class Action_Form {
                     Object.assign({
                         type: "number",
                         name: name,
-                        placeholder: title,
-                        title: title,
+                        placeholder: `${title} *`,
+                        title: `${title} *`,
                         required: true
                     }, data || {}),
                     null,
@@ -982,11 +984,11 @@ class Action_Form {
                 let option_ADOMs = [];
                 option_ADOMs.push(["option", {
                     value: "", disabled: true, selected: true
-                }, title, null]);
+                }, `${title} *`, null]);
                 for (let [value, title] of Object.entries(data))
                     option_ADOMs.push(["option", { value }, title, null]);
                 return PhongHNg_JSL.ADOM(["select", {
-                    name: name, title: title, required: true
+                    name: name, title: `${title} *`, required: true
                 }, null, option_ADOMs], document);
             }
 
@@ -994,8 +996,8 @@ class Action_Form {
                 return PhongHNg_JSL.ADOM(["input", {
                     type: "datetime-local",
                     name: name,
-                    placeholder: title,
-                    title: title,
+                    placeholder: `${title} *`,
+                    title: `${title} *`,
                     required: true
                 }, null, null], document);
             }
@@ -1010,7 +1012,7 @@ class Action_Form {
                         disabled: true,
                         selected: true
                     },
-                    title,
+                    `${title} *`,
                     null
                 ]);
 
@@ -1037,7 +1039,7 @@ class Action_Form {
                     "select",
                     {
                         name: name,
-                        title: title,
+                        title: `${title} *`,
                         required: true
                     },
                     null,
@@ -1060,9 +1062,7 @@ class Action_Form {
         return true;
     }
 
-    submit_form(button_event) {
-        button_event.preventDefault();
-
+    submit_form() {
         let Action_function_args = [null];
 
         let elms = this.form_elm.querySelectorAll("*[name]");
@@ -1099,5 +1099,7 @@ class Action_Form {
         }
 
         this.Data.do_action(Action_function_name, Action_function_args);
+
+        return true;
     }
 }
