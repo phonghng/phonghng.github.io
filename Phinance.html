@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="./images/Phinance.png" type="image/x-icon">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="./javascripts/libraries/PhongHNg_JSL_v3.js"></script>
     <script src="./javascripts/Phinance.js"></script>
 
     <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet" />
@@ -36,10 +37,7 @@
 </head>
 
 <body>
-    Phòng chờ Thu nhập chờ phân bổ
-
-    (tiền mặt/trong ngân hàng)
-    Quỹ chi tiêu (bắt buộc, thiết yếu, hưởng thụ): 50%
+    Quỹ chi tiêu: 50%
     Quỹ dự trữ: 5%
     Quỹ đầu tư: 5%
     Quỹ hưởng thụ: 5%
@@ -47,17 +45,21 @@
     Quỹ hưu trí: 20%
 
     TKNH
-        khoản tiết kiệm Vietinbank: 7.000.000đ (chưa bao gồm lãi)
-        khoản tiết kiệm Techcombank: 6.000.000đ (chưa bao gồm lãi)
-        khoản tiết kiệm Mama-bank: 8.000.000đ
+    khoản tiết kiệm Vietinbank: 7.000.000đ (chưa bao gồm lãi)
+    khoản tiết kiệm Techcombank: 6.000.000đ (chưa bao gồm lãi)
+    khoản tiết kiệm Mama-bank: 8.000.000đ
 
-    Khoản nợ ABC (nợ qua thanh toán, nợ qua vay)
+    <form id="action_form"></form>
 
     <script>
         let noti = new Notification();
         let _ = new Data(noti);
+        _.logs.push([1688382103962, "FCr", "Xin chào", false, 0]);
         _.parse_logs();
-        console.log(_)
+        let form = new Action_Form(noti, _, document.querySelector("#action_form"), console.log);
+        form.generate_form("O2O");
+
+        // thêm tính năng xóa/sửa obj
     </script>
 </body>
 
