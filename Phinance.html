@@ -37,29 +37,19 @@
 </head>
 
 <body>
-    Quỹ chi tiêu: 50%
-    Quỹ dự trữ: 5%
-    Quỹ đầu tư: 5%
-    Quỹ hưởng thụ: 5%
-    Quỹ dự phòng: 15%
-    Quỹ hưu trí: 20%
-
-    TKNH
-    khoản tiết kiệm Vietinbank: 7.000.000đ (chưa bao gồm lãi)
-    khoản tiết kiệm Techcombank: 6.000.000đ (chưa bao gồm lãi)
-    khoản tiết kiệm Mama-bank: 8.000.000đ
-
     <form id="action_form"></form>
 
     <script>
         let noti = new Notification();
-        let _ = new Data(noti);
-        _.logs.push([1688382103962, "FCr", "Xin chào", false, 0]);
-        _.parse_logs();
-        let form = new Action_Form(noti, _, document.querySelector("#action_form"), console.log);
+        let data = new Data(noti);
+        let form = new Action_Form(noti, data, document.querySelector("#action_form"), console.log, console.log);
+
+        data.logs.push([1688382103962, "FCr", "Xin chào", false, 0]);
+        data.parse_logs();
         form.generate_form("O2O");
 
         // thêm tính năng xóa/sửa obj
+        /* TODO */
     </script>
 </body>
 

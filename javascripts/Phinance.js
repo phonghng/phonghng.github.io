@@ -71,11 +71,42 @@ class Actions {
         };
     }
 
+    _edit_object_info(type, id, edit_data) {
+        let changes = this.Notification.validate("EDIT", { Data: this.data, type, id, edit_data });
+        if (!changes) return false;
+
+        let object = this.Data.data[`${type}s`][id];
+
+        let log_messages = [];
+        for (let [title, name, is_changed, , new_value, new_value_formatter] of changes)
+            if (is_changed) {
+                object[name] = new_value;
+                if (new_value_formatter)
+                    log_messages.push(`${title} thành <b>${new_value_formatter(new_value)}</b>`);
+                else
+                    log_messages.push(`${title} thành <b>${new_value}</b>`);
+            }
+
+        object.logs.push(
+            [timestamp, "fas fa-pencil", "var(--BLUE)",
+                `Thay đổi ${log_messages.join(", ")}`
+            ]);
+
+        return arguments;
+    }
+
     QCr(
-        timestamp = Date.now(),
-        action_code = "QCr",
+        timestamp,
+        action_code,
         queue_name
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["text", "queue_name", "Tên hành đợi"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Tạo hàng đợi"]
+            ];
+
         this.Data.data.queues[String(timestamp)] = {
             name: queue_name,
             balance: 0,
@@ -88,13 +119,59 @@ class Actions {
         return arguments;
     }
 
+    QEd(
+        timestamp,
+        action_code,
+        queue_id,
+        queue_name
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
+                ["text", "queue_name", "Tên hành đợi"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Sửa thông tin hàng đợi"]
+            ];
+        return this._edit_object_info("queue", queue_id, [
+            ["tên", "name", queue_name]
+        ]);
+    }
+
+    QRm(
+        timestamp,
+        action_code,
+        queue_id
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Xóa hàng đợi"]
+            ];
+        if (this.error_checker({
+            "FIND_QUEUE": { id: queue_id }
+        }))
+            return false;
+        this.Data.data.queues.splice(this.Data.data.queues.indexOf(queue_id), 1);
+        return arguments;
+    }
+
     FCr(
-        timestamp = Date.now(),
-        action_code = "FCr",
+        timestamp,
+        action_code,
         fund_name,
         is_anb,
         rrid
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["text", "fund_name", "Tên quỹ"],
+                ["checkbox", "is_anb", "Số dư có thể âm"],
+                ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Tạo hàng đợi"]
+            ];
+
         if (this.error_checker({
             "RRID": { rrid }
         }))
@@ -108,19 +185,71 @@ class Actions {
             rrid,
             logs: [
                 [timestamp, "fas fa-sparkles", "var(--LEMON)",
-                    `Tạo quỹ <b>${fund_name}</b>`]
+                    `Tạo quỹ <b>${fund_name}</b> với số dư ${is_anb ? "CÓ" : "KHÔNG"} `
+                    + `thể âm, ${rrid}% nhận phân bổ thu nhập`]
             ]
         };
 
         return arguments;
     }
 
+    FEd(
+        timestamp,
+        action_code,
+        fund_id,
+        fund_name,
+        is_anb,
+        rrid
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["text", "fund_name", "Tên quỹ"],
+                ["checkbox", "is_anb", "Số dư có thể âm"],
+                ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Sửa thông tin quỹ"]
+            ];
+        return this._edit_object_info("fund", fund_id, [
+            ["tên", "name", fund_name],
+            ["số dư có thể âm", "is_anb", is_anb, new_value => new_value ? "CÓ" : "KHÔNG"],
+            ["phần trăm nhận phân bổ thu nhập", "rrid", rrid]
+        ]);
+    }
+
+    FRm(
+        timestamp,
+        action_code,
+        fund_id
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Xóa Quỹ"]
+            ];
+        if (this.error_checker({
+            "FIND_QUEUE": { id: fund_id }
+        }))
+            return false;
+        this.Data.data.funds.splice(this.Data.data.funds.indexOf(fund_id), 1);
+        return arguments;
+    }
+
     BCr(
-        timestamp = Date.now(),
-        action_code = "BCr",
+        timestamp,
+        action_code,
         bacc_name,
         bacc_type
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["text", "bacc_name", "Tên tài khoản ngân hàng"],
+                ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Tạo tài khoản ngân hàng"]
+            ];
+
         this.Data.data.baccs[String(timestamp)] = {
             name: bacc_name,
             balance: 0,
@@ -136,36 +265,139 @@ class Actions {
         return arguments;
     }
 
+    BEd(
+        timestamp,
+        action_code,
+        bacc_id,
+        bacc_name,
+        bacc_type
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
+                ["text", "bacc_name", "Tên tài khoản ngân hàng"],
+                ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Sửa thông tin tài khoản ngân hàng"]
+            ];
+        return this._edit_object_info("bacc", bacc_id, [
+            ["tên", "name", bacc_name],
+            ["loại tài khoản ngân hàng", "type", bacc_type, new_value => BACC_TYPES[new_value]]
+        ]);
+    }
+
+    BRm(
+        timestamp,
+        action_code,
+        bacc_id
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Xóa tài khoản ngân hàng"]
+            ];
+        if (this.error_checker({
+            "FIND_QUEUE": { id: bacc_id }
+        }))
+            return false;
+        this.Data.data.baccs.splice(this.Data.data.baccs.indexOf(bacc_id), 1);
+        return arguments;
+    }
+
     DCr(
-        timestamp = Date.now(),
-        action_code = "DCr",
+        timestamp,
+        action_code,
         debt_name,
         repayment_term,
         debtor
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["text", "debt_name", "Tên khoản nợ"],
+                ["datetime", "repayment_term", "Thời hạn trả nợ"],
+                ["checkbox", "debtor", "Tôi là người nợ"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Tạo khoản nợ"]
+            ];
+
         this.Data.data.debts[String(timestamp)] = {
             name: debt_name,
             repayment_term,
-            debtor, /* false is me, true is other(s) */
+            debtor, /* true is me, false is other(s) */
             balance: 0,
             is_anb: true,
             logs: [
                 [timestamp, "fas fa-sparkles", "var(--LEMON)",
-                    `Tạo khoản nợ <b>${debt_name}</b>`]
+                    `Tạo khoản nợ <b>${debt_name}</b> với thời hạn trả nợ là `
+                    + `${format_time(repayment_term)}, ${debtor ? "tôi" : "người khác"} là người nợ`]
             ]
         };
 
         return arguments;
     }
 
+    DEd(
+        timestamp,
+        action_code,
+        debt_id,
+        debt_name,
+        repayment_term,
+        debtor
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "debt_id", "Khoản nợ", () => timestamp("debt")],
+                ["text", "debt_name", "Tên khoản nợ"],
+                ["datetime", "repayment_term", "Thời hạn trả nợ"],
+                ["checkbox", "debtor", "Tôi là người nợ"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Sửa thông tin khoản nợ"]
+            ];
+        return this._edit_object_info("debt", debt_id, [
+            ["tên", "name", debt_name],
+            ["thời hạn trả nợ", "repayment_term", repayment_termm, new_value => format_time[new_value]],
+            ["người nợ", "debtor", debtor, new_value => new_value ? "tôi" : "người khác"]
+        ]);
+    }
+
+    DRm(
+        timestamp,
+        action_code,
+        debt_id
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "debt_id", "Khoản nợ", () => timestamp("debt")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Xóa khoản nợ"]
+            ];
+        if (this.error_checker({
+            "FIND_QUEUE": { id: debt_id }
+        }))
+            return false;
+        this.Data.data.debts.splice(this.Data.data.debts.indexOf(debt_id), 1);
+        return arguments;
+    }
+
     O2O(
-        timestamp = Date.now(),
+        timestamp,
         action_code,
         source_id,
         amount,
         content,
         target_id
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select_group", "source_id", "Đối tượng gửi", () => timestamp()],
+                ["number", "repayment_term", "Số tiền", { min: 0 }],
+                ["text", "content", "Nội dung"],
+                ["select_group", "target_id", "Đối tượng nhận", () => timestamp()],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Chuyển tiền"]
+            ];
+
         let source_type = OBJECT_TYPES_NAME[action_code.split("2")[0]];
         let target_type = OBJECT_TYPES_NAME[action_code.split("2")[1]];
 
@@ -198,12 +430,21 @@ class Actions {
     }
 
     OPM(
-        timestamp = Date.now(),
+        timestamp,
         action_code,
         object_id,
         amount,
         content
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select_group", "object_id", "Đối tượng", () => timestamp()],
+                ["number", "amount", "Số tiền"],
+                ["text", "content", "Nội dung"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Cộng/trừ tiền"]
+            ];
+
         let object_type = OBJECT_TYPES_NAME[action_code.split("")[0]];
 
         let error_checker_options = {};
@@ -241,7 +482,7 @@ class Actions {
     }
 
     OPm(
-        timestamp = Date.now(),
+        timestamp,
         action_code,
         object_id,
         amount,
@@ -249,6 +490,17 @@ class Actions {
         category,
         content
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select_group", "object_id", "Đối tượng", () => timestamp()],
+                ["number", "amount", "Số tiền"],
+                ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
+                ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
+                ["text", "content", "Nội dung"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Thanh toán"]
+            ];
+
         let object_type = OBJECT_TYPES_NAME[action_code.split("")[0]];
 
         let error_checker_options = {};
@@ -269,11 +521,19 @@ class Actions {
     }
 
     F1B(
-        timestamp = Date.now(),
-        action_code = "F1B",
+        timestamp,
+        action_code,
         fund_id,
         bacc_id
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Liên kết quỹ – tài khoản ngân hàng"]
+            ];
+
         if (this.error_checker({
             "FIND_FUND": { id: fund_id },
             "FIND_BACC": { id: bacc_id }
@@ -295,11 +555,19 @@ class Actions {
     }
 
     F0B(
-        timestamp = Date.now(),
-        action_code = "F0B",
+        timestamp,
+        action_code,
         fund_id,
         bacc_id
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Hủy liên kết quỹ – tài khoản ngân hàng"]
+            ];
+
         if (this.error_checker({
             "FUND_BACC_UNLINKED": { fund_id, bacc_id }
         }))
@@ -320,11 +588,19 @@ class Actions {
     }
 
     QID(
-        timestamp = Date.now(),
-        action_code = "QID",
+        timestamp,
+        action_code,
         queue_id,
         content
     ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["text", "content", "Nội dung"],
+                ["cancel", "cancel", "Hủy bỏ"],
+                ["submit", "submit", "Phân bổ thu nhập"]
+            ];
+
         const BASE_PENNY = 1000;
 
         if (this.error_checker({
@@ -337,7 +613,7 @@ class Actions {
         let funds_and_rrids =
             Object.entries(funds)
                 .filter(fund => fund[1].rrid)
-                .map(fund => [fund[0], fund[1].rrid]);
+                .map(fund => [fund[0], fund[1].rrid / 100]);
 
         let smallest_share = 0;
         let smallest_share_flag = false;
@@ -395,8 +671,16 @@ class Data {
         this.Actions = new Actions(Notification, this);
     }
 
-    get_logs() {
+    do_action(function_name, function_args) {
+        function_args[0] = Date.now();
+        let function_return = this.Actions[function_name](...function_args);
+        if (function_return)
+            this.logs.push(function_return);
+        return function_return;
+    }
 
+    get_logs() {
+        /* TODO */
     }
 
     parse_logs() {
@@ -421,7 +705,7 @@ class Data {
     }
 
     set_logs() {
-
+        /* TODO */
     }
 }
 
@@ -438,13 +722,16 @@ class Notification {
             "OUT_OF_RRID_SPACE": "Out of RRID space",
             "DATA__PARSED_LOG": "Parsed log",
             "DATA__CANT_PARSE_LOG": "Can't parse log",
-            "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Empty required field"
+            "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Empty required field",
+            "NO_CHANGE_IN_EDITING": "NO_CHANGE_IN_EDITING"
         };
+        /* TODO */
     }
 
     notify(code) {
         console.log(this.codes[code]);
         console.trace();
+        /* TODO */
     }
 
     validate(code, args) {
@@ -539,91 +826,48 @@ class Notification {
                         0
                     );
                 let is_out_of_rrid_space =
-                    (current_accumulated_rrid + args.rrid) > 1;
+                    (current_accumulated_rrid + args.rrid) > 100;
                 if (is_out_of_rrid_space)
                     this.notify("OUT_OF_RRID_SPACE");
                 return !is_out_of_rrid_space;
+            }
+
+            case "EDIT": {
+                if (!this.validate(`FIND_${args.type.toUpperCase()}`, args))
+                    return false;
+
+                let object = args.Data.data[`${args.type}s`][args.id];
+                for (let [index, [title, name, new_value, some_function]] of Object.entries(args.edit_data))
+                    args.edit_data[index] = [
+                        title,
+                        name,
+                        object[name] == new_value,
+                        object[name],
+                        new_value,
+                        some_function
+                    ];
+
+                let has_change =
+                    Object.values(args.edit_data)
+                        .every(test => test[2]);
+                if (!has_change) {
+                    this.notify("NO_CHANGE_IN_EDITING");
+                    return false;
+                }
+
+                return args.edit_data;
             }
         }
     }
 }
 
 class Action_Form {
-    constructor(Notification, Data, form_elm, submit_callback) {
+    constructor(Notification, Data, form_elm, submit_callback, cancel_callback) {
         this.Notification = Notification;
         this.Data = Data;
         this.form_elm = form_elm;
         this.submit_callback = submit_callback;
-
-        this.xADOM_args = {
-            "QCr": [
-                ["action_code", "action_code", "Mã hành động", "QCr"],
-                ["text", "queue_name", "Tên hành đợi"],
-                ["submit", "submit", "Tạo hàng đợi"]
-            ],
-            "FCr": [
-                ["action_code", "action_code", "Mã hành động", "FCr"],
-                ["text", "fund_name", "Tên quỹ"],
-                ["checkbox", "is_anb", "Số dư có thể âm"],
-                ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
-                ["submit", "submit", "Tạo hàng đợi"]
-            ],
-            "BCr": [
-                ["action_code", "action_code", "Mã hành động", "BCr"],
-                ["text", "bacc_name", "Tên tài khoản ngân hàng"],
-                ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
-                ["submit", "submit", "Tạo tài khoản ngân hàng"]
-            ],
-            "DCr": [
-                ["action_code", "action_code", "Mã hành động", "DCr"],
-                ["text", "debt_name", "Tên khoản nợ"],
-                ["datetime", "repayment_term", "Thời hạn trả nợ"],
-                ["checkbox", "debtor", "Tôi là người nợ"],
-                ["submit", "submit", "Tạo khoản nợ"]
-            ],
-            "O2O": [
-                ["action_code", "action_code", "Mã hành động", "O2O"],
-                ["select_group", "source_id", "Đối tượng gửi", this.get_object_list()],
-                ["number", "repayment_term", "Số tiền", { min: 0 }],
-                ["text", "content", "Nội dung"],
-                ["select_group", "target_id", "Đối tượng nhận", this.get_object_list()],
-                ["submit", "submit", "Chuyển tiền"]
-            ],
-            "OPM": [
-                ["action_code", "action_code", "Mã hành động", "OPM"],
-                ["select_group", "object_id", "Đối tượng", this.get_object_list()],
-                ["number", "amount", "Số tiền"],
-                ["text", "content", "Nội dung"],
-                ["submit", "submit", "Cộng/trừ tiền"]
-            ],
-            "Pay": [
-                ["action_code", "action_code", "Mã hành động", "Pay"],
-                ["select_group", "object_id", "Đối tượng", this.get_object_list()],
-                ["number", "amount", "Số tiền"],
-                ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
-                ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
-                ["text", "content", "Nội dung"],
-                ["submit", "submit", "Thanh toán"]
-            ],
-            "F1B": [
-                ["action_code", "action_code", "Mã hành động", "F1B"],
-                ["select", "fund_id", "Quỹ", this.get_object_list("fund")],
-                ["select", "bacc_id", "Tài khoản ngân hàng", this.get_object_list("bacc")],
-                ["submit", "submit", "Liên kết quỹ – tài khoản ngân hàng"]
-            ],
-            "F0B": [
-                ["action_code", "action_code", "Mã hành động", "F0B"],
-                ["select", "fund_id", "Quỹ", this.get_object_list("fund")],
-                ["select", "bacc_id", "Tài khoản ngân hàng", this.get_object_list("bacc")],
-                ["submit", "submit", "Hủy liên kết quỹ – tài khoản ngân hàng"]
-            ],
-            "QID": [
-                ["action_code", "action_code", "Mã hành động", "F0B"],
-                ["select", "fund_id", "Quỹ", this.get_object_list("fund")],
-                ["text", "content", "Nội dung"],
-                ["submit", "submit", "Phân bổ thu nhập"]
-            ]
-        };
+        this.cancel_callback = cancel_callback;
     }
 
     get_object_list(type) {
@@ -660,6 +904,10 @@ class Action_Form {
 
     xADOM(elm_type, name, title, data) {
         /* Extended PhongHNg_JSL.ADOM for Action_Form */
+
+        if (typeof data == "function")
+            data = data();
+
         switch (elm_type) {
             case "action_code": {
                 return PhongHNg_JSL.ADOM(["input", {
@@ -685,7 +933,18 @@ class Action_Form {
                 let elm = PhongHNg_JSL.ADOM(["button", {
                     title: title
                 }, title, null], document);
-                elm.onclick = (event) => this.submit_form(event);
+                elm.onclick = (event) => {
+                    this.submit_form(event);
+                    this.submit_callback(this);
+                };
+                return elm;
+            }
+
+            case "cancel": {
+                let elm = PhongHNg_JSL.ADOM(["button", {
+                    title: title
+                }, title, null], document);
+                elm.onclick = () => this.cancel_callback(this);
                 return elm;
             }
 
@@ -789,7 +1048,9 @@ class Action_Form {
     }
 
     generate_form(action_code) {
-        for (let xADOM_args of this.xADOM_args[action_code]) {
+        let xADOM_args_list = this.Data.Actions[action_code](type => this.get_object_list(type));
+        xADOM_args_list.unshift(["action_code", "action_code", "Mã hành động", action_code]);
+        for (let xADOM_args of xADOM_args_list) {
             let elms = this.xADOM(...xADOM_args);
             if (elms.constructor.name != "Array")
                 elms = [elms];
@@ -822,17 +1083,21 @@ class Action_Form {
                 Action_function_args.push(elm.value);
         }
 
-        let Action_function_name = Action_function_args[0];
+        let Action_function_name = Action_function_args[1];
 
-        if(Action_function_name == "O2O") {
-
-        } else if (Action_function_name == "OPM") {
-
-        }else if (Action_function_name == "OPm") {
-            
+        if (Action_function_name == "O2O") {
+            let [source_type, source_id] = Action_function_args[2].split("_");
+            let [target_type, target_id] = Action_function_args[5].split("_");
+            Action_function_args[1] = `${source_type}2${target_type}`;
+            Action_function_args[2] = source_id;
+            Action_function_args[5] = target_id;
+        } else if (Action_function_name == "OPM"
+            || Action_function_name == "OPm") {
+            let [object_type, object_id] = Action_function_args[2].split("_");
+            Action_function_args[1] = `${object_type}2${target_type}`;
+            Action_function_args[2] = object_id;
         }
 
-        console.log(Action_function_args);
-        this.submit_callback();
+        this.Data.do_action(Action_function_name, Action_function_args);
     }
 }
