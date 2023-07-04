@@ -53,11 +53,14 @@ const NOTIFICATION_TEXTS = {
     "CANT_FIND_DEBT": "Không thể tìm thấy khoản nợ!",
     "NOT_ENOUGH_BALANCE": "Không đủ số dư!",
     "FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB": "Không thể liên kết quỹ – tài khoản ngân hàng (do một cái cho phép, một cái không cho phép số dư có thể âm)!",
+    "FUND_BACC_UNLINKABLE__ALREADY_LINKED": "Không thể liên kết quỹ – tài khoản ngân hàng (do chúng đang liên kết với nhau)!",
+    "FUND_BACC_UNLINKABLE__BACC_ON_OTHER_LINK": "Không thể liên kết quỹ – tài khoản ngân hàng (do tài khoản ngân hàng đang liên kết với một quỹ khác)!",
     "CANT_FUND_BACC_UNLINK__NOT_LINKING": "Không thể hủy liên kết quỹ – tài khoản ngân hàng (do chúng đang không liên kết với nhau)!",
     "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
     "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
     "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật ký!",
-    "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!"
+    "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!",
+    "CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE": "Không chuyển đổi thành không cho phép số dư có thể âm trong khi số dư đang âm!"
 };
 
 const format_time =
@@ -99,6 +102,8 @@ class Actions {
                     log_messages.push(`${title} thành <b>${new_value_formatter(new_value)}</b>`);
                 else
                     log_messages.push(`${title} thành <b>${new_value}</b>`);
+                if (type == "bacc" && name == "type")
+                    object.is_anb = new_value == "credit";
             }
 
         object.logs.push(
@@ -790,11 +795,19 @@ class Notification {
 
                 let fund = args.Data.data.funds[args.fund_id];
                 let bacc = args.Data.data.baccs[args.bacc_id];
-                let is_linkable = fund.is_anb == bacc.is_anb;
 
-                if (!is_linkable)
+                if (fund.is_anb != bacc.is_anb) {
                     this.notify("FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB");
-                return is_linkable;
+                    return false;
+                } else if (bacc.linked_fund == fund_id) {
+                    this.notify("FUND_BACC_UNLINKABLE__ALREADY_LINKED");
+                    return false;
+                } else if (bacc.linked_fund) {
+                    this.notify("FUND_BACC_UNLINKABLE__BACC_ON_OTHER_LINK");
+                    return false;
+                }
+
+                return true;
             }
 
             case "FUND_BACC_UNLINKED": {
@@ -835,7 +848,13 @@ class Notification {
                     return false;
 
                 let object = args.Data.data[`${args.type}s`][args.id];
-                for (let [index, [title, name, new_value, some_function]] of Object.entries(args.edit_data))
+                for (let [index, [title, name, new_value, some_function]] of Object.entries(args.edit_data)) {
+                    if ((name == "is_anb" && new_value == false && object.balance < 0)
+                        || (args.type == "bacc" && name == "type" && new_value != "credit" && object.balance < 0)) {
+                        this.notify("CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE");
+                        return false;
+                    }
+
                     args.edit_data[index] = [
                         title,
                         name,
@@ -844,6 +863,7 @@ class Notification {
                         new_value,
                         some_function
                     ];
+                }
 
                 let has_change =
                     Object.values(args.edit_data)
