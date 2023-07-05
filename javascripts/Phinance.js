@@ -669,7 +669,7 @@ class Actions {
                 + `từ hàng đợi ${queue.name}) với nội dung "<i>${content}</i>"`]);
             queue_log_strings.push(`<b>${format_currency(distribution_amount)}</b> tới quỹ <b>${fund.name}</b>`);
         }
-        queue.logs.push([timestamp, "fas fa-filter-circle-dollar", "var(--LEMON)",
+        queue.logs.push([timestamp, "fas fa-funnel-dollar", "var(--LEMON)",
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
             + `${format_currency(total_distribution_amount)}) với nội dung "<i>${content}</i>"`]);
 
