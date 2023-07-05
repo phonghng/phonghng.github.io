@@ -596,11 +596,11 @@ class Actions {
         let bacc = this.Data.data.baccs[bacc_id];
 
         fund.linked_baccs.splice(fund.linked_baccs.indexOf(bacc_id), 1);
-        fund.logs.push([timestamp, "fas fa-link-slash", "var(--CHERRY)",
+        fund.logs.push([timestamp, "fas fa-unlink", "var(--CHERRY)",
             `Hủy liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}</b>`]);
 
         bacc.linked_fund = null;
-        bacc.logs.push([timestamp, "fas fa-link-slash", "var(--CHERRY)",
+        bacc.logs.push([timestamp, "fas fa-unlink", "var(--CHERRY)",
             `Hủy liên kết với quỹ <b>${fund.name}</b>`]);
 
         return arguments;
