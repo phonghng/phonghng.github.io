@@ -20,7 +20,7 @@ const OBJECT_TYPES_NAME = {
     "bacc_credit": "tài khoản tín dụng",
     "savings": "tiết kiệm",
     "current": "giao dịch",
-    "credit": "ín dụng",
+    "credit": "tín dụng",
     "debt": "khoản nợ"
 };
 
