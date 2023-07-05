@@ -24,17 +24,370 @@
             --SEAFOAM: #54C7EC;
             --TEAL: #2ABBA7;
             --TOMATO: #FB724B;
-
             --WHITE: #FFFFFF;
-            --LIGHT_GREY: #3A3B3C;
-            --DARK_GREY: #212121;
+            --GREY_0: #3E3E3E;
+            --GREY_1: #3A3B3C;
+            --GREY_2: #242526;
+            --GREY_3: #212121;
+            --GREY_4: #18191A;
             --BLACK: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--GREY_4);
+            color: var(--WHITE);
+            font-size: 18px;
+        }
+
+        .object_card {
+            display: grid;
+            grid-template-columns: min-content 1fr;
+            gap: 15px 10px;
+            grid-auto-flow: row;
+            align-items: center;
+            background-color: var(--GREY_3);
+            border-radius: 10px;
+            padding: 15px;
+            width: 250px;
+            display: inline-grid;
+        }
+
+        /* .object_card:hover {
+            position: relative;
+        }
+
+        .object_card:hover .buttons {
+            height: 33px;
+            overflow: auto;
+        } */
+
+        .object_card.no_info {
+            grid-template-rows: min-content min-content min-content min-content;
+            grid-template-areas:
+                "type_icon type_title"
+                "name name"
+                "balance balance"
+                "buttons buttons";
+        }
+
+        .object_card.one_info {
+            grid-template-rows: min-content min-content min-content min-content min-content;
+            grid-template-areas:
+                "type_icon type_title"
+                "name name"
+                "balance balance"
+                ". ."
+                "buttons buttons";
+        }
+
+        .object_card.two_info {
+            grid-template-rows: min-content min-content min-content min-content min-content min-content;
+            grid-template-areas:
+                "type_icon type_title"
+                "name name"
+                "balance balance"
+                ". ."
+                ". ."
+                "buttons buttons";
+        }
+
+        .object_card.three_info {
+            grid-template-rows: min-content min-content min-content min-content min-content min-content min-content;
+            grid-template-areas:
+                "type_icon type_title"
+                "name name"
+                "balance balance"
+                ". ."
+                ". ."
+                ". ."
+                "buttons buttons";
+        }
+
+        .object_card .type_icon {
+            grid-area: type_icon;
+            text-align: center;
+        }
+
+        .object_card.queue .type_icon,
+        .object_card.queue .type_title,
+        .object_card.queue .info_icon {
+            color: var(--BLUE);
+        }
+
+        .object_card.fund .type_icon,
+        .object_card.fund .type_title,
+        .object_card.fund .info_icon {
+            color: var(--SEAFOAM);
+        }
+
+        .object_card.bacc_savings .type_icon,
+        .object_card.bacc_savings .type_title,
+        .object_card.bacc_savings .info_icon {
+            color: var(--CHERRY);
+        }
+
+        .object_card.bacc_current .type_icon,
+        .object_card.bacc_current .type_title,
+        .object_card.bacc_current .info_icon {
+            color: var(--LEMON);
+        }
+
+        .object_card.bacc_credit .type_icon,
+        .object_card.bacc_credit .type_title,
+        .object_card.bacc_credit .info_icon {
+            color: var(--GRAPE);
+        }
+
+        .object_card.debt .type_icon,
+        .object_card.debt .type_title,
+        .object_card.debt .info_icon {
+            color: var(--TOMATO);
+        }
+
+        .object_card .type_title {
+            grid-area: type_title;
+            word-break: break-word;
+            text-align: justify;
+        }
+
+        .object_card .name {
+            grid-area: name;
+            font-size: 22px;
+            word-break: break-word;
+            text-align: justify;
+        }
+
+        .object_card .balance {
+            grid-area: balance;
+            font-size: 22px;
+            text-align: center;
+            padding: 5px 0;
+            font-weight: bold;
+            color: var(--LIME);
+        }
+
+        .object_card .info_icon {
+            text-align: center;
+        }
+
+        .object_card .info_description {
+            font-size: 16px;
+            text-align: justify;
+        }
+
+        .object_card .buttons {
+            grid-area: buttons;
+            text-align: center;
+            white-space: nowrap;
+            overflow: auto;
+            /* transition: height 0.5s;
+        height: 0;
+        overflow: hidden; */
+        }
+
+        .object_card .buttons button {
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: transparent;
+            color: var(--WHITE);
+            width: 30px;
+            height: 30px;
+            margin: 0 0 0 5px;
+            font-size: 16px;
+            transition: background-color, color 0.25s;
+        }
+
+        .object_card .buttons button:hover {
+            background-color: var(--base_color);
+            color: var(--WHITE);
+        }
+
+        .object_card .buttons button:active {
+            background-color: var(--WHITE);
+            color: var(--base_color);
+        }
+
+        .object_card .buttons button:first-child {
+            margin: 0;
+        }
+
+        .object_card .buttons button[title="Cộng/trừ tiền"] {
+            --base_color: var(--GRAPE);
+        }
+
+        .object_card .buttons button[title="Phân bổ thu nhập"] {
+            --base_color: var(--TOMATO);
+        }
+
+        .object_card .buttons button[title="Chuyển tiền"] {
+            --base_color: var(--LEMON);
+        }
+
+        .object_card .buttons button[title="Thanh toán"] {
+            --base_color: var(--TEAL);
+        }
+
+        .object_card .buttons button[title="Xem nhật kí"] {
+            --base_color: var(--LIME);
+        }
+
+        .object_card .buttons button[title="Sửa thông tin"] {
+            --base_color: var(--BLUE);
+        }
+
+        .object_card .buttons button[title="Xóa"] {
+            --base_color: var(--CHERRY);
+        }
+
+        .object_card .buttons button[title="Liên kết với tài khoản ngân hàng"],
+        .object_card .buttons button[title="Liên kết với quỹ"] {
+            --base_color: var(--SEAFOAM);
+        }
+
+        .object_card .buttons button[title="Hủy liên kết với tài khoản ngân hàng"],
+        .object_card .buttons button[title="Hủy liên kết với quỹ"] {
+            --base_color: var(--TOMATO);
         }
     </style>
 </head>
 
 <body>
     <form id="action_form"></form>
+
+    <div class="object_card_list">
+        <div class="object_card no_info queue">
+            <div class="type_icon"><i class="fas fa-list"></i></div>
+            <div class="type_title">Hàng đợi</div>
+            <div class="name">Thu nhập chờ phân bố hiiii,lâu rồi mình chưa comback rùi nhỉ?</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="buttons">
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Phân bổ thu nhập"><i class="fas fa-funnel-dollar"></i></button>
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="object_card three_info fund">
+            <div class="type_icon"><i class="fas fa-sack-dollar"></i></div>
+            <div class="type_title">Quỹ</div>
+            <div class="name">T[Nhạc Chill Us-Uk] Những Bài Hát Tiếng Anh "Cực Chill" Siêu Gây Nghiện_#</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="info_icon" title="Số dư có thể âm"><i class="fas fa-user-minus"></i></div>
+            <div class="info_description">Số dư KHÔNG thể âm</div>
+            <div class="info_icon" title="Tài khoản ngân hàng đã liên kết"><i class="fas fa-link"></i></div>
+            <div class="info_description">
+                Thu nhập chờ phân bố hiiii,
+                lâu rồi mình chưa comback rùi nhỉ?
+            </div>
+            <div class="info_icon" title="Phần trăm nhận phân bổ thu nhập"><i class="fas fa-percent"></i></div>
+            <div class="info_description">100%</div>
+            <div class="buttons">
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Liên kết với tài khoản ngân hàng"><i class="fas fa-link"></i></button>
+                <button title="Hủy liên kết với tài khoản ngân hàng"><i class="fas fa-unlink"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="object_card one_info bacc_savings">
+            <div class="type_icon"><i class="fas fa-piggy-bank"></i></div>
+            <div class="type_title">Tài khoản tiết kiệm</div>
+            <div class="name">T[Nhạc Chill Us-Uk] Những Bài Hát Tiếng Anh "Cực Chill" Siêu Gây Nghiện_#</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="info_icon" title="Quỹ đã liên kết"><i class="fas fa-link"></i></div>
+            <div class="info_description">
+                Thu nhập chờ phân bố hiiii,
+                lâu rồi mình chưa comback rùi nhỉ?
+            </div>
+            <div class="buttons">
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Liên kết với quỹ"><i class="fas fa-link"></i></button>
+                <button title="Hủy liên kết với quỹ"><i class="fas fa-unlink"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="object_card one_info bacc_current">
+            <div class="type_icon"><i class="fas fa-wallet"></i></div>
+            <div class="type_title">Tài khoản giao dịch</div>
+            <div class="name">T[Nhạc Chill Us-Uk] Những Bài Hát Tiếng Anh "Cực Chill" Siêu Gây Nghiện_#</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="info_icon" title="Quỹ đã liên kết"><i class="fas fa-link"></i></div>
+            <div class="info_description">
+                Thu nhập chờ phân bố hiiii,
+                lâu rồi mình chưa comback rùi nhỉ?
+            </div>
+            <div class="buttons">
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Liên kết với quỹ"><i class="fas fa-link"></i></button>
+                <button title="Hủy liên kết với quỹ"><i class="fas fa-unlink"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="object_card one_info bacc_credit">
+            <div class="type_icon"><i class="fas fa-credit-card"></i></div>
+            <div class="type_title">Tài khoản tín dụng</div>
+            <div class="name">T[Nhạc Chill Us-Uk] Những Bài Hát Tiếng Anh "Cực Chill" Siêu Gây Nghiện_#</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="info_icon" title="Quỹ đã liên kết"><i class="fas fa-link"></i></div>
+            <div class="info_description">
+                Thu nhập chờ phân bố hiiii,
+                lâu rồi mình chưa comback rùi nhỉ?
+            </div>
+            <div class="buttons">
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Liên kết với quỹ"><i class="fas fa-link"></i></button>
+                <button title="Hủy liên kết với quỹ"><i class="fas fa-unlink"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="object_card two_info debt">
+            <div class="type_icon"><i class="fas fa-badge-dollar"></i></div>
+            <div class="type_title">Khoản nợ</div>
+            <div class="name">T[Nhạc Chill Us-Uk] Những Bài Hát Tiếng Anh "Cực Chill" Siêu Gây Nghiện_#</div>
+            <div class="balance">1.000.000 ₫</div>
+            <div class="info_icon" title="Thời hạn trả nợ"><i class="fas fa-calendar-exclamation"></i></div>
+            <div class="info_description">12:49 05/07/2023</div>
+            <div class="info_icon" title="Người nợ"><i class="fas fa-user"></i></div>
+            <div class="info_description">TÔI là người nợ</div>
+            <div class="buttons">
+                <button title="Cộng/trừ tiền"><i class="fas fa-bolt"></i></button>
+                <button title="Chuyển tiền"><i class="fas fa-inbox-out"></i></button>
+                <button title="Thanh toán"><i class="fas fa-receipt"></i></button>
+                <button title="Xem nhật kí"><i class="fas fa-align-justify"></i></button>
+                <button title="Sửa thông tin"><i class="fas fa-pencil"></i></button>
+                <button title="Xóa"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let noti = new Notification();
