@@ -58,8 +58,8 @@ const NOTIFICATION_TEXTS = {
     "CANT_FUND_BACC_UNLINK__NOT_LINKING": "Không thể hủy liên kết quỹ – tài khoản ngân hàng (do chúng đang không liên kết với nhau)!",
     "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
     "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
-    "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật ký!",
-    "ACTION_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!",
+    "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật kí!",
+    "ACTIONS_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!",
     "CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE": "Không chuyển đổi thành không cho phép số dư có thể âm trong khi số dư đang âm!"
 };
 
@@ -88,15 +88,20 @@ class Actions {
         };
     }
 
-    _edit_object_info(type, id, edit_data) {
-        let changes = this.Notification.validate("EDIT", { Data: this.data, type, id, edit_data });
+    _edit_object_info(args, type, id, edit_data) {
+        let changes = this.Notification.validate("EDIT", { Data: this.Data, type, id, edit_data });
         if (!changes) return false;
 
         let object = this.Data.data[`${type}s`][id];
 
         let log_messages = [];
-        for (let [title, name, is_changed, , new_value, new_value_formatter] of changes)
+        for (let [title, name, is_changed, old_value, new_value, new_value_formatter] of changes)
             if (is_changed) {
+                if (name == "rrid")
+                    if (this.error_checker({
+                        "RRID": { rrid: new_value - old_value }
+                    }))
+                        return false;
                 object[name] = new_value;
                 if (new_value_formatter)
                     log_messages.push(`${title} thành <b>${new_value_formatter(new_value)}</b>`);
@@ -107,30 +112,54 @@ class Actions {
             }
 
         object.logs.push(
-            [timestamp, "fas fa-pencil", "var(--BLUE)",
+            [args[0], "pencil", "var(--BLUE)",
                 `Thay đổi ${log_messages.join(", ")}`
             ]);
 
-        return arguments;
+        return args;
     }
 
     QCr(
         timestamp,
-        action_code,
+        Actions_code,
         queue_name
     ) {
-        if (typeof timestamp == "function")
+        if (timestamp.constructor.name == "Function")
             return [
-                ["text", "queue_name", "Tên hành đợi"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Tạo hàng đợi"]
+                ["text", "queue_name", "Tên hàng đợi"],
+                ["submit", "submit", "Tạo hàng đợi"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
+        else if (timestamp.constructor.name == "Object") {
+            let queue = this.Data.data.queues[timestamp.id];
+            return [
+                "no_info",
+                "queue",
+                "list",
+                "Hàng đợi",
+                queue.name,
+                format_currency(queue.balance),
+                null,
+                [
+                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `Q_${timestamp.id}`]]],
+                    ["Phân bổ thu nhập", "funnel-dollar", "QID", [["queue_id", "value", timestamp.id]]],
+                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `Q_${timestamp.id}`]]],
+                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `Q_${timestamp.id}`]]],
+                    ["Xem nhật kí", "align-justify", false, `Q_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "QEd", [
+                        ["queue_id", "value", timestamp.id],
+                        ["queue_name", "value", queue.name]
+                    ]],
+                    ["Xóa", "trash", "QRm", [["queue_id", "value", timestamp.id]]]
+                ]
+            ];
+        }
 
         this.Data.data.queues[String(timestamp)] = {
             name: queue_name,
             balance: 0,
             logs: [
-                [timestamp, "fas fa-sparkles", "var(--LEMON)",
+                [timestamp, "sparkles", "var(--LEMON)",
                     `Tạo hàng đợi <b>${queue_name}</b>`]
             ]
         };
@@ -140,44 +169,44 @@ class Actions {
 
     QEd(
         timestamp,
-        action_code,
+        Actions_code,
         queue_id,
         queue_name
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
-                ["text", "queue_name", "Tên hành đợi"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Sửa thông tin hàng đợi"]
+                ["text", "queue_name", "Tên hàng đợi"],
+                ["submit", "submit", "Sửa thông tin hàng đợi"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
-        return this._edit_object_info("queue", queue_id, [
+        return this._edit_object_info(arguments, "queue", queue_id, [
             ["tên", "name", queue_name]
         ]);
     }
 
     QRm(
         timestamp,
-        action_code,
+        Actions_code,
         queue_id
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Xóa hàng đợi"]
+                ["submit", "submit", "Xóa hàng đợi"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
         if (this.error_checker({
             "FIND_QUEUE": { id: queue_id }
         }))
             return false;
-        this.Data.data.queues.splice(this.Data.data.queues.indexOf(queue_id), 1);
+        delete this.Data.data.queues[queue_id];
         return arguments;
     }
 
     FCr(
         timestamp,
-        action_code,
+        Actions_code,
         fund_name,
         is_anb,
         rrid
@@ -187,9 +216,52 @@ class Actions {
                 ["text", "fund_name", "Tên quỹ"],
                 ["checkbox", "is_anb", "Số dư có thể âm"],
                 ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Tạo hàng đợi"]
+                ["submit", "submit", "Tạo hàng đợi"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
+        else if (timestamp.constructor.name == "Object") {
+            let fund = this.Data.data.funds[timestamp.id];
+
+            let linked_baccs_html = [];
+            for (let linked_bacc_id of fund.linked_baccs) {
+                let linked_bacc = this.Data.data.baccs[linked_bacc_id];
+                let html_title =
+                    `Tên: ${linked_bacc.name.toUpperCase()}\n`
+                    + `Loại: ${BACC_TYPES[linked_bacc.type]}\n`
+                    + `Số dư: ${format_currency(linked_bacc.balance)}\n`;
+                linked_baccs_html.push(`<span title="${html_title}">${linked_bacc.name}</span>`);
+            }
+            linked_baccs_html = linked_baccs_html.join(", ");
+
+            return [
+                "three_info",
+                "fund",
+                "sack-dollar",
+                "Quỹ",
+                fund.name,
+                format_currency(fund.balance),
+                [
+                    ["Số dư có thể âm", "user-minus", `Số dư ${fund.is_anb ? "CÓ" : "KHÔNG"} thể âm`],
+                    ["Tài khoản ngân hàng đã liên kết", "link", linked_baccs_html || "Không có"],
+                    ["Phần trăm nhận phân bổ thu nhập", "percent", `${fund.rrid}%`]
+                ],
+                [
+                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `F_${timestamp.id}`]]],
+                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `F_${timestamp.id}`]]],
+                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `F_${timestamp.id}`]]],
+                    ["Liên kết với tài khoản ngân hàng", "link", "F1B", [["fund_id", "value", timestamp.id]]],
+                    ["Hủy liên kết với tài khoản ngân hàng", "unlink", "F0B", [["fund_id", "value", timestamp.id]]],
+                    ["Xem nhật kí", "align-justify", false, `F_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "FEd", [
+                        ["fund_id", "value", timestamp.id],
+                        ["fund_name", "value", fund.name],
+                        ["is_anb", "checked", fund.is_anb],
+                        ["rrid", "value", fund.rrid]
+                    ]],
+                    ["Xóa", "trash", "FRm", [["fund_id", "value", timestamp.id]]]
+                ]
+            ];
+        }
 
         if (this.error_checker({
             "RRID": { rrid }
@@ -203,7 +275,7 @@ class Actions {
             linked_baccs: [],
             rrid,
             logs: [
-                [timestamp, "fas fa-sparkles", "var(--LEMON)",
+                [timestamp, "sparkles", "var(--LEMON)",
                     `Tạo quỹ <b>${fund_name}</b> với số dư ${is_anb ? "CÓ" : "KHÔNG"} `
                     + `thể âm, ${rrid}% nhận phân bổ thu nhập`]
             ]
@@ -214,7 +286,7 @@ class Actions {
 
     FEd(
         timestamp,
-        action_code,
+        Actions_code,
         fund_id,
         fund_name,
         is_anb,
@@ -226,10 +298,10 @@ class Actions {
                 ["text", "fund_name", "Tên quỹ"],
                 ["checkbox", "is_anb", "Số dư có thể âm"],
                 ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Sửa thông tin quỹ"]
+                ["submit", "submit", "Sửa thông tin quỹ"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
-        return this._edit_object_info("fund", fund_id, [
+        return this._edit_object_info(arguments, "fund", fund_id, [
             ["tên", "name", fund_name],
             ["số dư có thể âm", "is_anb", is_anb, new_value => new_value ? "CÓ" : "KHÔNG"],
             ["phần trăm nhận phân bổ thu nhập", "rrid", rrid]
@@ -238,26 +310,26 @@ class Actions {
 
     FRm(
         timestamp,
-        action_code,
+        Actions_code,
         fund_id
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "fund_id", "Quỹ", () => timestamp("fund")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Xóa Quỹ"]
+                ["submit", "submit", "Xóa quỹ"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
         if (this.error_checker({
-            "FIND_QUEUE": { id: fund_id }
+            "FIND_FUND": { id: fund_id }
         }))
             return false;
-        this.Data.data.funds.splice(this.Data.data.funds.indexOf(fund_id), 1);
+        delete this.Data.data.funds[fund_id];
         return arguments;
     }
 
     BCr(
         timestamp,
-        action_code,
+        Actions_code,
         bacc_name,
         bacc_type
     ) {
@@ -265,9 +337,77 @@ class Actions {
             return [
                 ["text", "bacc_name", "Tên tài khoản ngân hàng"],
                 ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Tạo tài khoản ngân hàng"]
+                ["submit", "submit", "Tạo tài khoản ngân hàng"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
+        else if (timestamp.constructor.name == "Object") {
+            let bacc = this.Data.data.baccs[timestamp.id];
+
+            let object_id_prefilled = [["object_id", "value", `B_${timestamp.id}`]];
+            let bacc_id_prefilled = [["bacc_id", "value", timestamp.id]];
+            let source_id_prefilled = [["source_id", "value", `B_${timestamp.id}`]];
+            let edit_prefilled = [
+                ["bacc_id", "value", timestamp.id],
+                ["bacc_name", "value", bacc.name],
+                ["bacc_type", "value", bacc.type]
+            ];
+            const TYPE_SETTINGS = {
+                "savings": ["bacc_savings", "piggy-bank", "Tài khoản tiết kiệm", [
+                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
+                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
+                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
+                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
+                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
+                ]],
+                "current": ["bacc_current", "wallet", "Tài khoản giao dịch", [
+                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
+                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
+                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
+                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
+                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
+                ]],
+                "credit": ["bacc_credit", "credit-card", "Tài khoản tín dụng", [
+                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
+                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
+                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
+                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
+                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
+                ]]
+            };
+
+            let linked_fund = this.Data.data.funds[fund.linked_baccs];
+            let linked_fund_linked_baccs_text =
+                linked_fund.linked_baccs.map(linked_bacc => linked_bacc.name).join(", ");
+            let html_title =
+                `Tên: ${linked_fund.name.toUpperCase()}\n`
+                + `Số dư có thể âm: Số dư ${linked_fund.is_anb ? "CÓ" : "KHÔNG"} thể âm\n`
+                + `Tài khoản ngân hàng đã liên kết: ${linked_fund_linked_baccs_text || "Không có"} \n`;
+            + `Phần trăm nhận phân bổ thu nhập: ${linked_fund.rrid}%\n`;
+            + `Số dư: ${format_currency(linked_fund.balance)} \n`;
+            let linked_fund_html = `< span title = "${html_title}" > ${linked_fund.name}</span > `;
+
+            return [
+                "one_info",
+                TYPE_SETTINGS[bacc.type][0],
+                TYPE_SETTINGS[bacc.type][1],
+                TYPE_SETTINGS[bacc.type][2],
+                bacc.name,
+                format_currency(bacc.balance),
+                [
+                    ["Quỹ đã liên kết", "link", linked_fund_html || "Không có"]
+                ],
+                TYPE_SETTINGS[bacc.type][3]
+            ];
+        }
 
         this.Data.data.baccs[String(timestamp)] = {
             name: bacc_name,
@@ -276,7 +416,7 @@ class Actions {
             type: bacc_type,
             linked_fund: null,
             logs: [
-                [timestamp, "fas fa-sparkles", "var(--LEMON)",
+                [timestamp, "sparkles", "var(--LEMON)",
                     `Tạo tài khoản ${OBJECT_TYPES_NAME[bacc_type]} <b>${bacc_name}</b>`]
             ]
         };
@@ -286,7 +426,7 @@ class Actions {
 
     BEd(
         timestamp,
-        action_code,
+        Actions_code,
         bacc_id,
         bacc_name,
         bacc_type
@@ -296,10 +436,10 @@ class Actions {
                 ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
                 ["text", "bacc_name", "Tên tài khoản ngân hàng"],
                 ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Sửa thông tin tài khoản ngân hàng"]
+                ["submit", "submit", "Sửa thông tin tài khoản ngân hàng"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
-        return this._edit_object_info("bacc", bacc_id, [
+        return this._edit_object_info(arguments, "bacc", bacc_id, [
             ["tên", "name", bacc_name],
             ["loại tài khoản ngân hàng", "type", bacc_type, new_value => BACC_TYPES[new_value]]
         ]);
@@ -307,26 +447,26 @@ class Actions {
 
     BRm(
         timestamp,
-        action_code,
+        Actions_code,
         bacc_id
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Xóa tài khoản ngân hàng"]
+                ["submit", "submit", "Xóa tài khoản ngân hàng"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
         if (this.error_checker({
-            "FIND_QUEUE": { id: bacc_id }
+            "FIND_BACC": { id: bacc_id }
         }))
             return false;
-        this.Data.data.baccs.splice(this.Data.data.baccs.indexOf(bacc_id), 1);
+        delete this.Data.data.baccs[bacc_id];
         return arguments;
     }
 
     DCr(
         timestamp,
-        action_code,
+        Actions_code,
         debt_name,
         repayment_term,
         debtor
@@ -336,9 +476,37 @@ class Actions {
                 ["text", "debt_name", "Tên khoản nợ"],
                 ["datetime", "repayment_term", "Thời hạn trả nợ"],
                 ["checkbox", "debtor", "Tôi là người nợ"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Tạo khoản nợ"]
+                ["submit", "submit", "Tạo khoản nợ"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
+        else if (timestamp.constructor.name == "Object") {
+            let debt = this.Data.data.debts[timestamp.id];
+            return [
+                "two_info",
+                "debt",
+                "badge-dollar",
+                "Khoản nợ",
+                debt.name,
+                format_currency(debt.balance),
+                [
+                    ["Thời hạn trả nợ", "calendar-exclamation", format_time(repayment_term)],
+                    ["Người nợ", "user", `${debtor ? "TÔI" : "NGƯỜI KHÁC"} là người nợ`]
+                ],
+                [
+                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `D_${timestamp.id} `]]],
+                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `D_${timestamp.id} `]]],
+                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `D_${timestamp.id} `]]],
+                    ["Xem nhật kí", "align-justify", false, `D_${timestamp.id} `],
+                    ["Sửa thông tin", "pencil", "DEd", [
+                        ["debt_id", "value", timestamp.id],
+                        ["debt_name", "value", debt.name],
+                        ["repayment_term", "value", moment(debt.repayment_term).format("YYYY-MM-DDThh:mm")],
+                        ["debtor", "checked", debt.debtor]
+                    ]],
+                    ["Xóa", "trash", "DRm", [["debt_id", "value", timestamp.id]]]
+                ]
+            ];
+        }
 
         this.Data.data.debts[String(timestamp)] = {
             name: debt_name,
@@ -347,8 +515,8 @@ class Actions {
             balance: 0,
             is_anb: true,
             logs: [
-                [timestamp, "fas fa-sparkles", "var(--LEMON)",
-                    `Tạo khoản nợ <b>${debt_name}</b> với thời hạn trả nợ là `
+                [timestamp, "sparkles", "var(--LEMON)",
+                    `Tạo khoản nợ < b > ${debt_name}</b > với thời hạn trả nợ là `
                     + `${format_time(repayment_term)}, ${debtor ? "tôi" : "người khác"} là người nợ`]
             ]
         };
@@ -358,7 +526,7 @@ class Actions {
 
     DEd(
         timestamp,
-        action_code,
+        Actions_code,
         debt_id,
         debt_name,
         repayment_term,
@@ -370,38 +538,38 @@ class Actions {
                 ["text", "debt_name", "Tên khoản nợ"],
                 ["datetime", "repayment_term", "Thời hạn trả nợ"],
                 ["checkbox", "debtor", "Tôi là người nợ"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Sửa thông tin khoản nợ"]
+                ["submit", "submit", "Sửa thông tin khoản nợ"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
-        return this._edit_object_info("debt", debt_id, [
+        return this._edit_object_info(arguments, "debt", debt_id, [
             ["tên", "name", debt_name],
-            ["thời hạn trả nợ", "repayment_term", repayment_termm, new_value => format_time[new_value]],
+            ["thời hạn trả nợ", "repayment_term", repayment_term, new_value => format_time[new_value]],
             ["người nợ", "debtor", debtor, new_value => new_value ? "tôi" : "người khác"]
         ]);
     }
 
     DRm(
         timestamp,
-        action_code,
+        Actions_code,
         debt_id
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "debt_id", "Khoản nợ", () => timestamp("debt")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Xóa khoản nợ"]
+                ["submit", "submit", "Xóa khoản nợ"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
         if (this.error_checker({
-            "FIND_QUEUE": { id: debt_id }
+            "FIND_DEBT": { id: debt_id }
         }))
             return false;
-        this.Data.data.debts.splice(this.Data.data.debts.indexOf(debt_id), 1);
+        delete this.Data.data.debts[debt_id];
         return arguments;
     }
 
     O2O(
         timestamp,
-        action_code,
+        Actions_code,
         source_id,
         amount,
         content,
@@ -413,12 +581,12 @@ class Actions {
                 ["number", "repayment_term", "Số tiền", { min: 0 }],
                 ["text", "content", "Nội dung"],
                 ["select_group", "target_id", "Đối tượng nhận", () => timestamp()],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Chuyển tiền"]
+                ["submit", "submit", "Chuyển tiền"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
-        let source_type = OBJECT_TYPES_NAME[action_code.split("2")[0]];
-        let target_type = OBJECT_TYPES_NAME[action_code.split("2")[1]];
+        let source_type = OBJECT_TYPES_NAME[Actions_code.split("2")[0]];
+        let target_type = OBJECT_TYPES_NAME[Actions_code.split("2")[1]];
 
         let error_checker_options = {};
         error_checker_options[`FIND_${source_type.toUpperCase()}`] =
@@ -431,26 +599,26 @@ class Actions {
             return false;
 
         let source = this.Data.data[`${source_type}s`][source_id];
-        source_type = source.type ? `${source_type}_${source.type}` : source_type;
+        source_type = source.type ? `${source_type}_${source.type} ` : source_type;
         let target = this.Data.data[`${target_type}s`][target_id];
-        target_type = target.type ? `${target_type}_${target.type}` : target_type;
+        target_type = target.type ? `${target_type}_${target.type} ` : target_type;
 
         source.balance -= amount;
-        source.logs.push([timestamp, "fas fa-inbox-out", "var(--CHERRY)",
-            `Chuyển <b>${format_currency(amount)}</b> tới ${OBJECT_TYPES_NAME[target_type]}`
-            + ` <b>${target.name}</b> với nội dung "<i>${content}</i>"`]);
+        source.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
+            `Chuyển < b > ${format_currency(amount)}</b > tới ${OBJECT_TYPES_NAME[target_type]} `
+            + ` < b > ${target.name}</b > với nội dung "<i>${content}</i>"`]);
 
         target.balance += amount;
-        target.logs.push([timestamp, "fas fa-inbox-in", "var(--LIME)",
-            `Nhận <b>${format_currency(amount)}</b> từ ${OBJECT_TYPES_NAME[source_type]}`
-            + ` <b>${source.name}</b> với nội dung "<i>${content}</i>"`]);
+        target.logs.push([timestamp, "inbox-in", "var(--LIME)",
+            `Nhận < b > ${format_currency(amount)}</b > từ ${OBJECT_TYPES_NAME[source_type]} `
+            + ` < b > ${source.name}</b > với nội dung "<i>${content}</i>"`]);
 
         return arguments;
     }
 
     OPM(
         timestamp,
-        action_code,
+        Actions_code,
         object_id,
         amount,
         content
@@ -460,11 +628,11 @@ class Actions {
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
                 ["number", "amount", "Số tiền"],
                 ["text", "content", "Nội dung"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Cộng/trừ tiền"]
+                ["submit", "submit", "Cộng/trừ tiền"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
-        let object_type = OBJECT_TYPES_NAME[action_code.split("")[0]];
+        let object_type = OBJECT_TYPES_NAME[Actions_code.split("")[0]];
 
         let error_checker_options = {};
         error_checker_options[`FIND_${object_type.toUpperCase()}`] =
@@ -478,22 +646,22 @@ class Actions {
         let object = this.Data.data[`${object_type}s`][object_id];
         object.balance += amount;
         if (amount >= 0)
-            object.logs.push([timestamp, "fas fa-inbox-in", "var(--LIME)",
-                `Cộng <b>${format_currency(amount)}</b> với nội dung "<i>${content}</i>"`]);
+            object.logs.push([timestamp, "inbox-in", "var(--LIME)",
+                `Cộng < b > ${format_currency(amount)}</b > với nội dung "<i>${content}</i>"`]);
         else
-            object.logs.push([timestamp, "fas fa-inbox-out", "var(--CHERRY)",
-                `Trừ <b>${format_currency(-amount)}</b> với nội dung "<i>${content}</i>"`]);
+            object.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
+                `Trừ < b > ${format_currency(-amount)}</b > với nội dung "<i>${content}</i>"`]);
 
         if (object.linked_fund) {
             let fund = this.Data.data.funds[object.linked_fund];
             fund.balance += amount;
             if (amount >= 0)
-                fund.logs.push([timestamp, "fas fa-inbox-in", "var(--LIME)",
-                    `Cộng <b>${format_currency(amount)}</b> (gián tiếp từ tài khoản `
+                fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
+                    `Cộng < b > ${format_currency(amount)}</b > (gián tiếp từ tài khoản `
                     + `${OBJECT_TYPES_NAME[object.type]} ${object.name}) với nội dung "<i>${content}</i>"`]);
             else
-                fund.logs.push([timestamp, "fas fa-inbox-out", "var(--CHERRY)",
-                    `Trừ <b>${format_currency(-amount)}</b> (gián tiếp từ tài khoản `
+                fund.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
+                    `Trừ < b > ${format_currency(-amount)}</b > (gián tiếp từ tài khoản `
                     + `${OBJECT_TYPES_NAME[object.type]} ${object.name}) với nội dung "<i>${content}</i>"`]);
         }
 
@@ -502,7 +670,7 @@ class Actions {
 
     OPm(
         timestamp,
-        action_code,
+        Actions_code,
         object_id,
         amount,
         method,
@@ -516,11 +684,11 @@ class Actions {
                 ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
                 ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
                 ["text", "content", "Nội dung"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Thanh toán"]
+                ["submit", "submit", "Thanh toán"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
-        let object_type = OBJECT_TYPES_NAME[action_code.split("")[0]];
+        let object_type = OBJECT_TYPES_NAME[Actions_code.split("")[0]];
 
         let error_checker_options = {};
         error_checker_options[`FIND_${object_type.toUpperCase()}`] =
@@ -530,18 +698,18 @@ class Actions {
         if (this.error_checker(error_checker_options))
             return false;
 
-        let object = this.Data.data[`${object_type}s`][object_id];
+        let object = this.Data.data[`${object_type} s`][object_id];
         object.balance -= amount;
-        object.logs.push([timestamp, "fas fa-receipt", "var(--CHERRY)",
-            `Thanh toán (bằng ${PAYMENT_METHODS[method]}) <b>${format_currency(amount)}</b>`
-            + ` cho loại <i>${PAYMENT_CATEGORIES[category]}</i> với nội dung "<i>${content}</i>"`]);
+        object.logs.push([timestamp, "receipt", "var(--CHERRY)",
+            `Thanh toán(bằng ${PAYMENT_METHODS[method]}) < b > ${format_currency(amount)}</b > `
+            + ` cho loại < i > ${PAYMENT_CATEGORIES[category]}</i > với nội dung "<i>${content}</i>"`]);
 
         return arguments;
     }
 
     F1B(
         timestamp,
-        action_code,
+        Actions_code,
         fund_id,
         bacc_id
     ) {
@@ -549,8 +717,8 @@ class Actions {
             return [
                 ["select", "fund_id", "Quỹ", () => timestamp("fund")],
                 ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Liên kết quỹ – tài khoản ngân hàng"]
+                ["submit", "submit", "Liên kết quỹ – tài khoản ngân hàng"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
         if (this.error_checker({
@@ -563,11 +731,11 @@ class Actions {
         let bacc = this.Data.data.baccs[bacc_id];
 
         fund.linked_baccs.push(bacc_id);
-        fund.logs.push([timestamp, "fas fa-link", "var(--LIME)",
-            `Liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}<b/>`]);
+        fund.logs.push([timestamp, "link", "var(--LIME)",
+            `Liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}<b />`]);
 
         bacc.linked_fund = fund_id;
-        bacc.logs.push([timestamp, "fas fa-link", "var(--LIME)",
+        bacc.logs.push([timestamp, "link", "var(--LIME)",
             `Liên kết với quỹ <b>${fund.name}</b>`]);
 
         return arguments;
@@ -575,7 +743,7 @@ class Actions {
 
     F0B(
         timestamp,
-        action_code,
+        Actions_code,
         fund_id,
         bacc_id
     ) {
@@ -583,8 +751,8 @@ class Actions {
             return [
                 ["select", "fund_id", "Quỹ", () => timestamp("fund")],
                 ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Hủy liên kết quỹ – tài khoản ngân hàng"]
+                ["submit", "submit", "Hủy liên kết quỹ – tài khoản ngân hàng"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
         if (this.error_checker({
@@ -596,11 +764,11 @@ class Actions {
         let bacc = this.Data.data.baccs[bacc_id];
 
         fund.linked_baccs.splice(fund.linked_baccs.indexOf(bacc_id), 1);
-        fund.logs.push([timestamp, "fas fa-unlink", "var(--CHERRY)",
+        fund.logs.push([timestamp, "unlink", "var(--CHERRY)",
             `Hủy liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}</b>`]);
 
         bacc.linked_fund = null;
-        bacc.logs.push([timestamp, "fas fa-unlink", "var(--CHERRY)",
+        bacc.logs.push([timestamp, "unlink", "var(--CHERRY)",
             `Hủy liên kết với quỹ <b>${fund.name}</b>`]);
 
         return arguments;
@@ -608,16 +776,16 @@ class Actions {
 
     QID(
         timestamp,
-        action_code,
+        Actions_code,
         queue_id,
         content
     ) {
         if (typeof timestamp == "function")
             return [
-                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
+                ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
                 ["text", "content", "Nội dung"],
-                ["cancel", "cancel", "Hủy bỏ"],
-                ["submit", "submit", "Phân bổ thu nhập"]
+                ["submit", "submit", "Phân bổ thu nhập"],
+                ["cancel", "cancel", "Hủy bỏ"]
             ];
 
         const BASE_PENNY = 1000;
@@ -664,12 +832,12 @@ class Actions {
             fund.balance += distribution_amount;
             total_distribution_amount += distribution_amount;
             queue.balance -= distribution_amount;
-            fund.logs.push([timestamp, "fas fa-inbox-in", "var(--LIME)",
+            fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
                 `Nhận phân bổ thu nhập <b>${format_currency(distribution_amount)}</b> `
-                + `từ hàng đợi ${queue.name}) với nội dung "<i>${content}</i>"`]);
+                + `từ hàng đợi ${queue.name} với nội dung "<i>${content}</i>"`]);
             queue_log_strings.push(`<b>${format_currency(distribution_amount)}</b> tới quỹ <b>${fund.name}</b>`);
         }
-        queue.logs.push([timestamp, "fas fa-funnel-dollar", "var(--LEMON)",
+        queue.logs.push([timestamp, "funnel-dollar", "var(--LEMON)",
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
             + `${format_currency(total_distribution_amount)}) với nội dung "<i>${content}</i>"`]);
 
@@ -678,8 +846,9 @@ class Actions {
 }
 
 class Data {
-    constructor(Notification) {
+    constructor(Notification, UI_changed_callback) {
         this.Notification = Notification;
+        this.Actions = new Actions(Notification, this);
         this.logs = [];
         this.data = {
             queues: {},
@@ -687,14 +856,15 @@ class Data {
             baccs: {},
             debts: {}
         };
-        this.Actions = new Actions(Notification, this);
+        this.UI_changed_callback = UI_changed_callback;
     }
 
-    do_action(function_name, function_args) {
+    do_Actions(function_name, function_args) {
         function_args[0] = Date.now();
         let function_return = this.Actions[function_name](...function_args);
         if (function_return)
-            this.logs.push(function_return);
+            this.logs.push(Object.values(function_return));
+        this.UI_changed_callback();
         return function_return;
     }
 
@@ -715,15 +885,16 @@ class Data {
                 return false;
             }
         }
+        this.UI_changed_callback();
         return true;
     }
 
     async get_logs() {
-        /* TODO */
+        /* TODO, need return */
     }
 
     async set_logs() {
-        /* TODO */
+        /* TODO, need return */
     }
 }
 
@@ -735,6 +906,7 @@ class Notification {
     notify(code) {
         console.log(NOTIFICATION_TEXTS[code]);
         alert(NOTIFICATION_TEXTS[code]);
+        return true;
     }
 
     validate(code, args) {
@@ -858,17 +1030,14 @@ class Notification {
                     args.edit_data[index] = [
                         title,
                         name,
-                        object[name] == new_value,
+                        object[name] != new_value,
                         object[name],
                         new_value,
                         some_function
                     ];
                 }
 
-                let has_change =
-                    Object.values(args.edit_data)
-                        .every(test => test[2]);
-                if (!has_change) {
+                if (args.edit_data.every(test => !test[2])) {
                     this.notify("NO_CHANGE_IN_EDITING");
                     return false;
                 }
@@ -879,7 +1048,7 @@ class Notification {
     }
 }
 
-class Action_Form {
+class Actions_Form {
     constructor(Notification, Data, form_elm, submit_callback, cancel_callback) {
         this.Notification = Notification;
         this.Data = Data;
@@ -921,13 +1090,13 @@ class Action_Form {
     }
 
     xADOM(elm_type, name, title, data) {
-        /* Extended PhongHNg_JSL.ADOM for Action_Form */
+        /* Extended PhongHNg_JSL.ADOM for Actions_Form */
 
         if (typeof data == "function")
             data = data();
 
         switch (elm_type) {
-            case "action_code": {
+            case "Actions_code": {
                 return PhongHNg_JSL.ADOM(["input", {
                     type: "text",
                     name: name,
@@ -949,7 +1118,9 @@ class Action_Form {
 
             case "submit": {
                 let elm = PhongHNg_JSL.ADOM(["button", {
-                    title: title
+                    title: title,
+                    name: name,
+                    style: "--base_color: var(--LIME);"
                 }, title, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
@@ -961,7 +1132,9 @@ class Action_Form {
 
             case "cancel": {
                 let elm = PhongHNg_JSL.ADOM(["button", {
-                    title: title
+                    title: title,
+                    name: name,
+                    style: "--base_color: var(--CHERRY);"
                 }, title, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
@@ -1069,9 +1242,9 @@ class Action_Form {
         }
     }
 
-    generate_form(action_code) {
-        let xADOM_args_list = this.Data.Actions[action_code](type => this.get_object_list(type));
-        xADOM_args_list.unshift(["action_code", "action_code", "Mã hành động", action_code]);
+    generate_form(Actions_code) {
+        let xADOM_args_list = this.Data.Actions[Actions_code](type => this.get_object_list(type));
+        xADOM_args_list.unshift(["Actions_code", "Actions_code", "Mã hành động", Actions_code]);
         for (let xADOM_args of xADOM_args_list) {
             let elms = this.xADOM(...xADOM_args);
             if (elms.constructor.name != "Array")
@@ -1082,44 +1255,202 @@ class Action_Form {
         return true;
     }
 
+    reset_form() {
+        this.form_elm.textContent = "";
+        return true;
+    }
+
     submit_form() {
-        let Action_function_args = [null];
+        let Actions_function_args = [null];
 
         let elms = this.form_elm.querySelectorAll("*[name]");
         for (let elm of elms) {
+            if (elm.tagName == "BUTTON")
+                continue;
+
             if (elm.required && elm.value == "") {
                 elm.focus();
-                this.Notification.notify("ACTION_FORM__EMPTY_REQUIRED_FIELD");
+                this.Notification.notify("ACTIONS_FORM__EMPTY_REQUIRED_FIELD");
                 return false;
             }
 
             if (elm.tagName == "INPUT" && elm.type == "checkbox")
-                Action_function_args.push(elm.checked);
+                Actions_function_args.push(elm.checked);
             else if (elm.tagName == "INPUT" && elm.type == "number")
-                Action_function_args.push(Number(elm.value));
+                Actions_function_args.push(Number(elm.value));
             else if (elm.tagName == "INPUT" && elm.type == "datetime-local")
-                Action_function_args.push((new Date(elm.value)).getTime());
+                Actions_function_args.push((new Date(elm.value)).getTime());
             else
-                Action_function_args.push(elm.value);
+                Actions_function_args.push(elm.value);
         }
 
-        let Action_function_name = Action_function_args[1];
+        let Actions_function_name = Actions_function_args[1];
 
-        if (Action_function_name == "O2O") {
-            let [source_type, source_id] = Action_function_args[2].split("_");
-            let [target_type, target_id] = Action_function_args[5].split("_");
-            Action_function_args[1] = `${source_type}2${target_type}`;
-            Action_function_args[2] = source_id;
-            Action_function_args[5] = target_id;
-        } else if (Action_function_name == "OPM"
-            || Action_function_name == "OPm") {
-            let [object_type, object_id] = Action_function_args[2].split("_");
-            Action_function_args[1] = `${object_type}2${target_type}`;
-            Action_function_args[2] = object_id;
+        if (Actions_function_name == "O2O") {
+            let [source_type, source_id] = Actions_function_args[2].split("_");
+            let [target_type, target_id] = Actions_function_args[5].split("_");
+            Actions_function_args[1] = `${source_type}2${target_type}`;
+            Actions_function_args[2] = source_id;
+            Actions_function_args[5] = target_id;
+        } else if (Actions_function_name == "OPM"
+            || Actions_function_name == "OPm") {
+            let [object_type, object_id] = Actions_function_args[2].split("_");
+            Actions_function_args[1] = Actions_function_name.replace("O", object_type);
+            Actions_function_args[2] = object_id;
         }
 
-        this.Data.do_action(Action_function_name, Action_function_args);
+        return this.Data.do_Actions(Actions_function_name, Actions_function_args);
+    }
+}
+
+class UI {
+    constructor(Notification, Data, elms) {
+        this.Notification = Notification;
+        this.Data = Data;
+        this.elms = elms;
+        this.Actions_Form = new Actions_Form(
+            this.Notification,
+            this.Data,
+            this.elms.Actions_popup.querySelector("form"),
+            () => this.close_Actions_form(),
+            () => this.close_Actions_form()
+        );
+    }
+
+    open_Actions_form(Actions_code, prefilled) {
+        this.Actions_Form.reset_form();
+
+        let elm_selector = query => this.elms.Actions_popup.querySelector(query);
+        this.Actions_Form.generate_form(Actions_code);
+        elm_selector(".title").innerText =
+            elm_selector("button[name='submit']").innerText;
+        elm_selector(".close_button").onclick =
+            () => this.close_Actions_form();
+
+        if (prefilled)
+            for (let [elm_name, attribute_name, value] of prefilled)
+                elm_selector(`*[name="${elm_name}"]`)[attribute_name] = value;
+
+        this.elms.Actions_popup.style.display = "flex";
+        this.elms.Actions_popup.querySelector(".main")
+            .animate([
+                { transform: "scale(0)" },
+                { transform: "scale(1)" },
+            ], {
+                duration: 250,
+                iterations: 1,
+            });
 
         return true;
+    }
+
+    close_Actions_form() {
+        this.elms.Actions_popup.querySelector(".main")
+            .animate([
+                { transform: "scale(1)" },
+                { transform: "scale(0)" },
+            ], {
+                duration: 250,
+                iterations: 1,
+            });
+
+        setTimeout(() => {
+            this.elms.Actions_popup.style.display = "none";
+            this.Actions_Form.reset_form();
+        }, 250);
+
+        return true;
+    }
+
+    generate_object_card(type_name, object_id) {
+        const swap_object_key_value = o => Object.entries(o).reduce((r, [k, v]) => (r[v] = k, r), {});
+
+        let type_shortcode = swap_object_key_value(OBJECT_TYPES_NAME)[type_name];
+        let object_card_info = this.Data.Actions[`${type_shortcode}Cr`]({ type: type_name, id: object_id });
+
+        let object_card = document.createElement("div");
+        object_card.classList.add("object_card", object_card_info[0], object_card_info[1]);
+
+        let type_icon = document.createElement("div");
+        type_icon.classList.add("type_icon");
+        let type_icon_icon = document.createElement("i");
+        type_icon_icon.classList.add("fas", `fa-${object_card_info[2]}`);
+        type_icon.appendChild(type_icon_icon);
+        object_card.appendChild(type_icon);
+
+        let type_title = document.createElement("div");
+        type_title.classList.add("type_title");
+        type_title.innerHTML = object_card_info[3];
+        object_card.appendChild(type_title);
+
+        let name = document.createElement("div");
+        name.classList.add("name");
+        name.innerHTML = object_card_info[4];
+        object_card.appendChild(name);
+
+        let balance = document.createElement("div");
+        balance.classList.add("balance");
+        balance.innerHTML = object_card_info[5];
+        object_card.appendChild(balance);
+
+        if (object_card_info[6])
+            for (let [title, icon, description] of object_card_info[6]) {
+                let info_icon = document.createElement("div");
+                info_icon.classList.add("info_icon");
+                info_icon.title = title;
+                let info_icon_icon = document.createElement("i");
+                info_icon_icon.classList.add("fas", `fa-${icon}`);
+                info_icon.appendChild(info_icon_icon);
+                object_card.appendChild(info_icon);
+
+                let info_description = document.createElement("div");
+                info_description.classList.add("info_description");
+                info_description.innerHTML = description;
+                object_card.appendChild(info_description);
+            }
+
+        let buttons = document.createElement("div");
+        buttons.classList.add("buttons");
+        for (let [title, icon, Actions_code, prefiled_options] of object_card_info[7]) {
+            let button = document.createElement("button");
+            button.title = title;
+            button.onclick = () => {
+                if (Actions_code)
+                    this.open_Actions_form(Actions_code, prefiled_options);
+                else
+                    this.open_logs_viewer(prefiled_options);
+            };
+            let button_icon = document.createElement("i");
+            button_icon.classList.add("fas", `fa-${icon}`);
+            button.appendChild(button_icon);
+            buttons.appendChild(button);
+        }
+        object_card.appendChild(buttons);
+
+        return object_card;
+    }
+
+    reset_object_card_list() {
+        this.elms.object_card_list.textContent = "";
+        return true;
+    }
+
+    update_object_card_list() {
+        this.reset_object_card_list();
+        for (let [type_name, objects] of Object.entries(this.Data.data))
+            for (let object_id of Object.keys(objects))
+                this.elms.object_card_list.appendChild(
+                    this.generate_object_card(type_name.replace(/s$/g, ""), object_id)
+                );
+        new Masonry(this.elms.object_card_list, {
+            itemSelector: ".object_card",
+            gutter: 10
+        });
+        return true;
+    }
+
+    open_logs_viewer(object_id) {
+        console.log(object_id);
+        /* TODO, need return */
     }
 }
