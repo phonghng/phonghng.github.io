@@ -26,7 +26,7 @@
             --TEAL: #2ABBA7;
             --TOMATO: #FB724B;
             --WHITE: #FFFFFF;
-            --GREY_0: #3E3E3E;
+            --GREY_0: #999999;
             --GREY_1: #3A3B3C;
             --GREY_2: #242526;
             --GREY_3: #212121;
@@ -43,6 +43,15 @@
             background-color: var(--GREY_4);
             color: var(--WHITE);
             font-size: 18px;
+        }
+
+        body>h2 {
+            text-align: center;
+            margin-block: 25px;
+        }
+
+        #object_card_list {
+            margin: 0 auto;
         }
 
         .object_card {
@@ -162,6 +171,7 @@
             font-size: 22px;
             word-break: break-word;
             text-align: justify;
+            font-weight: bold;
         }
 
         .object_card .balance {
@@ -258,6 +268,46 @@
             --base_color: var(--TOMATO);
         }
 
+        body>.buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px auto 25px auto;
+            max-width: 1000px;
+        }
+
+        body>.buttons button {
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: transparent;
+            color: var(--WHITE);
+            font-size: 14px;
+            transition: background-color, color 0.25s;
+            cursor: pointer;
+            font-weight: bold;
+            flex-grow: 1;
+            min-width: fit-content;
+        }
+
+        body>.buttons button i {
+            color: var(--base_color);
+            transition: background-color, color 0.25s;
+            margin-right: 5px;
+        }
+
+        body>.buttons button:hover,
+        body>.buttons button:hover i {
+            background-color: var(--base_color);
+            color: var(--WHITE);
+        }
+
+        body>.buttons button:active,
+        body>.buttons button:active i {
+            background-color: var(--base_color);
+            color: var(--base_color);
+        }
+
         .popup_container {
             position: fixed;
             top: 0;
@@ -265,7 +315,7 @@
             width: 100%;
             height: 100%;
             backdrop-filter: blur(3px) invert(15%);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
         }
@@ -321,8 +371,8 @@
             grid-area: content;
             background-color: var(--GREY_3);
             border-radius: 5px;
-            padding: 10px;
             overflow: auto;
+            padding: 10px;
         }
 
         .popup_container#Actions_popup .main {
@@ -376,13 +426,72 @@
         .popup_container#Actions_popup .main form *:last-child {
             margin-bottom: 0;
         }
+
+        .popup_container#logs_popup .main {
+            width: fit-content;
+            height: fit-content;
+            max-width: 75vw;
+            max-height: 75vh;
+        }
+
+        .popup_container#logs_popup table {
+            border-spacing: 10px;
+            min-width: 300px;
+        }
+
+        .popup_container#logs_popup table tr td:nth-child(1) {
+            font-family: "Lucida Console", Courier, monospace;
+            font-size: 14px;
+            color: var(--GREY_0);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 750px) {
+            .popup_container#logs_popup table tr td:nth-child(1) {
+                white-space: normal;
+            }
+        }
+
+        .popup_container#logs_popup table tr td:nth-child(3) {
+            text-align: justify;
+        }
     </style>
 </head>
 
 <body>
+    <h2>Chương trình Quản lý tài chính cá nhân Phinance</h2>
+
     <div id="object_card_list"></div>
 
-    <div class="popup_container" id="Actions_popup" style="display: none;">
+    <div class="buttons">
+        <button style="--base_color: var(--BLUE);">
+            <i class="fas fa-list"></i>
+            Tạo hàng đợi mới
+        </button>
+        <button style="--base_color: var(--SEAFOAM);">
+            <i class="fas fa-sack-dollar"></i>
+            Tạo quỹ mới
+        </button>
+        <button style="--base_color: var(--CHERRY);">
+            <i class="fas fa-piggy-bank"></i>
+            Tạo TKTK mới
+        </button>
+        <button style="--base_color: var(--LEMON);">
+            <i class="fas fa-wallet"></i>
+            Tạo TKGD mới
+        </button>
+        <button style="--base_color: var(--GRAPE);">
+            <i class="fas fa-credit-card"></i>
+            Tạo TKTD mới
+        </button>
+        <button style="--base_color: var(--TOMATO);">
+            <i class="fas fa-badge-dollar"></i>
+            Tạo khoản nợ mới
+        </button>
+    </div>
+
+    <div class="popup_container" id="Actions_popup">
         <div class="main">
             <div class="title"></div>
             <button class="close_button">
@@ -396,29 +505,30 @@
 
     <div class="popup_container" id="logs_popup">
         <div class="main">
-            <div class="title">Nhật kí quỹ "ABC"</div>
+            <div class="title"></div>
             <button class="close_button">
                 <i class="fas fa-times"></i>
             </button>
             <div class="content">
-                <form id="action_form"></form>
+                <table></table>
             </div>
         </div>
     </div>
 
-    some text here
-
     <script>
-        let noti = new Notification();
-        let data = new Data(noti, () => ui.update_object_card_list());
-        let ui = new UI(noti, data, {
-            Actions_popup: document.querySelector("#Actions_popup"),
-            object_card_list: document.querySelector("#object_card_list")
-        });
-
-        data.logs.push([Date.now(), "FCr", "Xin chào", true, 0]);
-        data.logs.push([Date.now(), "QCr", "Xin chào"]);
-        data.parse_logs();
+        let _Notification = new Notification();
+        let _Data = new Data(_Notification, () => _UI.update_object_card_list());
+        let _UI = new UI(
+            _Notification,
+            _Data,
+            {
+                header_buttons: document.querySelector("body>.buttons"),
+                Actions_popup: document.querySelector("#Actions_popup"),
+                object_card_list: document.querySelector("#object_card_list"),
+                logs_popup: document.querySelector("#logs_popup")
+            }
+        );
+        _Data.get_logs();
     </script>
 </body>
 

@@ -104,17 +104,15 @@ class Actions {
                         return false;
                 object[name] = new_value;
                 if (new_value_formatter)
-                    log_messages.push(`${title} thành <b>${new_value_formatter(new_value)}</b>`);
+                    log_messages.push(`${title} thành ${new_value_formatter(new_value)}`);
                 else
-                    log_messages.push(`${title} thành <b>${new_value}</b>`);
+                    log_messages.push(`${title} thành ${new_value}`);
                 if (type == "bacc" && name == "type")
                     object.is_anb = new_value == "credit";
             }
 
-        object.logs.push(
-            [args[0], "pencil", "var(--BLUE)",
-                `Thay đổi ${log_messages.join(", ")}`
-            ]);
+        object.logs.push([args[0], "pencil", "var(--BLUE)",
+        `Thay đổi ${log_messages.join(", ")}`]);
 
         return args;
     }
@@ -160,7 +158,7 @@ class Actions {
             balance: 0,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo hàng đợi <b>${queue_name}</b>`]
+                    `Tạo hàng đợi "${queue_name}"`]
             ]
         };
 
@@ -216,7 +214,7 @@ class Actions {
                 ["text", "fund_name", "Tên quỹ"],
                 ["checkbox", "is_anb", "Số dư có thể âm"],
                 ["number", "rrid", "Phần trăm nhận phân bổ thu nhập", { min: 0, max: 100 }],
-                ["submit", "submit", "Tạo hàng đợi"],
+                ["submit", "submit", "Tạo quỹ"],
                 ["cancel", "cancel", "Hủy bỏ"]
             ];
         else if (timestamp.constructor.name == "Object") {
@@ -241,7 +239,7 @@ class Actions {
                 fund.name,
                 format_currency(fund.balance),
                 [
-                    ["Số dư có thể âm", "user-minus", `Số dư ${fund.is_anb ? "CÓ" : "KHÔNG"} thể âm`],
+                    ["Số dư có thể âm", "user-minus", `Số dư ${fund.is_anb ? "có" : "không"} thể âm`],
                     ["Tài khoản ngân hàng đã liên kết", "link", linked_baccs_html || "Không có"],
                     ["Phần trăm nhận phân bổ thu nhập", "percent", `${fund.rrid}%`]
                 ],
@@ -276,8 +274,8 @@ class Actions {
             rrid,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo quỹ <b>${fund_name}</b> với số dư ${is_anb ? "CÓ" : "KHÔNG"} `
-                    + `thể âm, ${rrid}% nhận phân bổ thu nhập`]
+                    `Tạo quỹ "${fund_name}" với số dư ${is_anb ? "có" : "không"} `
+                    + `thể âm, nhận ${rrid}% phân bổ thu nhập`]
             ]
         };
 
@@ -303,8 +301,8 @@ class Actions {
             ];
         return this._edit_object_info(arguments, "fund", fund_id, [
             ["tên", "name", fund_name],
-            ["số dư có thể âm", "is_anb", is_anb, new_value => new_value ? "CÓ" : "KHÔNG"],
-            ["phần trăm nhận phân bổ thu nhập", "rrid", rrid]
+            ["số dư có thể âm", "is_anb", is_anb, new_value => new_value ? "có" : "không"],
+            ["phần trăm nhận phân bổ thu nhập", "rrid", rrid, new_value => `${new_value}%`]
         ]);
     }
 
@@ -345,6 +343,7 @@ class Actions {
 
             let object_id_prefilled = [["object_id", "value", `B_${timestamp.id}`]];
             let bacc_id_prefilled = [["bacc_id", "value", timestamp.id]];
+            let F0B_prefilled = [["fund_id", "value", bacc.linked_fund], ["bacc_id", "value", timestamp.id]];
             let source_id_prefilled = [["source_id", "value", `B_${timestamp.id}`]];
             let edit_prefilled = [
                 ["bacc_id", "value", timestamp.id],
@@ -357,7 +356,7 @@ class Actions {
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
                     ["Thanh toán", "receipt", "OPm", object_id_prefilled],
                     ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
                     ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
                     ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
                     ["Xóa", "trash", "BRm", bacc_id_prefilled]
@@ -367,7 +366,7 @@ class Actions {
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
                     ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
                     ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
                     ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
                     ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
                     ["Xóa", "trash", "BRm", bacc_id_prefilled]
@@ -377,23 +376,28 @@ class Actions {
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
                     ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
                     ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
                     ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
                     ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
                     ["Xóa", "trash", "BRm", bacc_id_prefilled]
                 ]]
             };
 
-            let linked_fund = this.Data.data.funds[fund.linked_baccs];
-            let linked_fund_linked_baccs_text =
-                linked_fund.linked_baccs.map(linked_bacc => linked_bacc.name).join(", ");
-            let html_title =
-                `Tên: ${linked_fund.name.toUpperCase()}\n`
-                + `Số dư có thể âm: Số dư ${linked_fund.is_anb ? "CÓ" : "KHÔNG"} thể âm\n`
-                + `Tài khoản ngân hàng đã liên kết: ${linked_fund_linked_baccs_text || "Không có"} \n`;
-            + `Phần trăm nhận phân bổ thu nhập: ${linked_fund.rrid}%\n`;
-            + `Số dư: ${format_currency(linked_fund.balance)} \n`;
-            let linked_fund_html = `< span title = "${html_title}" > ${linked_fund.name}</span > `;
+            let linked_fund_html = ``;
+            if (bacc.linked_fund) {
+                let linked_fund = this.Data.data.funds[bacc.linked_fund];
+                let linked_fund_linked_baccs_text =
+                    linked_fund.linked_baccs
+                        .map(linked_bacc_id => this.Data.data.baccs[linked_bacc_id].name)
+                        .join(", ");
+                let html_title =
+                    `Tên: ${linked_fund.name.toUpperCase()}\n`
+                    + `Số dư có thể âm: Số dư ${linked_fund.is_anb ? "có" : "không"} thể âm\n`
+                    + `Tài khoản ngân hàng đã liên kết: ${linked_fund_linked_baccs_text || "Không có"} \n`;
+                + `Phần trăm nhận phân bổ thu nhập: ${linked_fund.rrid}%\n`;
+                + `Số dư: ${format_currency(linked_fund.balance)} \n`;
+                linked_fund_html = `<span title="${html_title}">${linked_fund.name}</span>`;
+            }
 
             return [
                 "one_info",
@@ -417,7 +421,7 @@ class Actions {
             linked_fund: null,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo tài khoản ${OBJECT_TYPES_NAME[bacc_type]} <b>${bacc_name}</b>`]
+                    `Tạo tài khoản ${OBJECT_TYPES_NAME[bacc_type]} "${bacc_name}"`]
             ]
         };
 
@@ -489,14 +493,14 @@ class Actions {
                 debt.name,
                 format_currency(debt.balance),
                 [
-                    ["Thời hạn trả nợ", "calendar-exclamation", format_time(repayment_term)],
-                    ["Người nợ", "user", `${debtor ? "TÔI" : "NGƯỜI KHÁC"} là người nợ`]
+                    ["Thời hạn trả nợ", "calendar-exclamation", format_time(debt.repayment_term)],
+                    ["Người nợ", "user", `${debt.debtor ? "Tôi" : "Người khác"} là người nợ`]
                 ],
                 [
-                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `D_${timestamp.id} `]]],
-                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `D_${timestamp.id} `]]],
-                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `D_${timestamp.id} `]]],
-                    ["Xem nhật kí", "align-justify", false, `D_${timestamp.id} `],
+                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `D_${timestamp.id}`]]],
+                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `D_${timestamp.id}`]]],
+                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `D_${timestamp.id}`]]],
+                    ["Xem nhật kí", "align-justify", false, `D_${timestamp.id}`],
                     ["Sửa thông tin", "pencil", "DEd", [
                         ["debt_id", "value", timestamp.id],
                         ["debt_name", "value", debt.name],
@@ -516,7 +520,7 @@ class Actions {
             is_anb: true,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo khoản nợ < b > ${debt_name}</b > với thời hạn trả nợ là `
+                    `Tạo khoản nợ "${debt_name}" với thời hạn trả nợ là `
                     + `${format_time(repayment_term)}, ${debtor ? "tôi" : "người khác"} là người nợ`]
             ]
         };
@@ -599,19 +603,19 @@ class Actions {
             return false;
 
         let source = this.Data.data[`${source_type}s`][source_id];
-        source_type = source.type ? `${source_type}_${source.type} ` : source_type;
+        source_type = source.type ? `${source_type}_${source.type}` : source_type;
         let target = this.Data.data[`${target_type}s`][target_id];
-        target_type = target.type ? `${target_type}_${target.type} ` : target_type;
+        target_type = target.type ? `${target_type}_${target.type}` : target_type;
 
         source.balance -= amount;
         source.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
-            `Chuyển < b > ${format_currency(amount)}</b > tới ${OBJECT_TYPES_NAME[target_type]} `
-            + ` < b > ${target.name}</b > với nội dung "<i>${content}</i>"`]);
+            `Chuyển ${format_currency(amount)} tới ${OBJECT_TYPES_NAME[target_type]} `
+            + `"${target.name}" với nội dung "${content}"`]);
 
         target.balance += amount;
         target.logs.push([timestamp, "inbox-in", "var(--LIME)",
-            `Nhận < b > ${format_currency(amount)}</b > từ ${OBJECT_TYPES_NAME[source_type]} `
-            + ` < b > ${source.name}</b > với nội dung "<i>${content}</i>"`]);
+            `Nhận ${format_currency(amount)} từ ${OBJECT_TYPES_NAME[source_type]} `
+            + `"${source.name}" với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -647,22 +651,22 @@ class Actions {
         object.balance += amount;
         if (amount >= 0)
             object.logs.push([timestamp, "inbox-in", "var(--LIME)",
-                `Cộng < b > ${format_currency(amount)}</b > với nội dung "<i>${content}</i>"`]);
+                `Cộng ${format_currency(amount)} với nội dung "${content}"`]);
         else
             object.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
-                `Trừ < b > ${format_currency(-amount)}</b > với nội dung "<i>${content}</i>"`]);
+                `Trừ ${format_currency(-amount)} với nội dung "${content}"`]);
 
         if (object.linked_fund) {
             let fund = this.Data.data.funds[object.linked_fund];
             fund.balance += amount;
             if (amount >= 0)
                 fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
-                    `Cộng < b > ${format_currency(amount)}</b > (gián tiếp từ tài khoản `
-                    + `${OBJECT_TYPES_NAME[object.type]} ${object.name}) với nội dung "<i>${content}</i>"`]);
+                    `Cộng ${format_currency(amount)} (gián tiếp từ tài khoản `
+                    + `${OBJECT_TYPES_NAME[object.type]} "${object.name}") với nội dung "${content}"`]);
             else
                 fund.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
-                    `Trừ < b > ${format_currency(-amount)}</b > (gián tiếp từ tài khoản `
-                    + `${OBJECT_TYPES_NAME[object.type]} ${object.name}) với nội dung "<i>${content}</i>"`]);
+                    `Trừ ${format_currency(-amount)} (gián tiếp từ tài khoản `
+                    + `${OBJECT_TYPES_NAME[object.type]} "${object.name}") với nội dung "${content}"`]);
         }
 
         return arguments;
@@ -680,7 +684,7 @@ class Actions {
         if (typeof timestamp == "function")
             return [
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
-                ["number", "amount", "Số tiền"],
+                ["number", "amount", "Số tiền", { min: 0 }],
                 ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
                 ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
                 ["text", "content", "Nội dung"],
@@ -698,11 +702,11 @@ class Actions {
         if (this.error_checker(error_checker_options))
             return false;
 
-        let object = this.Data.data[`${object_type} s`][object_id];
+        let object = this.Data.data[`${object_type}s`][object_id];
         object.balance -= amount;
         object.logs.push([timestamp, "receipt", "var(--CHERRY)",
-            `Thanh toán(bằng ${PAYMENT_METHODS[method]}) < b > ${format_currency(amount)}</b > `
-            + ` cho loại < i > ${PAYMENT_CATEGORIES[category]}</i > với nội dung "<i>${content}</i>"`]);
+            `Thanh toán (bằng ${PAYMENT_METHODS[method]}) ${format_currency(amount)} `
+            + `cho loại ${PAYMENT_CATEGORIES[category]} với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -722,8 +726,7 @@ class Actions {
             ];
 
         if (this.error_checker({
-            "FIND_FUND": { id: fund_id },
-            "FIND_BACC": { id: bacc_id }
+            "FUND_BACC_LINKABLE": { fund_id, bacc_id }
         }))
             return false;
 
@@ -732,11 +735,11 @@ class Actions {
 
         fund.linked_baccs.push(bacc_id);
         fund.logs.push([timestamp, "link", "var(--LIME)",
-            `Liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}<b />`]);
+            `Liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} "${bacc.name}"`]);
 
         bacc.linked_fund = fund_id;
         bacc.logs.push([timestamp, "link", "var(--LIME)",
-            `Liên kết với quỹ <b>${fund.name}</b>`]);
+            `Liên kết với quỹ "${fund.name}"`]);
 
         return arguments;
     }
@@ -765,11 +768,11 @@ class Actions {
 
         fund.linked_baccs.splice(fund.linked_baccs.indexOf(bacc_id), 1);
         fund.logs.push([timestamp, "unlink", "var(--CHERRY)",
-            `Hủy liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} <b>${bacc.name}</b>`]);
+            `Hủy liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} "${bacc.name}"`]);
 
         bacc.linked_fund = null;
         bacc.logs.push([timestamp, "unlink", "var(--CHERRY)",
-            `Hủy liên kết với quỹ <b>${fund.name}</b>`]);
+            `Hủy liên kết với quỹ "${fund.name}"`]);
 
         return arguments;
     }
@@ -833,13 +836,13 @@ class Actions {
             total_distribution_amount += distribution_amount;
             queue.balance -= distribution_amount;
             fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
-                `Nhận phân bổ thu nhập <b>${format_currency(distribution_amount)}</b> `
-                + `từ hàng đợi ${queue.name} với nội dung "<i>${content}</i>"`]);
-            queue_log_strings.push(`<b>${format_currency(distribution_amount)}</b> tới quỹ <b>${fund.name}</b>`);
+                `Nhận phân bổ thu nhập ${format_currency(distribution_amount)} `
+                + `từ hàng đợi "${queue.name}" với nội dung "${content}"`]);
+            queue_log_strings.push(`${format_currency(distribution_amount)} tới quỹ "${fund.name}"`);
         }
         queue.logs.push([timestamp, "funnel-dollar", "var(--LEMON)",
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
-            + `${format_currency(total_distribution_amount)}) với nội dung "<i>${content}</i>"`]);
+            + `${format_currency(total_distribution_amount)}) với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -865,6 +868,7 @@ class Data {
         if (function_return)
             this.logs.push(Object.values(function_return));
         this.UI_changed_callback();
+        this.set_logs();
         return function_return;
     }
 
@@ -891,9 +895,11 @@ class Data {
 
     async get_logs() {
         /* TODO, need return */
+        this.parse_logs();
     }
 
     async set_logs() {
+        console.log(this);
         /* TODO, need return */
     }
 }
@@ -960,8 +966,8 @@ class Notification {
 
             case "FUND_BACC_LINKABLE": {
                 if (
-                    !this.validate("FIND_FUND", { Data: args.data, id: args.fund_id })
-                    || !this.validate("FIND_BACC", { Data: args.data, id: args.bacc_id })
+                    !this.validate("FIND_FUND", { Data: args.Data, id: args.fund_id })
+                    || !this.validate("FIND_BACC", { Data: args.Data, id: args.bacc_id })
                 )
                     return false;
 
@@ -971,7 +977,7 @@ class Notification {
                 if (fund.is_anb != bacc.is_anb) {
                     this.notify("FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB");
                     return false;
-                } else if (bacc.linked_fund == fund_id) {
+                } else if (fund.linked_baccs.includes(args.bacc_id)) {
                     this.notify("FUND_BACC_UNLINKABLE__ALREADY_LINKED");
                     return false;
                 } else if (bacc.linked_fund) {
@@ -984,8 +990,8 @@ class Notification {
 
             case "FUND_BACC_UNLINKED": {
                 if (
-                    !this.validate("FIND_FUND", { Data: args.data, id: args.fund_id })
-                    || !this.validate("FIND_BACC", { Data: args.data, id: args.bacc_id })
+                    !this.validate("FIND_FUND", { Data: args.Data, id: args.fund_id })
+                    || !this.validate("FIND_BACC", { Data: args.Data, id: args.bacc_id })
                 )
                     return false;
 
@@ -1043,6 +1049,10 @@ class Notification {
                 }
 
                 return args.edit_data;
+            }
+
+            default: {
+                return false;
             }
         }
     }
@@ -1255,11 +1265,6 @@ class Actions_Form {
         return true;
     }
 
-    reset_form() {
-        this.form_elm.textContent = "";
-        return true;
-    }
-
     submit_form() {
         let Actions_function_args = [null];
 
@@ -1312,27 +1317,34 @@ class UI {
             this.Notification,
             this.Data,
             this.elms.Actions_popup.querySelector("form"),
-            () => this.close_Actions_form(),
-            () => this.close_Actions_form()
+            () => this.close_Actions_popup(),
+            () => this.close_Actions_popup()
         );
+
+        this.bind_header_buttons();
     }
 
-    open_Actions_form(Actions_code, prefilled) {
-        this.Actions_Form.reset_form();
+    bind_header_buttons() {
+        const HEADER_BUTTONS_FUNCTIONS = [
+            () => this.open_Actions_popup("QCr"),
+            () => this.open_Actions_popup("FCr"),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "savings"]]),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "current"]]),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "credit"]]),
+            () => this.open_Actions_popup("DCr")
+        ];
 
-        let elm_selector = query => this.elms.Actions_popup.querySelector(query);
-        this.Actions_Form.generate_form(Actions_code);
-        elm_selector(".title").innerText =
-            elm_selector("button[name='submit']").innerText;
-        elm_selector(".close_button").onclick =
-            () => this.close_Actions_form();
+        let buttons = this.elms.header_buttons.querySelectorAll("button");
+        for (let [index, button] of Object.entries(buttons))
+            button.onclick = HEADER_BUTTONS_FUNCTIONS[index];
+    }
 
-        if (prefilled)
-            for (let [elm_name, attribute_name, value] of prefilled)
-                elm_selector(`*[name="${elm_name}"]`)[attribute_name] = value;
+    open_popup(popup_elm, title, close_callback) {
+        popup_elm.querySelector(".title").innerText = title;
+        popup_elm.querySelector(".close_button").onclick = close_callback;
 
-        this.elms.Actions_popup.style.display = "flex";
-        this.elms.Actions_popup.querySelector(".main")
+        popup_elm.style.display = "flex";
+        popup_elm.querySelector(".main")
             .animate([
                 { transform: "scale(0)" },
                 { transform: "scale(1)" },
@@ -1344,8 +1356,8 @@ class UI {
         return true;
     }
 
-    close_Actions_form() {
-        this.elms.Actions_popup.querySelector(".main")
+    close_popup(popup_elm, closed_callback) {
+        popup_elm.querySelector(".main")
             .animate([
                 { transform: "scale(1)" },
                 { transform: "scale(0)" },
@@ -1353,12 +1365,32 @@ class UI {
                 duration: 250,
                 iterations: 1,
             });
-
         setTimeout(() => {
-            this.elms.Actions_popup.style.display = "none";
-            this.Actions_Form.reset_form();
+            popup_elm.style.display = "none";
+            closed_callback();
         }, 250);
+        return true;
+    }
 
+    open_Actions_popup(Actions_code, prefilled) {
+        this.elms.Actions_popup.querySelector("form").innerHTML = "";
+        this.Actions_Form.generate_form(Actions_code);
+        if (prefilled)
+            for (let [elm_name, attribute_name, value] of prefilled)
+                this.elms.Actions_popup.querySelector(`*[name="${elm_name}"]`)[attribute_name] = value;
+        this.elms.Actions_popup.querySelector(":nth-child(2)").focus();
+        this.open_popup(
+            this.elms.Actions_popup,
+            this.elms.Actions_popup.querySelector("button[name='submit']").innerText,
+            () => this.close_Actions_popup()
+        );
+        return true;
+    }
+
+    close_Actions_popup() {
+        this.close_popup(this.elms.Actions_popup, () => {
+            this.elms.Actions_popup.querySelector("form").innerHTML = "";
+        });
         return true;
     }
 
@@ -1416,9 +1448,9 @@ class UI {
             button.title = title;
             button.onclick = () => {
                 if (Actions_code)
-                    this.open_Actions_form(Actions_code, prefiled_options);
+                    this.open_Actions_popup(Actions_code, prefiled_options);
                 else
-                    this.open_logs_viewer(prefiled_options);
+                    this.open_logs_viewer(type_name, prefiled_options);
             };
             let button_icon = document.createElement("i");
             button_icon.classList.add("fas", `fa-${icon}`);
@@ -1444,13 +1476,55 @@ class UI {
                 );
         new Masonry(this.elms.object_card_list, {
             itemSelector: ".object_card",
-            gutter: 10
+            gutter: 10,
+            fitWidth: true
         });
         return true;
     }
 
-    open_logs_viewer(object_id) {
-        console.log(object_id);
-        /* TODO, need return */
+    open_logs_viewer(type_name, object_id) {
+        const reverse_array = array => {
+            let ret = new Array;
+            for (let i = array.length - 1; i >= 0; i--)
+                ret.push(array[i]);
+            return ret;
+        }
+
+        this.elms.logs_popup.querySelector("table").innerHTML = "";
+
+        let object = this.Data.data[`${type_name}s`][object_id.split("_")[1]];
+        let formatted_type_name = type_name + (object.type ? `_${object.type}` : "");
+
+        let table_elm = this.elms.logs_popup.querySelector("table");
+        for (let log of reverse_array(object.logs)) {
+            let tr_elm = document.createElement("tr");
+
+            let timestamp_td_elm = document.createElement("td");
+            timestamp_td_elm.innerText = format_time(log[0]);
+            tr_elm.appendChild(timestamp_td_elm);
+
+            let icon_td_elm = document.createElement("td");
+            icon_td_elm.style = `color: ${log[2]};`;
+            let icon_elm = document.createElement("i");
+            icon_elm.classList.add("fas", `fa-${log[1]}`);
+            icon_td_elm.appendChild(icon_elm);
+            tr_elm.appendChild(icon_td_elm);
+
+            let content_td_elm = document.createElement("td");
+            content_td_elm.innerHTML = log[3];
+            tr_elm.appendChild(content_td_elm);
+
+            table_elm.appendChild(tr_elm);
+        }
+
+        this.open_popup(
+            this.elms.logs_popup,
+            `Nhật kí ${OBJECT_TYPES_NAME[formatted_type_name]} "${object.name}"`,
+            () => this.close_popup(this.elms.logs_popup, () => {
+                this.elms.logs_popup.querySelector("table").innerHTML = "";
+            })
+        );
+
+        return true;
     }
 }
