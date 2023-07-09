@@ -8,8 +8,9 @@
     <link rel="shortcut icon" href="./images/Phinance.png" type="image/x-icon">
 
     <script src="./javascripts/libraries/moment.2.29.4.min.js"></script>
-    <script src="./javascripts/libraries/PhongHNg_JSL_v3.js"></script>
-    <script src="./javascripts/libraries/masonry.pkgd.min.js"></script>
+    <script src="./javascripts/libraries/PhongHNg_JSL.3.js"></script>
+    <script src="./javascripts/libraries/masonry.pkgd.4.2.2.min.js"></script>
+    <script src="./javascripts/libraries/crypto-js.min.js"></script>
     <script src="./javascripts/Phinance.js"></script>
 
     <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet" />
@@ -517,7 +518,11 @@
 
     <script>
         let _Notification = new Notification();
-        let _Data = new Data(_Notification, () => _UI.update_object_card_list());
+        let _Data = new Data(
+            _Notification,
+            () => _UI.update_object_card_list(),
+            `U2FsdGVkX1+U0gh/Twapqc8VOnOxhbNKi7pKssgAUDNTB2NDZmNedLpjni4EeQyswN1YsnPgm9T+VfYX35MZzA==`
+        );
         let _UI = new UI(
             _Notification,
             _Data,

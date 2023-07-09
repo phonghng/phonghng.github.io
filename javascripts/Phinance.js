@@ -59,6 +59,11 @@ const NOTIFICATION_TEXTS = {
     "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
     "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
     "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật kí!",
+    "DATA__MISSING_PASSWORD": "Không nhận được mật khẩu! Vui lòng tải lại trang để đăng nhập lại.",
+    "DATA__WRONG_PASSWORD": "Sai mật khẩu! Vui lòng tải lại trang để đăng nhập lại.",
+    "DATA__FAILED_FETCH": "Không thể lấy nhật kí! Vui lòng tải lại trang để đăng nhập lại.",
+    "DATA__SAVED": "Đã lưu nhật kí thành công!",
+    "DATA__PARSED_LOG": "Phân tích nhật kí thành công!",
     "ACTIONS_FORM__EMPTY_REQUIRED_FIELD": "Vui lòng điền hết những ô bắt buộc (có đánh dấu *)!",
     "CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE": "Không chuyển đổi thành không cho phép số dư có thể âm trong khi số dư đang âm!"
 };
@@ -849,7 +854,7 @@ class Actions {
 }
 
 class Data {
-    constructor(Notification, UI_changed_callback) {
+    constructor(Notification, UI_changed_callback, get_set_endpoint) {
         this.Notification = Notification;
         this.Actions = new Actions(Notification, this);
         this.logs = [];
@@ -860,6 +865,9 @@ class Data {
             debts: {}
         };
         this.UI_changed_callback = UI_changed_callback;
+        this.get_set_endpoint = get_set_endpoint;
+
+        this.fetch_queue = [];
     }
 
     do_Actions(function_name, function_args) {
@@ -890,17 +898,85 @@ class Data {
             }
         }
         this.UI_changed_callback();
+        this.Notification.notify("DATA__PARSED_LOG");
         return true;
     }
 
-    async get_logs() {
-        /* TODO, need return */
-        this.parse_logs();
+    get_logs() {
+        let password = prompt(`Nhập mật khẩu:`);
+        if (!password) {
+            this.Notification.notify("DATA__MISSING_PASSWORD");
+            return false;
+        }
+        let get_set_endpoint =
+            CryptoJS.AES.decrypt(this.get_set_endpoint, password)
+                .toString(CryptoJS.enc.Utf8);
+        if (!get_set_endpoint) {
+            this.Notification.notify("DATA__WRONG_PASSWORD");
+            return false;
+        }
+        this.get_set_endpoint = get_set_endpoint;
+
+        fetch(get_set_endpoint)
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else {
+                    this.Notification.notify("DATA__FAILED_FETCH");
+                    return false;
+                }
+            })
+            .then(json => {
+                if (json) {
+                    this.logs = json;
+                    this.parse_logs();
+                }
+            });
+
+        return true;
     }
 
-    async set_logs() {
-        console.log(this);
-        /* TODO, need return */
+    set_logs() {
+        this.fetch_queue.push({
+            url: this.get_set_endpoint,
+            options: {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ data: JSON.stringify(this.logs) })
+            },
+            callback: () => this.Notification.notify("DATA__SAVED"),
+            fetching: false
+        });
+        this.process_fetch_queue();
+        return true;
+    }
+
+    process_fetch_queue() {
+        let ready_for_next_fetch =
+            this.fetch_queue[0] && this.fetch_queue.every(item => !item.fetching);
+        if (!ready_for_next_fetch) return;
+
+        this.fetch_queue[0].fetching = true;
+        this.fetch(
+            this.fetch_queue[0].url,
+            this.fetch_queue[0].options,
+            () => {
+                let shifted_item = this.fetch_queue.shift();
+                shifted_item.callback();
+                this.process_fetch_queue();
+            }
+        );
+    }
+
+    fetch(url, options, callback) {
+        window.onbeforeunload = () => true;
+        fetch(url, options)
+            .then(() => {
+                window.onbeforeunload = false;
+                callback();
+            });
     }
 }
 
@@ -1378,12 +1454,12 @@ class UI {
         if (prefilled)
             for (let [elm_name, attribute_name, value] of prefilled)
                 this.elms.Actions_popup.querySelector(`*[name="${elm_name}"]`)[attribute_name] = value;
-        this.elms.Actions_popup.querySelector(":nth-child(2)").focus();
         this.open_popup(
             this.elms.Actions_popup,
             this.elms.Actions_popup.querySelector("button[name='submit']").innerText,
             () => this.close_Actions_popup()
         );
+        this.elms.Actions_popup.querySelector("form *:nth-child(2)").focus();
         return true;
     }
 
