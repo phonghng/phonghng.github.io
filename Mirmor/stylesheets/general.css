@@ -209,12 +209,3 @@ a:active {
     border-radius: 5px;
     background-color: var(--DARKMODE_GREY_4);
 }
-
-.checkbox_input {
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-.checkbox_input input[type="checkbox"] {
-    margin-right: 10px;
-}

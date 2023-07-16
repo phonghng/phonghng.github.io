@@ -365,10 +365,11 @@ const HABITS = {
                     required: true,
                     point: 15
                 },
-                sleep: {
-                    type: "habit_ext",
-                    name: "Ngủ đúng giờ",
-                    extension_id: "sleep"
+                sleep_early: {
+                    type: "habit_check",
+                    name: "Ngủ trước 22:00",
+                    required: true,
+                    point: 150
                 }
             }
         },
@@ -531,10 +532,6 @@ const EXTENSIONS = {
     quote: {
         name: "Trích dẫn",
         filename: "quote.html"
-    },
-    sleep: {
-        name: "Ngủ",
-        filename: "sleep.html"
     },
     view_data: {
         name: "Xem dữ liệu",
