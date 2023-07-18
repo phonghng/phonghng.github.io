@@ -39,11 +39,21 @@ const PAYMENT_METHODS = {
 };
 
 const PAYMENT_CATEGORIES = {
-    "mandatory_recurring_spending": "Chi tiêu định kì bắt buộc",
-    "nonmandatory_recurring_spending": "Chi tiêu định kì không bắt buộc",
-    "essential_spending": "Chi tiêu thiết yếu",
-    "consumption_spending": "Chi tiêu hưởng thụ",
-    "other_payment": "Thanh toán khác"
+    /**
+     * ===== ID GUIDE =====
+     * DB: mandatory recurring spending
+     *      C3: high school
+     * DK: nonmandatory recurring spending
+     * TB: essential regular spending
+     * TK: non-essential regular spending
+     * KH: other payment
+     *      HC: payment pending classification
+     *      HO: entrustment payment
+     */
+
+    "DB_C3_HocPhi": "Học phí cấp ba",
+    "DB_C3_KTXPhong": "Tiền phòng kí túc xá cấp ba",
+    "KH_HC_Tatca": "Chờ phân loại"
 };
 
 const NOTIFICATION_TEXTS = {
