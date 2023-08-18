@@ -693,8 +693,7 @@ class Actions {
         object_id,
         amount,
         method,
-        category,
-        content
+        category
     ) {
         if (typeof timestamp == "function")
             return [
@@ -702,7 +701,6 @@ class Actions {
                 ["number", "amount", "Số tiền", { min: 0 }],
                 ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
                 ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
-                ["text", "content", "Nội dung"],
                 ["submit", "submit", "Thanh toán"],
                 ["cancel", "cancel", "Hủy bỏ"]
             ];
@@ -721,7 +719,7 @@ class Actions {
         object.balance -= amount;
         object.logs.push([timestamp, "receipt", "var(--CHERRY)",
             `Thanh toán (bằng ${PAYMENT_METHODS[method]}) ${format_currency(amount)} `
-            + `cho loại ${PAYMENT_CATEGORIES[category]} với nội dung "${content}"`]);
+            + `cho loại ${PAYMENT_CATEGORIES[category]}`]);
 
         return arguments;
     }
