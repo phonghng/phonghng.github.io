@@ -693,7 +693,8 @@ class Actions {
         object_id,
         amount,
         method,
-        category
+        category,
+        content
     ) {
         if (typeof timestamp == "function")
             return [
@@ -701,6 +702,7 @@ class Actions {
                 ["number", "amount", "Số tiền", { min: 0 }],
                 ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
                 ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
+                ["text", "content", "Nội dung"],
                 ["submit", "submit", "Thanh toán"],
                 ["cancel", "cancel", "Hủy bỏ"]
             ];
@@ -719,7 +721,7 @@ class Actions {
         object.balance -= amount;
         object.logs.push([timestamp, "receipt", "var(--CHERRY)",
             `Thanh toán (bằng ${PAYMENT_METHODS[method]}) ${format_currency(amount)} `
-            + `cho loại ${PAYMENT_CATEGORIES[category]}`]);
+            + `cho loại ${PAYMENT_CATEGORIES[category]} với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -793,13 +795,11 @@ class Actions {
     QID(
         timestamp,
         Actions_code,
-        queue_id,
-        content
+        queue_id
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
-                ["text", "content", "Nội dung"],
                 ["submit", "submit", "Phân bổ thu nhập"],
                 ["cancel", "cancel", "Hủy bỏ"]
             ];
@@ -850,12 +850,12 @@ class Actions {
             queue.balance -= distribution_amount;
             fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
                 `Nhận phân bổ thu nhập ${format_currency(distribution_amount)} `
-                + `từ hàng đợi "${queue.name}" với nội dung "${content}"`]);
+                + `từ hàng đợi "${queue.name}"`]);
             queue_log_strings.push(`${format_currency(distribution_amount)} tới quỹ "${fund.name}"`);
         }
         queue.logs.push([timestamp, "funnel-dollar", "var(--LEMON)",
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
-            + `${format_currency(total_distribution_amount)}) với nội dung "${content}"`]);
+            + `${format_currency(total_distribution_amount)})`]);
 
         return arguments;
     }
