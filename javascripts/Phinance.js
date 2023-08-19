@@ -54,6 +54,7 @@ const PAYMENT_CATEGORIES = {
 
     "DB_C3_HocPhi": "Học phí cấp ba",
     "DB_C3_KTXPhong": "Tiền phòng kí túc xá cấp ba",
+    "DB_C3_AnChung": "Ăn chung (cấp ba)",
     "TK_ED_AnVat": "Ăn vặt",
     "TK_ED_UongVat": "Uống vặt",
     "KH_HC_Tatca": "Chờ phân loại"
