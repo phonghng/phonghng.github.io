@@ -46,6 +46,7 @@ const PAYMENT_CATEGORIES = {
      * DK: nonmandatory recurring spending
      * TB: essential regular spending
      * TK: non-essential regular spending
+     *      ED: eat and drink
      * KH: other payment
      *      HC: payment pending classification
      *      HO: entrustment payment
@@ -53,6 +54,8 @@ const PAYMENT_CATEGORIES = {
 
     "DB_C3_HocPhi": "Học phí cấp ba",
     "DB_C3_KTXPhong": "Tiền phòng kí túc xá cấp ba",
+    "TK_ED_AnVat": "Ăn vặt",
+    "TK_ED_UongVat": "Uống vặt",
     "KH_HC_Tatca": "Chờ phân loại"
 };
 
