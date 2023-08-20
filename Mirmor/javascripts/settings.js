@@ -59,7 +59,7 @@ const HABITS = {
                     children: {
                         weekly_plan: {
                             type: "habit_check",
-                            name: "Đánh giá về tuần qua, lên kế hoạch cho tuần tới",
+                            name: "Tổng kết tuần qua, lên kế hoạch cho tuần tới",
                             point: 50,
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.week;
@@ -67,7 +67,7 @@ const HABITS = {
                         },
                         monthly_plan: {
                             type: "habit_check",
-                            name: "Đánh giá về tháng qua, lên kế hoạch cho tháng tới",
+                            name: "Tổng kết tháng qua, lên kế hoạch cho tháng tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.month;
                             },
@@ -83,7 +83,7 @@ const HABITS = {
                         },
                         summer_vacation_plan: {
                             type: "habit_check",
-                            name: "Đánh giá về năm học qua, lên kế hoạch cho kì nghỉ hè tới",
+                            name: "Tổng kết năm học qua, lên kế hoạch cho kì nghỉ hè tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.academic_year;
                             },
@@ -91,7 +91,7 @@ const HABITS = {
                         },
                         academic_year_plan: {
                             type: "habit_check",
-                            name: "Đánh giá về kì nghỉ hè qua, lên kế hoạch cho năm học tới",
+                            name: "Tổng kết kì nghỉ hè qua, lên kế hoạch cho năm học tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.summer_vacation;
                             },
@@ -99,7 +99,7 @@ const HABITS = {
                         },
                         annual_plan: {
                             type: "habit_check",
-                            name: "Đánh giá về năm qua, lên kế hoạch cho năm tới",
+                            name: "Tổng kết năm qua, lên kế hoạch cho năm tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.year;
                             },
@@ -114,22 +114,6 @@ const HABITS = {
                             point: 150
                         }
                     }
-                },
-                sweep_room: {
-                    type: "habit_check",
-                    name: "Quét phòng",
-                    required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.week;
-                    },
-                    point: 25
-                },
-                dump_trash: {
-                    type: "habit_check",
-                    name: "Đổ rác",
-                    required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.week;
-                    },
-                    point: 15
                 },
                 wash_face_towel: {
                     type: "habit_check",
@@ -490,24 +474,6 @@ const HABITS = {
                     unit: "lần",
                     point_per_value: 150,
                     goal_value: 0
-                },
-                time_for_family: {
-                    type: "habit_number",
-                    name: "Thời gian dành cho gia đình",
-                    required: true,
-
-                    unit: "phút",
-                    point_per_value: 2,
-                    goal_value: 60
-                },
-                time_for_housework: {
-                    type: "habit_number",
-                    name: "Thời gian làm việc nhà",
-                    required: true,
-
-                    unit: "phút",
-                    point_per_value: 2,
-                    goal_value: 30
                 }
             }
         },
