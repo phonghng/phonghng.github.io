@@ -39,25 +39,14 @@ const PAYMENT_METHODS = {
 };
 
 const PAYMENT_CATEGORIES = {
-    /**
-     * ===== ID GUIDE =====
-     * DB: mandatory recurring spending
-     *      C3: high school
-     * DK: nonmandatory recurring spending
-     * TB: essential regular spending
-     * TK: non-essential regular spending
-     *      ED: eat and drink
-     * KH: other payment
-     *      HC: payment pending classification
-     *      HO: entrustment payment
-     */
-
-    "DB_C3_HocPhi": "Học phí cấp ba",
-    "DB_C3_KTXPhong": "Tiền phòng kí túc xá cấp ba",
-    "DB_C3_AnChung": "Ăn chung (cấp ba)",
-    "TK_ED_AnVat": "Ăn vặt",
-    "TK_ED_UongVat": "Uống vặt",
-    "KH_HC_Tatca": "Chờ phân loại"
+    "HocPhiC3": "Học phí cấp ba",
+    "TienPhongKTXC3": "Tiền phòng kí túc xá cấp ba",
+    "AnTrua": "Ăn trưa",
+    "AnToi": "Ăn tối",
+    "AnQuanHe": "Ăn/uống chung (vì xây dựng quan hệ)",
+    "AnVat": "Ăn vặt",
+    "UongVat": "Uống vặt",
+    "ChoPhanLoai": "Chờ phân loại"
 };
 
 const NOTIFICATION_TEXTS = {
