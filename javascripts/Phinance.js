@@ -41,6 +41,7 @@ const PAYMENT_METHODS = {
 const PAYMENT_CATEGORIES = {
     "HocPhiC3": "Học phí cấp ba",
     "TienPhongKTXC3": "Tiền phòng kí túc xá cấp ba",
+    "AnSang": "Ăn sáng",
     "AnTrua": "Ăn trưa",
     "AnToi": "Ăn tối",
     "AnQuanHe": "Ăn/uống chung (vì xây dựng quan hệ)",
