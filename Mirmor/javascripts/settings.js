@@ -8,7 +8,7 @@ const HABITS = {
             children: {
                 get_up: {
                     type: "habit_check",
-                    name: "Dậy trước 06:00",
+                    name: "Dậy sớm",
                     required: true,
                     point: 15
                 },
@@ -261,7 +261,7 @@ const HABITS = {
                 },
                 bath: {
                     type: "habit_check",
-                    name: "Tắm rửa, gội đầu trước 19:00",
+                    name: "Tắm rửa, gội đầu",
                     required: true,
                     point: 15
                 },
@@ -351,7 +351,7 @@ const HABITS = {
                 },
                 sleep_early: {
                     type: "habit_check",
-                    name: "Ngủ trước 22:00",
+                    name: "Ngủ sớm",
                     required: true,
                     point: 150
                 }
