@@ -199,65 +199,13 @@ const HABITS = {
                     }
                 },
                 sport: {
-                    type: "group",
-                    name: "Tập thể thao",
-                    children: {
-                        cycling: {
-                            type: "habit_number",
-                            name: "Đạp xe",
-                            required: (arguments) => {
-                                let day_in_week = arguments.XDate_function().date_object_expanded.day;
-                                let month = arguments.XDate_function().date_object_expanded.month;
-                                return ![5, 6, 7].includes(month)
-                                    || !(day_in_week == 2 || day_in_week == 5);
-                            },
+                    type: "habit_number",
+                    name: "Thể thao",
+                    required: true,
 
-                            unit: "phút",
-                            point_per_value: 2,
-                            goal_value: 15
-                        },
-                        badminton: {
-                            type: "habit_number",
-                            name: "Cầu lông",
-                            required: false,
-
-                            unit: "phút",
-                            point_per_value: 2,
-                            goal_value: 30
-                        },
-                        swimming: {
-                            type: "habit_number",
-                            name: "Bơi lội",
-                            required: (arguments) => {
-                                let day_in_week = arguments.XDate_function().date_object_expanded.day;
-                                let month = arguments.XDate_function().date_object_expanded.month;
-                                return [5, 6, 7].includes(month)
-                                    && (day_in_week == 2 || day_in_week == 5);
-                            },
-
-                            unit: "phút",
-                            point_per_value: 3,
-                            goal_value: 30
-                        },
-                        walk_run: {
-                            type: "habit_number",
-                            name: "Đi bộ/chạy bộ",
-                            required: false,
-
-                            unit: "phút",
-                            point_per_value: 1.5,
-                            goal_value: 0
-                        },
-                        laboring: {
-                            type: "habit_number",
-                            name: "Lao động",
-                            required: false,
-
-                            unit: "phút",
-                            point_per_value: 1,
-                            goal_value: 0
-                        }
-                    }
+                    unit: "phút (tương đương 1 phút đạp xe)",
+                    point_per_value: 2,
+                    goal_value: 15
                 },
                 bath: {
                     type: "habit_check",
