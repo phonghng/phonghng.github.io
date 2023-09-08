@@ -203,7 +203,7 @@ const HABITS = {
                     name: "Thể thao",
                     required: true,
 
-                    unit: "phút (tương đương 1 phút đạp xe)",
+                    unit: "phút",
                     point_per_value: 2,
                     goal_value: 15
                 },
