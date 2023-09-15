@@ -192,24 +192,21 @@ input[type="checkbox"]+label {
 }
 
 button {
-    --color_1: var(--GREY_1);
-    --color_2: var(--WHITE);
-    --color_3: transparent;
-    background-color: var(--color_1);
-    color: var(--color_2);
+    background-color: var(--base_color);
+    color: var(--WHITE);
     transition: background-color, color 0.25s;
     cursor: pointer;
     font-weight: bold;
 }
 
 button:hover {
-    background-color: var(--color_2);
-    color: var(--color_1);
+    background-color: var(--WHITE);
+    color: var(--base_color);
 }
 
 button:active {
-    background-color: var(--color_3);
-    color: var(--color_2);
+    background-color: transparent;
+    color: var(--WHITE);
 }
 
 button:disabled,
