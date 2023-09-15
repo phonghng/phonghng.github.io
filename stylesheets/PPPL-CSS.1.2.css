@@ -217,41 +217,17 @@ button:active {
     color: var(--WHITE);
 }
 
-button:has(>i.fas:first-child),
-button:has(>i.far:first-child),
-button:has(>i.fal:first-child),
-button:has(>i.fat:first-child),
-button:has(>i.fad:first-child),
-button:has(>i.fass:first-child),
-button:has(>i.fasr:first-child),
-button:has(>i.fasl:first-child),
-button:has(>i.fab:first-child) {
+button:has(>i[class^="fa"]:first-child) {
     background-color: transparent;
     color: var(--base_color);
 }
 
-button:has(>i.fas:first-child):hover,
-button:has(>i.far:first-child):hover,
-button:has(>i.fal:first-child):hover,
-button:has(>i.fat:first-child):hover,
-button:has(>i.fad:first-child):hover,
-button:has(>i.fass:first-child):hover,
-button:has(>i.fasr:first-child):hover,
-button:has(>i.fasl:first-child):hover,
-button:has(>i.fab:first-child):hover {
+button:has(>i[class^="fa"]:first-child):hover {
     background-color: transparent;
     color: var(--WHITE);
 }
 
-button:has(>i.fas:first-child):active,
-button:has(>i.far:first-child):active,
-button:has(>i.fal:first-child):active,
-button:has(>i.fat:first-child):active,
-button:has(>i.fad:first-child):active,
-button:has(>i.fass:first-child):active,
-button:has(>i.fasr:first-child):active,
-button:has(>i.fasl:first-child):active,
-button:has(>i.fab:first-child):active {
+button:has(>i[class^="fa"]:first-child):active {
     background-color: transparent;
     color: var(--base_color);
 }
