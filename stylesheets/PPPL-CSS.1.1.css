@@ -1,4 +1,7 @@
-/* PhongHNg's Personal Programming Library - CSS */
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
 html,
 body,
 div,
@@ -129,6 +132,7 @@ table {
     border-spacing: 0;
 }
 
+/* PhongHNg's Personal Programming Library - CSS */
 :root {
     --BLUE: #1877F2;
     --CHERRY: #F3425F;
@@ -155,10 +159,7 @@ table {
 body {
     background-color: var(--GREY_4);
     color: var(--WHITE);
-    font-size: 16px;
-    margin: 0 auto;
-    max-width: 750px;
-    padding: 20px;
+    font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -173,7 +174,7 @@ textarea {
     border: none;
     border-radius: 5px;
     padding: 10px;
-    font-size: 16px;
+    font-size: 15px;
     width: 100%;
     background-color: var(--GREY_1);
     color: var(--WHITE);
