@@ -1,0 +1,59 @@
+:root {
+    --BLUE: #1877F2;
+    --CHERRY: #F3425F;
+    --GRAPE: #9360F7;
+    --LEMON: #F7B928;
+    --LIME: #45BD62;
+    --PINK: #FF66BF;
+    --SEAFOAM: #54C7EC;
+    --TEAL: #2ABBA7;
+    --TOMATO: #FB724B;
+
+    --BODY_BACKGROUND_COLOR: #18191A;
+    --BODY_TEXT_COLOR: #FFFFFF;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr min-content 1fr;
+    grid-auto-columns: 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "."
+        "body"
+        ".";
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    grid-area: body;
+    margin: 0 auto;
+    padding: 15px;
+    font-size: 18px;
+    background-color: var(--BODY_BACKGROUND_COLOR);
+    color: var(--BODY_TEXT_COLOR);
+    max-width: 500px;
+    text-align: justify;
+}
+
+a {
+    cursor: pointer;
+    color: var(--BLUE);
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: underline;
+}
+
+a.reveal_info {
+    color: var(--CHERRY);
+}

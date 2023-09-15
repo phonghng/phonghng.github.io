@@ -1178,14 +1178,14 @@ class Actions_Form {
     }
 
     xADOM(elm_type, name, title, data) {
-        /* Extended PhongHNg_JSL.ADOM for Actions_Form */
+        /* Extended PPPL_JS.ADOM for Actions_Form */
 
         if (typeof data == "function")
             data = data();
 
         switch (elm_type) {
             case "Actions_code": {
-                return PhongHNg_JSL.ADOM(["input", {
+                return PPPL_JS.ADOM(["input", {
                     type: "text",
                     name: name,
                     value: data,
@@ -1195,7 +1195,7 @@ class Actions_Form {
             }
 
             case "text": {
-                return PhongHNg_JSL.ADOM(["input", {
+                return PPPL_JS.ADOM(["input", {
                     type: "text",
                     name: name,
                     placeholder: `${title} *`,
@@ -1205,7 +1205,7 @@ class Actions_Form {
             }
 
             case "submit": {
-                let elm = PhongHNg_JSL.ADOM(["button", {
+                let elm = PPPL_JS.ADOM(["button", {
                     title: title,
                     name: name,
                     style: "--base_color: var(--LIME);"
@@ -1219,7 +1219,7 @@ class Actions_Form {
             }
 
             case "cancel": {
-                let elm = PhongHNg_JSL.ADOM(["button", {
+                let elm = PPPL_JS.ADOM(["button", {
                     title: title,
                     name: name,
                     style: "--base_color: var(--CHERRY);"
@@ -1233,21 +1233,21 @@ class Actions_Form {
 
             case "checkbox": {
                 return [
-                    PhongHNg_JSL.ADOM(["input", {
+                    PPPL_JS.ADOM(["input", {
                         type: "checkbox",
                         name: name,
                         id: name,
                         title: title
                     }, null, null], document),
 
-                    PhongHNg_JSL.ADOM(["label", {
+                    PPPL_JS.ADOM(["label", {
                         for: name, title: title
                     }, title, null], document),
                 ];
             }
 
             case "number": {
-                return PhongHNg_JSL.ADOM([
+                return PPPL_JS.ADOM([
                     "input",
                     Object.assign({
                         type: "number",
@@ -1268,13 +1268,13 @@ class Actions_Form {
                 }, `${title} *`, null]);
                 for (let [value, title] of Object.entries(data))
                     option_ADOMs.push(["option", { value }, title, null]);
-                return PhongHNg_JSL.ADOM(["select", {
+                return PPPL_JS.ADOM(["select", {
                     name: name, title: `${title} *`, required: true
                 }, null, option_ADOMs], document);
             }
 
             case "datetime": {
-                return PhongHNg_JSL.ADOM(["input", {
+                return PPPL_JS.ADOM(["input", {
                     type: "datetime-local",
                     name: name,
                     placeholder: `${title} *`,
@@ -1316,7 +1316,7 @@ class Actions_Form {
                     ]);
                 }
 
-                return PhongHNg_JSL.ADOM([
+                return PPPL_JS.ADOM([
                     "select",
                     {
                         name: name,

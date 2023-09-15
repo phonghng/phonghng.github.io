@@ -26,7 +26,7 @@ class PHNotion_Hey_Mirmor {
         this.queue = [];
 
         this.get(
-            PhongHNg_JSL.XDate(this.timestamp).date_object_expanded.date_string,
+            PPPL_JS.XDate(this.timestamp).date_object_expanded.date_string,
             getted_data => {
                 this.initialization_data = getted_data;
                 this.init_js();
@@ -163,13 +163,13 @@ class PHNotion_Hey_Mirmor {
                 HomepageView_class.update_view();
             },
             DataStorage_class.data,
-            () => PhongHNg_JSL.XDate(this.timestamp),
+            () => PPPL_JS.XDate(this.timestamp),
         );
 
         const Data_class = new Data(
             Habits_class,
             {
-                XDate_function: () => PhongHNg_JSL.XDate(this.timestamp),
+                XDate_function: () => PPPL_JS.XDate(this.timestamp),
                 line_indent: `      `,
                 line_spacing: `\n\n`
             }

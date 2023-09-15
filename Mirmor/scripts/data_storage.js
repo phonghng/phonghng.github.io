@@ -15,7 +15,7 @@ class DataStorage {
             JSON.stringify(this.data),
             Data_class.to_JSON(),
             Data_class.to_string(this.HomepageView_class_data),
-            PhongHNg_JSL.XDate(timestamp).date_object_expanded.date_string
+            PPPL_JS.XDate(timestamp).date_object_expanded.date_string
         );
     }
 
