@@ -191,6 +191,14 @@ input[type="checkbox"]+label {
     margin-left: 5px;
 }
 
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 button {
     background-color: var(--base_color);
     color: var(--WHITE);
@@ -209,9 +217,47 @@ button:active {
     color: var(--WHITE);
 }
 
-button:disabled,
-input:disabled,
-select:disabled,
-textarea:disabled {
-    cursor: not-allowed;
+button:has(>i.fas:first-child),
+button:has(>i.far:first-child),
+button:has(>i.fal:first-child),
+button:has(>i.fat:first-child),
+button:has(>i.fad:first-child),
+button:has(>i.fass:first-child),
+button:has(>i.fasr:first-child),
+button:has(>i.fasl:first-child),
+button:has(>i.fab:first-child) {
+    background-color: transparent;
+    color: var(--base_color);
+}
+
+button:has(>i.fas:first-child):hover,
+button:has(>i.far:first-child):hover,
+button:has(>i.fal:first-child):hover,
+button:has(>i.fat:first-child):hover,
+button:has(>i.fad:first-child):hover,
+button:has(>i.fass:first-child):hover,
+button:has(>i.fasr:first-child):hover,
+button:has(>i.fasl:first-child):hover,
+button:has(>i.fab:first-child):hover {
+    background-color: transparent;
+    color: var(--WHITE);
+}
+
+button:has(>i.fas:first-child):active,
+button:has(>i.far:first-child):active,
+button:has(>i.fal:first-child):active,
+button:has(>i.fat:first-child):active,
+button:has(>i.fad:first-child):active,
+button:has(>i.fass:first-child):active,
+button:has(>i.fasr:first-child):active,
+button:has(>i.fasl:first-child):active,
+button:has(>i.fab:first-child):active {
+    background-color: transparent;
+    color: var(--base_color);
+}
+
+button:disabled:hover,
+button:disabled:active {
+    background-color: var(--base_color);
+    color: var(--WHITE);
 }
