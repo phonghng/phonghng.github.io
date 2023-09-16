@@ -1,8 +1,3 @@
-/**
- * - - - ABBRAVIATION - - -
- * eci = emergency contact information
- */
-
 const ECI_ENCRYPTED = `U2FsdGVkX1/+MwNJst8WB+kixC67pyk864wFse+940fO30BgE1KXe7AzYo6Ok1RhA/rrHUt9yN5d6jg+4dJH/gZmgWFP0K+mpDrCeGcq7cvP61ZZ4eUQabPfLGWq4//upP7rSmbjw7iahwrfvb1lZadTKNuL8Syoq5IdbJPBHXTMh6bJsU/VXUYKFBW5HxSIXtABSvBa3E3hlh7mKCCOlGv/nc0JlusNIcSeVqjx6RQfjrsrsxFK7Zi57E6j4Wp7e5ynM8fWe45wdMiJL9oZj5NZkvpLdq6iaCZZCNFeyPdeV6Y9JbKZYwbP9AVJWRlrPv2AVeU0bwEtcZjdGfOcxNs2GXcyHodHZ/EAifwO+VYZEYXis10zKxoCgfm63XGREmP/wO2hOK8ibdGB+CXDmuI5s2qDFHKD7LUKAFSUuXPAIOuiF9rcTUNDt6dnxMW3d8MLlawSfey4ngmtzskv9zRC6gYCWJR2P6KHlmT9uIC0ULthqMUhD+qO0m0Zi03u`;
 
 function link_anchor_tags() {

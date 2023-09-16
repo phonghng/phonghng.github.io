@@ -559,5 +559,42 @@ const PPPL_JS = {
                 form_element.appendChild(element);
         }
         return form_element;
+    },
+
+    PPPL_WUIC: {
+        popup: {
+            open(container_element, title, close_callback) {
+                container_element.querySelector(".container .main .title").innerText = title;
+                container_element.querySelector(".container .main .close_button").onclick = close_callback;
+        
+                container_element.style.display = "flex";
+                container_element.querySelector(".container .main")
+                    .animate([
+                        { transform: "scale(0)" },
+                        { transform: "scale(1)" },
+                    ], {
+                        duration: 250,
+                        iterations: 1,
+                    });
+        
+                return true;
+            },
+        
+            close(container_element, closed_callback) {
+                container_element.querySelector(".container .main")
+                    .animate([
+                        { transform: "scale(1)" },
+                        { transform: "scale(0)" },
+                    ], {
+                        duration: 250,
+                        iterations: 1,
+                    });
+                setTimeout(() => {
+                    container_element.style.display = "none";
+                    closed_callback();
+                }, 250);
+                return true;
+            }
+        }
     }
 }
