@@ -1200,8 +1200,8 @@ class Actions_Form {
                     name: name,
                     style: "--base_color: var(--LIME);"
                 }, {
-                    innerHTML: title
-                }, null], document);
+                        innerHTML: title
+                    }, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
                     if (this.submit_form())
@@ -1216,8 +1216,8 @@ class Actions_Form {
                     name: name,
                     style: "--base_color: var(--CHERRY);"
                 }, {
-                    innerHTML: title
-                }, null], document);
+                        innerHTML: title
+                    }, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
                     this.cancel_callback(this);
@@ -1237,8 +1237,8 @@ class Actions_Form {
                     PPPL_JS.ADOM(["label", {
                         for: name, title: title
                     }, {
-                        innerHTML: title
-                    }, null], document),
+                            innerHTML: title
+                        }, null], document),
                 ];
             }
 
@@ -1263,7 +1263,7 @@ class Actions_Form {
                     value: "", disabled: true, selected: true
                 }, `${title} *`, null]);
                 for (let [value, title] of Object.entries(data))
-                    option_ADOMs.push(["option", { value }, title, null]);
+                    option_ADOMs.push(["option", { value }, { innerHTML: title }, null]);
                 return PPPL_JS.ADOM(["select", {
                     name: name, title: `${title} *`, required: true
                 }, null, option_ADOMs], document);
@@ -1289,7 +1289,9 @@ class Actions_Form {
                         disabled: true,
                         selected: true
                     },
-                    `${title} *`,
+                    {
+                        innerHTML: `${title} *`
+                    },
                     null
                 ]);
 
@@ -1300,7 +1302,7 @@ class Actions_Form {
                         optgroup_ADOM_children.push([
                             "option",
                             { value: object_id },
-                            object_name,
+                            { innerHTML: object_name },
                             null
                         ]);
 
