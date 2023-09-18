@@ -1199,7 +1199,9 @@ class Actions_Form {
                     title: title,
                     name: name,
                     style: "--base_color: var(--LIME);"
-                }, title, null], document);
+                }, {
+                    innerHTML: title
+                }, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
                     if (this.submit_form())
@@ -1213,7 +1215,9 @@ class Actions_Form {
                     title: title,
                     name: name,
                     style: "--base_color: var(--CHERRY);"
-                }, title, null], document);
+                }, {
+                    innerHTML: title
+                }, null], document);
                 elm.onclick = event => {
                     event.preventDefault();
                     this.cancel_callback(this);
@@ -1232,7 +1236,9 @@ class Actions_Form {
 
                     PPPL_JS.ADOM(["label", {
                         for: name, title: title
-                    }, title, null], document),
+                    }, {
+                        innerHTML: title
+                    }, null], document),
                 ];
             }
 
