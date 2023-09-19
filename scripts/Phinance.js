@@ -1261,7 +1261,7 @@ class Actions_Form {
                 let option_ADOMs = [];
                 option_ADOMs.push(["option", {
                     value: "", disabled: true, selected: true
-                }, `${title} *`, null]);
+                }, { innerHTML: `${title} *` }, null]);
                 for (let [value, title] of Object.entries(data))
                     option_ADOMs.push(["option", { value }, { innerHTML: title }, null]);
                 return PPPL_JS.ADOM(["select", {
