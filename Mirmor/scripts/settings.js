@@ -31,7 +31,7 @@ const HABITS = {
                 },
                 check_news: {
                     type: "habit_check",
-                    name: "Kiểm tra tin tức",
+                    name: "Kiểm tra tin tức trên <a href='https://feedly.com/'>Feedly</a> và <a href='https://facebook.com/'>Facebook</a>",
                     required: true,
                     point: 75
                 },
@@ -311,123 +311,99 @@ const HABITS = {
                 }
             }
         },
-        review_activity: {
+        Doi_Gio_planning_review: {
             type: "group",
-            name: "Đánh giá",
+            name: "Đánh giá Kế hoạch Đổi Gió",
             children: {
-                Doi_Gio_planning: {
-                    type: "group",
-                    name: "Kế hoạch Đổi Gió",
-                    children: {
-                        dexterity: {
-                            type: "habit_check",
-                            name: "Kĩ tính",
-                            required: true,
-                            point: 50
-                        },
-                        happy: {
-                            type: "habit_check",
-                            name: "Hạnh phúc",
-                            required: true,
-                            point: 50
-                        },
-                        decisive: {
-                            type: "habit_check",
-                            name: "Quyết đoán",
-                            required: true,
-                            point: 50
-                        },
-                        reckless: {
-                            type: "habit_check",
-                            name: "Táo bạo",
-                            required: true,
-                            point: 50
-                        },
-                        methodical: {
-                            type: "habit_check",
-                            name: "Quy củ",
-                            required: true,
-                            point: 50
-                        },
-                        self_learning: {
-                            type: "habit_check",
-                            name: "Tự học",
-                            required: true,
-                            point: 50
-                        },
-                        exquisite: {
-                            type: "habit_check",
-                            name: "Tinh tế",
-                            required: true,
-                            point: 50
-                        },
-                        sincerely: {
-                            type: "habit_check",
-                            name: "Chân thành",
-                            required: true,
-                            point: 50
-                        },
-                        friendly: {
-                            type: "habit_check",
-                            name: "Thân thiện",
-                            required: true,
-                            point: 50
-                        },
-                        reconciliation: {
-                            type: "habit_check",
-                            name: "Hoà giải",
-                            required: true,
-                            point: 50
-                        },
-                        responsibility: {
-                            type: "habit_check",
-                            name: "Trách nhiệm",
-                            required: true,
-                            point: 50
-                        },
-                        humble: {
-                            type: "habit_check",
-                            name: "Khiêm tốn",
-                            required: true,
-                            point: 50
-                        },
-                        patience: {
-                            type: "habit_check",
-                            name: "Điềm tĩnh",
-                            required: true,
-                            point: 50
-                        },
-                        discipline: {
-                            type: "habit_check",
-                            name: "Kỉ luật",
-                            required: true,
-                            point: 50
-                        },
-                        prominence: {
-                            type: "habit_check",
-                            name: "Nổi bật",
-                            required: true,
-                            point: 50
-                        }
-                    }
+                dexterity: {
+                    type: "habit_check",
+                    name: "Kĩ tính",
+                    required: true,
+                    point: 50
                 },
-                time_for_experience: {
-                    type: "habit_number",
-                    name: "Thời gian hoạt động trải nghiệm, xã hội",
-                    required: false,
-
-                    unit: "phút",
-                    point_per_value: 2,
-                    goal_value: 60
+                happy: {
+                    type: "habit_check",
+                    name: "Hạnh phúc",
+                    required: true,
+                    point: 50
                 },
-                volunteering_activities: {
-                    type: "habit_number",
-                    name: "Hoạt động thiện nguyện",
-                    required: false,
-
-                    unit: "lần",
-                    point_per_value: 150,
-                    goal_value: 0
+                decisive: {
+                    type: "habit_check",
+                    name: "Quyết đoán",
+                    required: true,
+                    point: 50
+                },
+                reckless: {
+                    type: "habit_check",
+                    name: "Táo bạo",
+                    required: true,
+                    point: 50
+                },
+                methodical: {
+                    type: "habit_check",
+                    name: "Quy củ",
+                    required: true,
+                    point: 50
+                },
+                self_learning: {
+                    type: "habit_check",
+                    name: "Tự học",
+                    required: true,
+                    point: 50
+                },
+                exquisite: {
+                    type: "habit_check",
+                    name: "Tinh tế",
+                    required: true,
+                    point: 50
+                },
+                sincerely: {
+                    type: "habit_check",
+                    name: "Chân thành",
+                    required: true,
+                    point: 50
+                },
+                friendly: {
+                    type: "habit_check",
+                    name: "Thân thiện",
+                    required: true,
+                    point: 50
+                },
+                reconciliation: {
+                    type: "habit_check",
+                    name: "Hoà giải",
+                    required: true,
+                    point: 50
+                },
+                responsibility: {
+                    type: "habit_check",
+                    name: "Trách nhiệm",
+                    required: true,
+                    point: 50
+                },
+                humble: {
+                    type: "habit_check",
+                    name: "Khiêm tốn",
+                    required: true,
+                    point: 50
+                },
+                patience: {
+                    type: "habit_check",
+                    name: "Điềm tĩnh",
+                    required: true,
+                    point: 50
+                },
+                discipline: {
+                    type: "habit_check",
+                    name: "Kỉ luật",
+                    required: true,
+                    point: 50
+                },
+                prominence: {
+                    type: "habit_check",
+                    name: "Nổi bật",
+                    required: true,
+                    point: 50
                 }
             }
         },
