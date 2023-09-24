@@ -567,7 +567,7 @@ const PPPL_JS = {
             open(container_element, title, close_callback) {
                 container_element.querySelector(".container .main .title").innerText = title;
                 container_element.querySelector(".container .main .close_button").onclick = close_callback;
-        
+
                 container_element.style.display = "flex";
                 container_element.querySelector(".container .main")
                     .animate([
@@ -577,10 +577,10 @@ const PPPL_JS = {
                         duration: 250,
                         iterations: 1,
                     });
-        
+
                 return true;
             },
-        
+
             close(container_element, closed_callback) {
                 container_element.querySelector(".container .main")
                     .animate([
@@ -601,8 +601,10 @@ const PPPL_JS = {
 
     /* Utils for JSEncrypt */
     JSEncrypt: {
-        generate_keys: () => {
+        generate_keys: (private_key) => {
             let _JSEncrypt = new JSEncrypt();
+            if (private_key)
+                _JSEncrypt.setPrivateKey(private_key);
             return {
                 public: _JSEncrypt.getPublicKey(),
                 private: _JSEncrypt.getPrivateKey()
