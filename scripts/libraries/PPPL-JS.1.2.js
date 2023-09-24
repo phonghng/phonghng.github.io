@@ -561,6 +561,7 @@ const PPPL_JS = {
         return form_element;
     },
 
+    /* Utils for PPPL-WUIC */
     PPPL_WUIC: {
         popup: {
             open(container_element, title, close_callback) {
@@ -595,6 +596,27 @@ const PPPL_JS = {
                 }, 250);
                 return true;
             }
+        }
+    },
+
+    /* Utils for JSEncrypt */
+    JSEncrypt: {
+        generate_keys: () => {
+            let _JSEncrypt = new JSEncrypt();
+            return {
+                public: _JSEncrypt.getPublicKey(),
+                private: _JSEncrypt.getPrivateKey()
+            };
+        },
+        encrypt: (public_key, message) => {
+            let _JSEncrypt = new JSEncrypt();
+            _JSEncrypt.setPublicKey(public_key);
+            return _JSEncrypt.encrypt(message);
+        },
+        decrypt: (private_key, encrypted) => {
+            let _JSEncrypt = new JSEncrypt();
+            _JSEncrypt.setPrivateKey(private_key);
+            return _JSEncrypt.decrypt(encrypted);
         }
     }
 }
