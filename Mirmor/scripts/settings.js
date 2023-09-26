@@ -75,7 +75,7 @@ const HABITS = {
                         },
                         review_Mirmor: {
                             type: "habit_check",
-                            name: "Đánh giá tổng thể về Mirmor",
+                            name: "Đánh giá tổng thể Mirmor",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.month;
                             },
@@ -100,14 +100,6 @@ const HABITS = {
                         annual_plan: {
                             type: "habit_check",
                             name: "Tổng kết năm qua, lên kế hoạch cho năm tới",
-                            required: (arguments) => {
-                                return arguments.XDate_function().is_last_day_of.year;
-                            },
-                            point: 150
-                        },
-                        life_plan: {
-                            type: "habit_check",
-                            name: "Chiêm nghiệm về cuộc đời, lên kế hoạch cho cuộc đời",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.year;
                             },
@@ -264,20 +256,26 @@ const HABITS = {
                         }
                     }
                 },
+                reading_book: {
+                    type: "habit_number",
+                    name: "Đọc sách",
+                    required: true,
+
+                    unit: "trang",
+                    point_per_value: 5,
+                    goal_value: 5
+                },
+                learn_eJOY: {
+                    type: "habit_check",
+                    name: "Học trên eJOY",
+                    required: true,
+                    point: 25
+                },
                 completed_all_todo: {
                     type: "habit_check",
                     name: "Hoàn thành tất cả việc cần làm",
                     required: true,
                     point: 100
-                },
-                reading_book: {
-                    type: "habit_number",
-                    name: "Đọc sách",
-                    required: false,
-
-                    unit: "trang",
-                    point_per_value: 5,
-                    goal_value: 25
                 }
             }
         },
