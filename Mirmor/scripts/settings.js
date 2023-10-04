@@ -265,9 +265,9 @@ const HABITS = {
                     point_per_value: 5,
                     goal_value: 5
                 },
-                learn_eJOY: {
+                learn_Eng_vocab: {
                     type: "habit_check",
-                    name: "Học trên eJOY",
+                    name: "Học từ vựng tiếng Anh",
                     required: true,
                     point: 25
                 },
