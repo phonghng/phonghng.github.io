@@ -112,7 +112,10 @@ class Actions {
                 else
                     log_messages.push(`${title} thành ${new_value}`);
                 if (type == "bacc" && name == "type")
-                    object.is_anb = new_value == "credit";
+                    object.is_anb = (
+                        new_value == "credit_card"
+                        || new_value == "loan"
+                    );
             }
 
         object.logs.push([args[0], "pencil", "var(--BLUE)",
@@ -430,7 +433,7 @@ class Actions {
         this.Data.data.baccs[String(timestamp)] = {
             name: bacc_name,
             balance: 0,
-            is_anb: bacc_type == "credit",
+            is_anb: (bacc_type == "credit_card" || bacc_type == "loan"),
             type: bacc_type,
             linked_fund: null,
             logs: [
@@ -1111,7 +1114,7 @@ class Notification {
                 let object = args.Data.data[`${args.type}s`][args.id];
                 for (let [index, [title, name, new_value, some_function]] of Object.entries(args.edit_data)) {
                     if ((name == "is_anb" && new_value == false && object.balance < 0)
-                        || (args.type == "bacc" && name == "type" && new_value != "credit" && object.balance < 0)) {
+                        || (args.type == "bacc" && name == "type" && new_value != "credit" && new_value != "loan" && object.balance < 0)) {
                         this.notify("CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE");
                         return false;
                     }
@@ -1164,17 +1167,21 @@ class Actions_Form {
                 "Quỹ":
                     Object.entries(this.Data.data.funds)
                         .map(object => [`F_${object[0]}`, object[1].name]),
+                "Tài khoản thanh toans":
+                    Object.entries(this.Data.data.baccs)
+                        .filter(bacc => bacc[1].type == "payment")
+                        .map(object => [`B_${object[0]}`, object[1].name]),
                 "Tài khoản tiết kiệm":
                     Object.entries(this.Data.data.baccs)
                         .filter(bacc => bacc[1].type == "savings")
                         .map(object => [`B_${object[0]}`, object[1].name]),
-                "Tài khoản giao dịch":
+                "Tài khoản thẻ tín dụng":
                     Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "current")
+                        .filter(bacc => bacc[1].type == "credit_carrd")
                         .map(object => [`B_${object[0]}`, object[1].name]),
-                "Tài khoản tín dụng":
+                "Tài khoản vay vốn":
                     Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "credit")
+                        .filter(bacc => bacc[1].type == "loan")
                         .map(object => [`B_${object[0]}`, object[1].name]),
                 "Khoản nợ":
                     Object.entries(this.Data.data.debts)
@@ -1419,9 +1426,10 @@ class UI {
         const HEADER_BUTTONS_FUNCTIONS = [
             () => this.open_Actions_popup("QCr"),
             () => this.open_Actions_popup("FCr"),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "payment"]]),
             () => this.open_Actions_popup("BCr", [["bacc_type", "value", "savings"]]),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "current"]]),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "credit"]]),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "credit_card"]]),
+            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "loan"]]),
             () => this.open_Actions_popup("DCr")
         ];
 
