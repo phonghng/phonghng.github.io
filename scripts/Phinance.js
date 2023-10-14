@@ -5,27 +5,31 @@ const OBJECT_TYPES_NAME = {
     "D": "debt",
     "queue": "hàng đợi",
     "fund": "quỹ",
+    "bacc_payment": "tài khoản thanh toán",
     "bacc_savings": "tài khoản tiết kiệm",
-    "bacc_current": "tài khoản giao dịch",
-    "bacc_credit": "tài khoản tín dụng",
+    "bacc_credit_card": "tài khoản thẻ tín dụng",
+    "bacc_loan": "tài khoản vay vốn",
+    "payment": "thanh toán",
     "savings": "tiết kiệm",
-    "current": "giao dịch",
-    "credit": "tín dụng",
+    "credit_card": "thẻ tín dụng",
+    "loan": "vay vốn",
     "debt": "khoản nợ"
 };
 
 const BACC_TYPES = {
+    "payment": "Tài khoản thanh toán",
     "savings": "Tài khoản tiết kiệm",
-    "current": "Tài khoản giao dịch",
-    "credit": "Tài khoản tín dụng"
+    "credit_card": "Tài khoản thẻ tín dụng",
+    "loan": "Tài khoản vay vốn",
 };
 
 const PAYMENT_METHODS = {
     "cash": "Tiền mặt",
-    "current_account_transfering": "Chuyển khoản tài khoản giao dịch",
-    "current_account_card": "Thẻ tài khoản giao dịch",
-    "credit_account_transfering": "Chuyển khoản tài khoản tín dụng",
-    "credit_account_card": "Thẻ tài khoản tín dụng"
+    "internet_nanking": "Internet Banking",
+    "mobile_nanking": "Mobile Banking",
+    "debit_card": "Thẻ ghi nợ",
+    "credit_card": "Thẻ tín dụng",
+    "prepaid_card": "Thẻ trả trước"
 };
 
 const PAYMENT_CATEGORIES = {
@@ -351,6 +355,16 @@ class Actions {
                 ["bacc_type", "value", bacc.type]
             ];
             const TYPE_SETTINGS = {
+                "payment": ["bacc_payment", "wallet", "Tài khoản thanh toán", [
+                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
+                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
+                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
+                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
+                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
+                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
+                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
+                ]],
                 "savings": ["bacc_savings", "piggy-bank", "Tài khoản tiết kiệm", [
                     ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
@@ -361,7 +375,7 @@ class Actions {
                     ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
                     ["Xóa", "trash", "BRm", bacc_id_prefilled]
                 ]],
-                "current": ["bacc_current", "wallet", "Tài khoản giao dịch", [
+                "credit_card": ["bacc_credit_card", "credit-card", "Tài khoản thẻ tín dụng", [
                     ["Thanh toán", "receipt", "OPm", object_id_prefilled],
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
                     ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
@@ -371,7 +385,7 @@ class Actions {
                     ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
                     ["Xóa", "trash", "BRm", bacc_id_prefilled]
                 ]],
-                "credit": ["bacc_credit", "credit-card", "Tài khoản tín dụng", [
+                "loan": ["bacc_loan", "hand-holding-usd", "Tài khoản vay vốn", [
                     ["Thanh toán", "receipt", "OPm", object_id_prefilled],
                     ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
                     ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
