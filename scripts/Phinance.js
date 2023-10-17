@@ -33,8 +33,6 @@ const PAYMENT_METHODS = {
 };
 
 const PAYMENT_CATEGORIES = {
-    "HocPhiC3": "Học phí cấp ba",
-    "TienPhongKTXC3": "Tiền phòng kí túc xá cấp ba",
     "DongGopChung": "Đóng góp các khoản chung",
     "AnSang": "Ăn sáng",
     "AnTrua": "Ăn trưa",
@@ -42,6 +40,9 @@ const PAYMENT_CATEGORIES = {
     "AnQuanHe": "Ăn/uống chung",
     "AnVat": "Ăn vặt",
     "UongVat": "Uống vặt",
+    "NhuYeuPham": "Mua nhu yếu phẩm",
+    "Photo": "In ấn, photocopy",
+    "Qua": "Mua quà tặng",
     "ChoPhanLoai": "Chờ phân loại"
 };
 
