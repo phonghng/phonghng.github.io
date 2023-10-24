@@ -96,3 +96,31 @@ function assign_eci_reveal_info_anchor() {
 link_anchor_tags();
 append_items_title();
 assign_eci_reveal_info_anchor();
+
+const get_url_param = key => new URL(location.href).searchParams.get(key);
+let private_note_type = get_url_param("private_note_type");
+let private_note_content = ``;
+switch (private_note_type) {
+    case "cpp_ctn_bt": {
+        let teacher = [
+            "Đỗ Thị Linh",
+            "Nguyễn Thị Kim Tuyến"
+        ][parseInt(get_url_param("teacher_code"))];
+        private_note_content =
+            `Đoạn mã được viết bởi tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            <br/>
+            Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
+            <br/>
+            Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
+            — Trường: THPT Chuyên (tỉnh Thái Nguyên, Việt Nam).<br/>
+            — Giáo viên: ${teacher}.<br/>
+            — Nội dung tiết học: ${get_url_param("lesson_content")}.<br/>
+            — Nội dung bài tập: ${get_url_param("exercise_content")}.`;
+        let vnoj_problem_code = get_url_param("vnoj_problem_code");
+        if (vnoj_problem_code)
+            private_note_content += 
+                `<br/>
+                — Mã bài VNOJ (có thể xem đề bài, kết quả chấm bài làm của đoạn mã): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+    }
+}
+document.querySelector("#private_note").innerHTML = private_note_content;

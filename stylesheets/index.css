@@ -8,6 +8,13 @@
     --SEAFOAM: #54C7EC;
     --TEAL: #2ABBA7;
     --TOMATO: #FB724B;
+    --WHITE: #FFFFFF;
+    --GREY_0: #999999;
+    --GREY_1: #3A3B3C;
+    --GREY_2: #242526;
+    --GREY_3: #212121;
+    --GREY_4: #18191A;
+    --BLACK: #000000;
 
     --BODY_BACKGROUND_COLOR: #18191A;
     --BODY_TEXT_COLOR: #FFFFFF;
@@ -36,7 +43,7 @@ html {
 body {
     grid-area: body;
     margin: 0 auto;
-    padding: 15px;
+    padding: 25px 0;
     font-size: 18px;
     background-color: var(--BODY_BACKGROUND_COLOR);
     color: var(--BODY_TEXT_COLOR);
@@ -56,4 +63,10 @@ a:active {
 
 a.reveal_info {
     color: var(--CHERRY);
+}
+
+#private_note {
+    color: var(--GREY_0);
+    margin: 0 0 25px 0;
+    text-align: justify;
 }
