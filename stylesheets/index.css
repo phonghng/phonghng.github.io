@@ -69,4 +69,5 @@ a.reveal_info {
     color: var(--GREY_0);
     margin: 0 0 25px 0;
     text-align: justify;
+    font-style: italic;
 }

@@ -1,3 +1,5 @@
+/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=JavaScript&library_name=PPPL-JS&version=1.3 */
+
 /* PhongHNg's Personal Programming Library - JavaScript */
 const PPPL_JS = {
     /* Seedable pseudorandom number generator */
