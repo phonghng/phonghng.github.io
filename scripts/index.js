@@ -118,9 +118,10 @@ switch (private_note_type) {
             — Nội dung bài tập: ${get_url_param("exercise_content")}.`;
         let vnoj_problem_code = get_url_param("vnoj_problem_code");
         if (vnoj_problem_code)
-            private_note_content += 
+            private_note_content +=
                 `<br/>
                 — Mã bài VNOJ (có thể xem đề bài, kết quả chấm bài làm của đoạn mã): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+        break;
     }
 
     case "code__open_source__library": {
@@ -128,6 +129,7 @@ switch (private_note_type) {
             `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} được viết bởi tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
             <br/>
             Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
+        break;
     }
 }
 document.querySelector("#private_note").innerHTML = private_note_content;
