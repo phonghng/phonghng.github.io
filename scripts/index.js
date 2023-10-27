@@ -120,7 +120,7 @@ switch (private_note_type) {
         if (vnoj_problem_code)
             private_note_content +=
                 `<br/>
-                — Mã bài VNOJ (có thể xem đề bài, kết quả chấm bài làm của đoạn mã): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+                — Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
         break;
     }
 
