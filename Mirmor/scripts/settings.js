@@ -31,7 +31,7 @@ const HABITS = {
                 },
                 check_news: {
                     type: "habit_check",
-                    name: "Kiểm tra tin tức trên <a href='https://feedly.com/'>Feedly</a> và <a href='https://facebook.com/'>Facebook</a>",
+                    name: "Kiểm tra tin tức trên <a href='https://news.google.com/foryou?hl=vi&gl=VN&ceid=VN%3Avi'>Google News</a>, <a href='https://feedly.com/'>Feedly</a>, <a href='https://facebook.com/'>Facebook</a>",
                     required: true,
                     point: 75
                 },
