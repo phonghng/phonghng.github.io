@@ -134,7 +134,7 @@ switch (private_note_type) {
 
     case "property": {
         private_note_content =
-            `"${get_url_param("Property_name")}" có gắn đường liên kết trở tới trang này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            `"${get_url_param("property_name")}" có gắn đường liên kết trở tới trang này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
             <br/>
             Nếu bạn là người sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
             <br/>
