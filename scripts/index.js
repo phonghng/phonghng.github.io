@@ -131,5 +131,15 @@ switch (private_note_type) {
             Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
         break;
     }
+
+    case "property": {
+        private_note_content =
+            `"${get_url_param("Property_name")}" có gắn đường liên kết trở tới trang này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            <br/>
+            Nếu bạn là người sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
+            <br/>
+            Nếu bạn tìm thấy tài sản này trong trường tôi làm thất lạc, rất mong bạn sẽ bảo quản và giúp tôi sớm nhận lại được nó; tôi xin cảm ơn và hậu tạ!`;
+        break;
+    }
 }
 document.querySelector("#private_note").innerHTML = private_note_content;
