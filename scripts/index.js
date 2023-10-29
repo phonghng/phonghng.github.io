@@ -107,7 +107,7 @@ switch (private_note_type) {
             "Nguyễn Thị Kim Tuyến"
         ][parseInt(get_url_param("teacher_code"))];
         private_note_content =
-            `Đoạn mã được viết bởi tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
             <br/>
             Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
             <br/>
@@ -126,7 +126,7 @@ switch (private_note_type) {
 
     case "code__open_source__library": {
         private_note_content =
-            `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} được viết bởi tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
             <br/>
             Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
         break;
@@ -134,7 +134,7 @@ switch (private_note_type) {
 
     case "property": {
         private_note_content =
-            `"${get_url_param("property_name")}" có gắn đường liên kết trở tới trang này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi, NGUYỄN HẢI PHONG. Thông tin liên lạc với tôi được đăng tải ở dưới.<br/>
+            `"${get_url_param("property_name")}" có gắn đường liên kết trỏ tới trang này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
             <br/>
             Nếu bạn là người sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
             <br/>
@@ -142,4 +142,7 @@ switch (private_note_type) {
         break;
     }
 }
-document.querySelector("#private_note").innerHTML = private_note_content;
+if (private_note_type) {
+    document.querySelector("#private_note").innerHTML = private_note_content;
+    document.querySelector("#private_note").style.display = "block";
+}

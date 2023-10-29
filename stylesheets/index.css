@@ -70,4 +70,5 @@ a.reveal_info {
     margin: 0 0 25px 0;
     text-align: justify;
     font-style: italic;
+    display: none;
 }
