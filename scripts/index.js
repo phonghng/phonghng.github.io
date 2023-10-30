@@ -125,6 +125,7 @@ switch (private_note_type) {
     }
     
     case "code__closed_source__vnoj": {
+        let vnoj_problem_code = get_url_param("vnoj_problem_code");
         private_note_content =
             `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
             <br/>
