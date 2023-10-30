@@ -131,7 +131,7 @@ switch (private_note_type) {
             <br/>
             Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
             <br/>
-            Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+            Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/${vnoj_problem_code}">${vnoj_problem_code}</a>.`;
         break;
     }
 
