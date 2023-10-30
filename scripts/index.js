@@ -123,6 +123,16 @@ switch (private_note_type) {
                 — Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
         break;
     }
+    
+    case "code__closed_source__vnoj": {
+        private_note_content =
+            `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+            <br/>
+            Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
+            <br/>
+            Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+        break;
+    }
 
     case "code__open_source__library": {
         private_note_content =
