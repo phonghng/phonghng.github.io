@@ -1,26 +1,14 @@
 const OBJECT_TYPES_NAME = {
     "Q": "queue",
     "F": "fund",
-    "B": "bacc",
     "D": "debt",
     "queue": "hàng đợi",
     "fund": "quỹ",
-    "bacc_payment": "tài khoản thanh toán",
-    "bacc_savings": "tài khoản tiết kiệm",
-    "bacc_credit_card": "tài khoản thẻ tín dụng",
-    "bacc_loan": "tài khoản vay vốn",
     "payment": "thanh toán",
     "savings": "tiết kiệm",
     "credit_card": "thẻ tín dụng",
     "loan": "vay vốn",
     "debt": "khoản nợ"
-};
-
-const BACC_TYPES = {
-    "payment": "Tài khoản thanh toán",
-    "savings": "Tài khoản tiết kiệm",
-    "credit_card": "Tài khoản thẻ tín dụng",
-    "loan": "Tài khoản vay vốn",
 };
 
 const PAYMENT_METHODS = {
@@ -49,13 +37,8 @@ const PAYMENT_CATEGORIES = {
 const NOTIFICATION_TEXTS = {
     "CANT_FIND_QUEUE": "Không thể tìm thấy hàng đợi!",
     "CANT_FIND_FUND": "Không thể tìm thấy quỹ!",
-    "CANT_FIND_BACC": "Không thể tìm thấy tài khoản ngân hàng!",
     "CANT_FIND_DEBT": "Không thể tìm thấy khoản nợ!",
     "NOT_ENOUGH_BALANCE": "Không đủ số dư!",
-    "FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB": "Không thể liên kết quỹ – tài khoản ngân hàng (do một cái cho phép, một cái không cho phép số dư có thể âm)!",
-    "FUND_BACC_UNLINKABLE__ALREADY_LINKED": "Không thể liên kết quỹ – tài khoản ngân hàng (do chúng đang liên kết với nhau)!",
-    "FUND_BACC_UNLINKABLE__BACC_ON_OTHER_LINK": "Không thể liên kết quỹ – tài khoản ngân hàng (do tài khoản ngân hàng đang liên kết với một quỹ khác)!",
-    "CANT_FUND_BACC_UNLINK__NOT_LINKING": "Không thể hủy liên kết quỹ – tài khoản ngân hàng (do chúng đang không liên kết với nhau)!",
     "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
     "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
     "DATA__CANT_PARSE_LOG": "Không thể phân tích nhật kí!",
@@ -112,11 +95,6 @@ class Actions {
                     log_messages.push(`${title} thành ${new_value_formatter(new_value)}`);
                 else
                     log_messages.push(`${title} thành ${new_value}`);
-                if (type == "bacc" && name == "type")
-                    object.is_anb = (
-                        new_value == "credit_card"
-                        || new_value == "loan"
-                    );
             }
 
         object.logs.push([args[0], "pencil", "var(--BLUE)",
@@ -228,17 +206,6 @@ class Actions {
         else if (timestamp.constructor.name == "Object") {
             let fund = this.Data.data.funds[timestamp.id];
 
-            let linked_baccs_html = [];
-            for (let linked_bacc_id of fund.linked_baccs) {
-                let linked_bacc = this.Data.data.baccs[linked_bacc_id];
-                let html_title =
-                    `Tên: ${linked_bacc.name.toUpperCase()}\n`
-                    + `Loại: ${BACC_TYPES[linked_bacc.type]}\n`
-                    + `Số dư: ${format_currency(linked_bacc.balance)}\n`;
-                linked_baccs_html.push(`<span title="${html_title}">${linked_bacc.name}</span>`);
-            }
-            linked_baccs_html = linked_baccs_html.join(", ");
-
             return [
                 "three_info",
                 "fund",
@@ -248,7 +215,6 @@ class Actions {
                 format_currency(fund.balance),
                 [
                     ["Số dư có thể âm", "user-minus", `Số dư ${fund.is_anb ? "có" : "không"} thể âm`],
-                    ["Tài khoản ngân hàng đã liên kết", "link", linked_baccs_html || "Không có"],
                     ["Phần trăm nhận phân bổ thu nhập", "percent", `${fund.rrid}%`]
                 ],
                 [
@@ -278,7 +244,6 @@ class Actions {
             name: fund_name,
             balance: 0,
             is_anb,
-            linked_baccs: [],
             rrid,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
@@ -330,159 +295,6 @@ class Actions {
         }))
             return false;
         delete this.Data.data.funds[fund_id];
-        return arguments;
-    }
-
-    BCr(
-        timestamp,
-        Actions_code,
-        bacc_name,
-        bacc_type
-    ) {
-        if (typeof timestamp == "function")
-            return [
-                ["text", "bacc_name", "Tên tài khoản ngân hàng"],
-                ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
-                ["submit", "submit", "Tạo tài khoản ngân hàng"],
-                ["cancel", "cancel", "Hủy bỏ"]
-            ];
-        else if (timestamp.constructor.name == "Object") {
-            let bacc = this.Data.data.baccs[timestamp.id];
-
-            let object_id_prefilled = [["object_id", "value", `B_${timestamp.id}`]];
-            let bacc_id_prefilled = [["bacc_id", "value", timestamp.id]];
-            let F0B_prefilled = [["fund_id", "value", bacc.linked_fund], ["bacc_id", "value", timestamp.id]];
-            let source_id_prefilled = [["source_id", "value", `B_${timestamp.id}`]];
-            let edit_prefilled = [
-                ["bacc_id", "value", timestamp.id],
-                ["bacc_name", "value", bacc.name],
-                ["bacc_type", "value", bacc.type]
-            ];
-            const TYPE_SETTINGS = {
-                "payment": ["bacc_payment", "wallet", "Tài khoản thanh toán", [
-                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
-                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
-                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
-                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
-                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
-                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
-                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
-                ]],
-                "savings": ["bacc_savings", "piggy-bank", "Tài khoản tiết kiệm", [
-                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
-                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
-                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
-                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
-                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
-                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
-                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
-                ]],
-                "credit_card": ["bacc_credit_card", "credit-card", "Tài khoản thẻ tín dụng", [
-                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
-                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
-                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
-                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
-                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
-                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
-                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
-                ]],
-                "loan": ["bacc_loan", "hand-holding-usd", "Tài khoản vay vốn", [
-                    ["Thanh toán", "receipt", "OPm", object_id_prefilled],
-                    ["Chuyển tiền", "inbox-out", "O2O", source_id_prefilled],
-                    ["Cộng/trừ tiền", "bolt", "OPM", object_id_prefilled],
-                    ["Liên kết với quỹ", "link", "F1B", bacc_id_prefilled],
-                    ["Hủy liên kết với quỹ", "unlink", "F0B", F0B_prefilled],
-                    ["Xem nhật kí", "align-justify", false, `B_${timestamp.id}`],
-                    ["Sửa thông tin", "pencil", "BEd", edit_prefilled],
-                    ["Xóa", "trash", "BRm", bacc_id_prefilled]
-                ]]
-            };
-
-            let linked_fund_html = ``;
-            if (bacc.linked_fund) {
-                let linked_fund = this.Data.data.funds[bacc.linked_fund];
-                let linked_fund_linked_baccs_text =
-                    linked_fund.linked_baccs
-                        .map(linked_bacc_id => this.Data.data.baccs[linked_bacc_id].name)
-                        .join(", ");
-                let html_title =
-                    `Tên: ${linked_fund.name.toUpperCase()}\n`
-                    + `Số dư có thể âm: Số dư ${linked_fund.is_anb ? "có" : "không"} thể âm\n`
-                    + `Tài khoản ngân hàng đã liên kết: ${linked_fund_linked_baccs_text || "Không có"} \n`;
-                + `Phần trăm nhận phân bổ thu nhập: ${linked_fund.rrid}%\n`;
-                + `Số dư: ${format_currency(linked_fund.balance)} \n`;
-                linked_fund_html = `<span title="${html_title}">${linked_fund.name}</span>`;
-            }
-
-            return [
-                "one_info",
-                TYPE_SETTINGS[bacc.type][0],
-                TYPE_SETTINGS[bacc.type][1],
-                TYPE_SETTINGS[bacc.type][2],
-                bacc.name,
-                format_currency(bacc.balance),
-                [
-                    ["Quỹ đã liên kết", "link", linked_fund_html || "Không có"]
-                ],
-                TYPE_SETTINGS[bacc.type][3]
-            ];
-        }
-
-        this.Data.data.baccs[String(timestamp)] = {
-            name: bacc_name,
-            balance: 0,
-            is_anb: (bacc_type == "credit_card" || bacc_type == "loan"),
-            type: bacc_type,
-            linked_fund: null,
-            logs: [
-                [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo tài khoản ${OBJECT_TYPES_NAME[bacc_type]} "${bacc_name}"`]
-            ]
-        };
-
-        return arguments;
-    }
-
-    BEd(
-        timestamp,
-        Actions_code,
-        bacc_id,
-        bacc_name,
-        bacc_type
-    ) {
-        if (typeof timestamp == "function")
-            return [
-                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["text", "bacc_name", "Tên tài khoản ngân hàng"],
-                ["select", "bacc_type", "Loại tài khoản ngân hàng", BACC_TYPES],
-                ["submit", "submit", "Sửa thông tin tài khoản ngân hàng"],
-                ["cancel", "cancel", "Hủy bỏ"]
-            ];
-        return this._edit_object_info(arguments, "bacc", bacc_id, [
-            ["tên", "name", bacc_name],
-            ["loại tài khoản ngân hàng", "type", bacc_type, new_value => BACC_TYPES[new_value]]
-        ]);
-    }
-
-    BRm(
-        timestamp,
-        Actions_code,
-        bacc_id
-    ) {
-        if (typeof timestamp == "function")
-            return [
-                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["submit", "submit", "Xóa tài khoản ngân hàng"],
-                ["cancel", "cancel", "Hủy bỏ"]
-            ];
-        if (this.error_checker({
-            "FIND_BACC": { id: bacc_id }
-        }))
-            return false;
-        delete this.Data.data.baccs[bacc_id];
         return arguments;
     }
 
@@ -729,72 +541,6 @@ class Actions {
         return arguments;
     }
 
-    F1B(
-        timestamp,
-        Actions_code,
-        fund_id,
-        bacc_id
-    ) {
-        if (typeof timestamp == "function")
-            return [
-                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
-                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["submit", "submit", "Liên kết quỹ – tài khoản ngân hàng"],
-                ["cancel", "cancel", "Hủy bỏ"]
-            ];
-
-        if (this.error_checker({
-            "FUND_BACC_LINKABLE": { fund_id, bacc_id }
-        }))
-            return false;
-
-        let fund = this.Data.data.funds[fund_id];
-        let bacc = this.Data.data.baccs[bacc_id];
-
-        fund.linked_baccs.push(bacc_id);
-        fund.logs.push([timestamp, "link", "var(--LIME)",
-            `Liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} "${bacc.name}"`]);
-
-        bacc.linked_fund = fund_id;
-        bacc.logs.push([timestamp, "link", "var(--LIME)",
-            `Liên kết với quỹ "${fund.name}"`]);
-
-        return arguments;
-    }
-
-    F0B(
-        timestamp,
-        Actions_code,
-        fund_id,
-        bacc_id
-    ) {
-        if (typeof timestamp == "function")
-            return [
-                ["select", "fund_id", "Quỹ", () => timestamp("fund")],
-                ["select", "bacc_id", "Tài khoản ngân hàng", () => timestamp("bacc")],
-                ["submit", "submit", "Hủy liên kết quỹ – tài khoản ngân hàng"],
-                ["cancel", "cancel", "Hủy bỏ"]
-            ];
-
-        if (this.error_checker({
-            "FUND_BACC_UNLINKED": { fund_id, bacc_id }
-        }))
-            return false;
-
-        let fund = this.Data.data.funds[fund_id];
-        let bacc = this.Data.data.baccs[bacc_id];
-
-        fund.linked_baccs.splice(fund.linked_baccs.indexOf(bacc_id), 1);
-        fund.logs.push([timestamp, "unlink", "var(--CHERRY)",
-            `Hủy liên kết với tài khoản ${OBJECT_TYPES_NAME[bacc.type]} "${bacc.name}"`]);
-
-        bacc.linked_fund = null;
-        bacc.logs.push([timestamp, "unlink", "var(--CHERRY)",
-            `Hủy liên kết với quỹ "${fund.name}"`]);
-
-        return arguments;
-    }
-
     QID(
         timestamp,
         Actions_code,
@@ -872,7 +618,6 @@ class Data {
         this.data = {
             queues: {},
             funds: {},
-            baccs: {},
             debts: {}
         };
         this.UI_changed_callback = UI_changed_callback;
@@ -1020,14 +765,6 @@ class Notification {
                 return false;
             }
 
-            case "FIND_BACC": {
-                if (Object.keys(args.Data.data.baccs)
-                    .includes(args.id))
-                    return true;
-                this.notify("CANT_FIND_BACC");
-                return false;
-            }
-
             case "FIND_DEBT": {
                 if (Object.keys(args.Data.data.debts)
                     .includes(args.id))
@@ -1051,48 +788,6 @@ class Notification {
                 return is_enough_balance;
             }
 
-            case "FUND_BACC_LINKABLE": {
-                if (
-                    !this.validate("FIND_FUND", { Data: args.Data, id: args.fund_id })
-                    || !this.validate("FIND_BACC", { Data: args.Data, id: args.bacc_id })
-                )
-                    return false;
-
-                let fund = args.Data.data.funds[args.fund_id];
-                let bacc = args.Data.data.baccs[args.bacc_id];
-
-                if (fund.is_anb != bacc.is_anb) {
-                    this.notify("FUND_BACC_UNLINKABLE__DIFFERENT_ON_ANB");
-                    return false;
-                } else if (fund.linked_baccs.includes(args.bacc_id)) {
-                    this.notify("FUND_BACC_UNLINKABLE__ALREADY_LINKED");
-                    return false;
-                } else if (bacc.linked_fund) {
-                    this.notify("FUND_BACC_UNLINKABLE__BACC_ON_OTHER_LINK");
-                    return false;
-                }
-
-                return true;
-            }
-
-            case "FUND_BACC_UNLINKED": {
-                if (
-                    !this.validate("FIND_FUND", { Data: args.Data, id: args.fund_id })
-                    || !this.validate("FIND_BACC", { Data: args.Data, id: args.bacc_id })
-                )
-                    return false;
-
-                let fund = args.Data.data.funds[args.fund_id];
-                let bacc = args.Data.data.baccs[args.bacc_id];
-                let is_linking =
-                    fund.linked_baccs.includes(args.bacc_id)
-                    && bacc.linked_fund == args.fund_id;
-
-                if (!is_linking)
-                    this.notify("CANT_FUND_BACC_UNLINK__NOT_LINKING");
-                return is_linking;
-            }
-
             case "RRID": {
                 let funds = args.Data.data.funds;
                 let current_accumulated_rrid =
@@ -1114,8 +809,7 @@ class Notification {
 
                 let object = args.Data.data[`${args.type}s`][args.id];
                 for (let [index, [title, name, new_value, some_function]] of Object.entries(args.edit_data)) {
-                    if ((name == "is_anb" && new_value == false && object.balance < 0)
-                        || (args.type == "bacc" && name == "type" && new_value != "credit" && new_value != "loan" && object.balance < 0)) {
+                    if (name == "is_anb" && new_value == false && object.balance < 0) {
                         this.notify("CANT_CHANGE_ANB_WHEN_BALANCE_IS_NEGATIVE");
                         return false;
                     }
@@ -1168,22 +862,6 @@ class Actions_Form {
                 "Quỹ":
                     Object.entries(this.Data.data.funds)
                         .map(object => [`F_${object[0]}`, object[1].name]),
-                "Tài khoản thanh toans":
-                    Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "payment")
-                        .map(object => [`B_${object[0]}`, object[1].name]),
-                "Tài khoản tiết kiệm":
-                    Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "savings")
-                        .map(object => [`B_${object[0]}`, object[1].name]),
-                "Tài khoản thẻ tín dụng":
-                    Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "credit_carrd")
-                        .map(object => [`B_${object[0]}`, object[1].name]),
-                "Tài khoản vay vốn":
-                    Object.entries(this.Data.data.baccs)
-                        .filter(bacc => bacc[1].type == "loan")
-                        .map(object => [`B_${object[0]}`, object[1].name]),
                 "Khoản nợ":
                     Object.entries(this.Data.data.debts)
                         .map(object => [`D_${object[0]}`, object[1].name])
@@ -1427,10 +1105,6 @@ class UI {
         const HEADER_BUTTONS_FUNCTIONS = [
             () => this.open_Actions_popup("QCr"),
             () => this.open_Actions_popup("FCr"),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "payment"]]),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "savings"]]),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "credit_card"]]),
-            () => this.open_Actions_popup("BCr", [["bacc_type", "value", "loan"]]),
             () => this.open_Actions_popup("DCr")
         ];
 

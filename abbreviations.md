@@ -10,4 +10,3 @@
 - **iwd**: income waiting to be distributed into funds
 - **anb**: allow negative balance
 - **rrid**: rate of receiving income distribution (n% out of 100%)
-- **bacc**: bank account

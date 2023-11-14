@@ -119,30 +119,6 @@ body>h2 {
     color: var(--SEAFOAM);
 }
 
-.object_card.bacc_payment .type_icon,
-.object_card.bacc_payment .type_title,
-.object_card.bacc_payment .info_icon {
-    color: var(--LEMON);
-}
-
-.object_card.bacc_savings .type_icon,
-.object_card.bacc_savings .type_title,
-.object_card.bacc_savings .info_icon {
-    color: var(--CHERRY);
-}
-
-.object_card.bacc_credit_card .type_icon,
-.object_card.bacc_credit_card .type_title,
-.object_card.bacc_credit_card .info_icon {
-    color: var(--GRAPE);
-}
-
-.object_card.bacc_loan .type_icon,
-.object_card.bacc_loan .type_title,
-.object_card.bacc_loan .info_icon {
-    color: var(--PINK);
-}
-
 .object_card.debt .type_icon,
 .object_card.debt .type_title,
 .object_card.debt .info_icon {
