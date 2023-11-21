@@ -10,7 +10,9 @@ body {
     display: none;
     background-color: var(--GREY_2);
     padding: 15px;
-    border-radius: 10px;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
     margin-bottom: 50px;
     font-size: 15px;
 }
@@ -21,19 +23,33 @@ body {
 }
 
 #logo_avatar img {
-    height: 175px;
-    width: 175px;
-    border-radius: 10px;
+    height: calc(100% * 2 / 5);
+    width: calc(100% * 2 / 5);
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
     background-color: #FFFFFF;
     padding: 5px;
 }
 
 #logo_avatar img:nth-child(1) {
-    transform: rotate(-15deg);
+    -webkit-transform: rotate(-15deg);
+       -moz-transform: rotate(-15deg);
+        -ms-transform: rotate(-15deg);
+         -o-transform: rotate(-15deg);
+            transform: rotate(-15deg);
 }
 
 #logo_avatar img:nth-child(2) {
-    transform: rotate(15deg);
+    -webkit-transform: rotate(15deg);
+       -moz-transform: rotate(15deg);
+        -ms-transform: rotate(15deg);
+         -o-transform: rotate(15deg);
+            transform: rotate(15deg);
+    background: -webkit-gradient(linear, left top, right top, from(#12c2e9), color-stop(#c471ed), to(#f64f59));
+    background: -webkit-linear-gradient(left, #12c2e9, #c471ed, #f64f59);
+    background: -moz-linear-gradient(left, #12c2e9, #c471ed, #f64f59);
+    background: -o-linear-gradient(left, #12c2e9, #c471ed, #f64f59);
     background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59);
 }
 
@@ -51,12 +67,12 @@ body>h1 {
     grid-template-columns: 1fr -webkit-min-content;
     grid-template-columns: 1fr min-content;
     -ms-grid-rows: -webkit-min-content 0 -webkit-min-content 0 -webkit-min-content;
-    -ms-grid-rows: min-content 0 min-content 0 min-content;
     grid-template-rows: -webkit-min-content -webkit-min-content -webkit-min-content;
+    -ms-grid-rows: min-content 0 min-content 0 min-content;
     grid-template-rows: min-content min-content min-content;
     gap: 0 10px;
     grid-auto-flow: row;
-    grid-template-areas:
+        grid-template-areas:
         "title buttons"
         "content content"
         "child child";
@@ -147,12 +163,12 @@ body>.item_card:not(:first-of-type) {
     grid-template-columns: 1fr -webkit-min-content;
     grid-template-columns: 1fr min-content;
     -ms-grid-rows: -webkit-min-content;
-    -ms-grid-rows: min-content;
     grid-template-rows: -webkit-min-content;
+    -ms-grid-rows: min-content;
     grid-template-rows: min-content;
     gap: 0 10px;
     grid-auto-flow: row;
-    grid-template-areas:
+        grid-template-areas:
         "input button";
 }
 
