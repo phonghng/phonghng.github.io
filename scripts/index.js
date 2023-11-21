@@ -1,159 +1,212 @@
-const ECI_ENCRYPTED = `U2FsdGVkX1/+MwNJst8WB+kixC67pyk864wFse+940fO30BgE1KXe7AzYo6Ok1RhA/rrHUt9yN5d6jg+4dJH/gZmgWFP0K+mpDrCeGcq7cvP61ZZ4eUQabPfLGWq4//upP7rSmbjw7iahwrfvb1lZadTKNuL8Syoq5IdbJPBHXTMh6bJsU/VXUYKFBW5HxSIXtABSvBa3E3hlh7mKCCOlGv/nc0JlusNIcSeVqjx6RQfjrsrsxFK7Zi57E6j4Wp7e5ynM8fWe45wdMiJL9oZj5NZkvpLdq6iaCZZCNFeyPdeV6Y9JbKZYwbP9AVJWRlrPv2AVeU0bwEtcZjdGfOcxNs2GXcyHodHZ/EAifwO+VYZEYXis10zKxoCgfm63XGREmP/wO2hOK8ibdGB+CXDmuI5s2qDFHKD7LUKAFSUuXPAIOuiF9rcTUNDt6dnxMW3d8MLlawSfey4ngmtzskv9zRC6gYCWJR2P6KHlmT9uIC0ULthqMUhD+qO0m0Zi03u`;
-
-function link_anchor_tags() {
-    let elements = document.querySelectorAll("a[_link_type]");
-    for (const element of elements) {
-        let link_type = element.getAttribute("_link_type");
-        switch (link_type) {
-            case "email":
-                element.href = `mailto:${element.innerHTML}`;
-                break;
-            case "link":
-                element.href = `${element.innerHTML}`;
-                break;
-            case "zalo":
-                element.href = `https://zalo.me/${element.innerHTML.replace(/\./g, "")}`;
-                break;
-            case "phone":
-                element.href = `tel:${element.innerHTML.replace(/\./g, "")}`;
-                break;
-            case "geohack":
-                let latitude = element.getAttribute("_geohack_latitude");
-                let longitude = element.getAttribute("_geohack_longitude");
-                element.href = `https://geohack.toolforge.org/geohack.php?language=vi&pagename=${element.innerHTML}&params=${latitude};${longitude}`;
-                break;
+const BUTTONS_CONFIG = {
+    "copy": {
+        title: "Sao chép nội dung",
+        icon: "copy",
+        onclick: async (element, item_content, arguments) => {
+            try {
+                await navigator.clipboard.writeText(arguments.copy_content || item_content);
+                show_signal_icon(element, "check", "var(--LIME)", 1000);
+            } catch (err) {
+                show_signal_icon(element, "x", "var(--CHERRY)", 1000);
+            }
         }
-
-        element.target = "_blank";
-    }
-}
-
-function append_items_title() {
-    let items = document.querySelectorAll("p[_item_title]");
-    for (const item of items) {
-        let title = document.createElement("strong");
-        title.innerHTML = `${item.getAttribute("_item_title")}:`;
-        item.insertBefore(title, item.firstChild);
-    }
-}
-
-function eci_encrypt(json, password) {
-    let json_stringified = JSON.stringify(json);
-    return CryptoJS.AES.encrypt(json_stringified, password).toString();
-}
-
-function eci_decrypt(encrypted_json, password, reveal_info_anchor) {
-    let decrypted;
-
-    try {
-        decrypted =
-            CryptoJS.AES.decrypt(
-                encrypted_json || ECI_ENCRYPTED,
-                password
-            ).toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-        alert(`Đã xảy ra lỗi: "${error.message}". Có thể là do mật khẩu bị sai. Vui lòng kiểm tra lại!`);
-        return;
-    }
-
-    reveal_info_anchor.style.display = "none";
-
-    let json = JSON.parse(decrypted);
-
-    let item_title = reveal_info_anchor.parentElement.getAttribute("_item_title")
-
-    let element =
-        document.querySelector(`p[_item_title="${item_title}"] a[_link_type]`)
-        || document.querySelector(`p[_item_title="${item_title}"] span`);
-
-    let element_attributes = json[item_title];
-    for (const name in element_attributes) {
-        const value = element_attributes[name];
-        if (name.startsWith("_")) {
-            element.setAttribute(name, value);
-        } else {
-            element[name] = value;
+    },
+    "mailto": {
+        title: "Gửi thư điện tử",
+        icon: "envelope",
+        onclick: (element, item_content, arguments) => {
+            window.open("mailto:" + item_content);
+        }
+    },
+    "tel": {
+        title: "Gọi điện thoại",
+        icon: "phone",
+        onclick: (element, item_content, arguments) => {
+            window.open("tel:" + arguments.phone_number || item_content);
+        }
+    },
+    "Zalo": {
+        title: "Kết bạn Zalo",
+        icon: "user-plus",
+        onclick: (element, item_content, arguments) => {
+            window.open(arguments.Zalo_QR_link);
+        }
+    },
+    "locate": {
+        title: "Tra cứu vị trí",
+        icon: "location-dot",
+        onclick: (element, item_content, arguments) => {
+            let latitude = arguments.latitude;
+            let longitude = arguments.longitude;
+            window.open(`https://geohack.toolforge.org/geohack.php`
+                + `?language=vi&pagename=${item_content}&params=${latitude};${longitude}`);
+        }
+    },
+    "open_link": {
+        title: "Mở đường liên kết",
+        icon: "up-right-from-square",
+        onclick: (element, item_content, arguments) => {
+            window.open(arguments.link || item_content);
         }
     }
+};
 
-    link_anchor_tags();
-}
+const show_signal_icon =
+    (element, icon_name, base_color, duration) => {
+        let orginal_icon_name =
+            element.innerHTML
+                .replace(`<i class="fa-solid fa-`, "")
+                .replace(`></i>`, "");
+        let orginal_base_color = element.style.getPropertyValue("--base_color");
 
-function assign_eci_reveal_info_anchor() {
-    let anchors = document.querySelectorAll("p[_item_title] a.reveal_info");
-    for (const anchor of anchors) {
-        anchor.innerHTML = "Bấm vào đây để hiện thông tin...";
-        anchor.onclick = (event) => {
-            eci_decrypt(
-                ECI_ENCRYPTED,
-                prompt('Nhập mật khẩu:'),
-                event.target
+        element.innerHTML = `<i class="fa-solid fa-${icon_name}"></i>`;
+        element.style.setProperty("--base_color", base_color);
+        setTimeout(() => {
+            element.innerHTML = `<i class="fa-solid fa-${orginal_icon_name}"></i>`;
+            element.style.setProperty("--base_color", orginal_base_color);
+        }, duration);
+    }
+
+const generate_QR_code_element =
+    content => {
+        let element = document.createElement("div");
+        element.style.textAlign = "center";
+        QrCreator.render({
+            text: content,
+            radius: 0.5,
+            ecLevel: "H",
+            fill: "#FFFFFF",
+            background: null,
+            size: 200
+        }, element);
+        return element;
+    }
+
+const generate_item_card =
+    (title, button_names, buttons_arguments, content, children) =>
+        PPPL_JS.ADOM([
+            "div",
+            { class: "item_card" },
+            null,
+            [[
+                "div",
+                { class: "title" },
+                { innerHTML: title },
+                null,
+                null
+            ], [
+                "div",
+                { class: "buttons" },
+                null,
+                button_names.map(button_name => [
+                    "button",
+                    { title: BUTTONS_CONFIG[button_name].title },
+                    { innerHTML: `<i class="fa-solid fa-${BUTTONS_CONFIG[button_name].icon}"></i>` },
+                    null,
+                    DOM =>
+                        DOM.onclick = () => {
+                            if (buttons_arguments.constructor.name == "Protected_Information")
+                                if (buttons_arguments.json)
+                                    buttons_arguments = buttons_arguments.json.buttons_arguments;
+                                else {
+                                    show_signal_icon(DOM, "x", "var(--CHERRY)", 1000);
+                                    return false;
+                                }
+                            BUTTONS_CONFIG[button_name].onclick(DOM, content, buttons_arguments);
+                        }
+                ]),
+                null
+            ], [
+                "div",
+                { class: "content" },
+                { innerHTML: typeof content == "string" ? content : "" },
+                [buttons_arguments.constructor.name == "Protected_Information"
+                    ? buttons_arguments.generate_HTML(content)
+                    : content],
+                null
+            ], [
+                "div",
+                { class: "children" },
+                null,
+                children?.map(child => generate_item_card(...child)),
+                null
+            ]],
+            null
+        ], document);
+
+
+class Protected_Information {
+    constructor(encrypted) {
+        this.encrypted = encrypted;
+        this.json = undefined;
+    }
+
+    encrypt(json, password) {
+        let json_stringified = JSON.stringify(json);
+        return CryptoJS.AES.encrypt(json_stringified, password).toString();
+    }
+
+    decrypt(password) {
+        try {
+            this.json = JSON.parse(
+                CryptoJS.AES.decrypt(
+                    this.encrypted,
+                    password
+                ).toString(CryptoJS.enc.Utf8)
             );
-        };
-    }
-}
-
-link_anchor_tags();
-append_items_title();
-assign_eci_reveal_info_anchor();
-
-const get_url_param = key => new URL(location.href).searchParams.get(key);
-let private_note_type = get_url_param("private_note_type");
-let private_note_content = ``;
-switch (private_note_type) {
-    case "code__closed_source__ctn__exercise": {
-        let teacher = [
-            "Đỗ Thị Linh",
-            "Nguyễn Thị Kim Tuyến"
-        ][parseInt(get_url_param("teacher_code"))];
-        private_note_content =
-            `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-            <br/>
-            Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
-            <br/>
-            Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
-            — Trường: THPT Chuyên (tỉnh Thái Nguyên, Việt Nam).<br/>
-            — Giáo viên: ${teacher}.<br/>
-            — Nội dung tiết học: ${get_url_param("lesson_content")}.<br/>
-            — Nội dung bài tập: ${get_url_param("exercise_content")}.`;
-        let vnoj_problem_code = get_url_param("vnoj_problem_code");
-        if (vnoj_problem_code)
-            private_note_content +=
-                `<br/>
-                — Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
-        break;
-    }
-    
-    case "code__closed_source__vnoj": {
-        let vnoj_problem_code = get_url_param("vnoj_problem_code");
-        private_note_content =
-            `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-            <br/>
-            Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
-            <br/>
-            Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/${vnoj_problem_code}">${vnoj_problem_code}</a>.`;
-        break;
+            return [true];
+        } catch (error) {
+            return [false, error.message];
+        }
     }
 
-    case "code__open_source__library": {
-        private_note_content =
-            `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-            <br/>
-            Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
-        break;
+    generate_form(submit_callback) {
+        return PPPL_JS.ADOM([
+            "div",
+            { class: "protected_information_form" },
+            null,
+            [[
+                "input",
+                { placeholder: "Nhập mật khẩu để xem..." },
+                null,
+                null,
+                null
+            ], [
+                "button",
+                null,
+                { innerHTML: "Gửi" },
+                null,
+                DOM =>
+                    DOM.onclick = () =>
+                        submit_callback(
+                            DOM.parentElement,
+                            DOM.parentElement.querySelector("input").value
+                        )
+            ]],
+            null
+        ], document);
     }
 
-    case "property": {
-        private_note_content =
-            `"${get_url_param("property_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-            <br/>
-            Nếu bạn là người sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
-            <br/>
-            Nếu bạn tìm thấy tài sản này trong trường tôi làm thất lạc, rất mong bạn sẽ bảo quản và giúp tôi sớm nhận lại được nó; tôi xin cảm ơn và hậu tạ!`;
-        break;
+    generate_HTML(content_function) {
+        return this.generate_form((form_element, password) => {
+            let decrypt_response = this.decrypt(password);
+            if (decrypt_response[0]) {
+                let content_element = form_element.parentElement;
+                let content = content_function ? content_function(this.json.content) : this.json.content;
+                content_element.replaceWith(
+                    PPPL_JS.ADOM([
+                        "div",
+                        { class: "content" },
+                        { innerHTML: typeof content == "string" ? content : "" },
+                        [content],
+                        null
+                    ], document)
+                );
+            } else {
+                alert(`Đã xảy ra lỗi "${decrypt_response[1]}". `
+                    + `Có thể do mật khẩu bị sai, vui lòng nhập lại mật khẩu!`);
+                form_element.querySelector("input").focus();
+            }
+        })
     }
-}
-if (private_note_type) {
-    document.querySelector("#private_note").innerHTML = private_note_content;
-    document.querySelector("#private_note").style.display = "block";
 }

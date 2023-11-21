@@ -1,4 +1,4 @@
-/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=JavaScript&library_name=PPPL-JS&version=1.3 */
+/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=JavaScript&library_name=PPPL-JS&version=1.4 */
 
 /* PhongHNg's Personal Programming Library - JavaScript */
 const PPPL_JS = {
@@ -194,7 +194,7 @@ const PPPL_JS = {
 
     /* Convert from ruled-array format to DOM format */
     ADOM(array, document) {
-        let [tag_name, html_attributes, javascript_attributes, children_ADOM] = array;
+        let [tag_name, html_attributes, javascript_attributes, children, callback] = array;
         let DOM = document.createElement(tag_name);
         if (html_attributes)
             for (let [key, value] of Object.entries(html_attributes))
@@ -205,9 +205,14 @@ const PPPL_JS = {
         if (javascript_attributes)
             for (let [key, value] of Object.entries(javascript_attributes))
                 DOM[key] = value;
-        if (children_ADOM)
-            for (let child_ADOM of children_ADOM)
-                DOM.appendChild(PPPL_JS.ADOM(child_ADOM, document));
+        if (children)
+            for (let child of children.constructor.name == "Array" ? children : [children])
+                if (child.constructor.name == "HTMLDivElement")
+                    DOM.appendChild(child);
+                else if (child.constructor.name == "Array")
+                    DOM.appendChild(PPPL_JS.ADOM(child, document));
+        if (callback)
+            callback(DOM);
         return DOM;
     },
 
