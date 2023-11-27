@@ -145,28 +145,22 @@ const HABITS = {
             type: "group",
             name: "Trong ngày",
             children: {
+                water: {
+                    type: "habit_number",
+                    name: "Uống nước",
+                    required: true,
+
+                    unit: "ml",
+                    point_per_value: 0.05,
+                    goal_value: 2000,
+                },
                 eat_lunch: {
                     type: "group",
                     name: "Ăn trưa",
                     children: {
-                        water: {
-                            type: "habit_number",
-                            name: "Uống nước",
-                            required: true,
-
-                            unit: "ml",
-                            point_per_value: 0.05,
-                            goal_value: 1000,
-                        },
                         vegatable: {
                             type: "habit_check",
                             name: "Rau củ",
-                            required: true,
-                            point: 50
-                        },
-                        good_drink: {
-                            type: "habit_check",
-                            name: "Nước trái cây, nước bổ",
                             required: true,
                             point: 50
                         },
@@ -215,24 +209,9 @@ const HABITS = {
                     type: "group",
                     name: "Ăn tối",
                     children: {
-                        water: {
-                            type: "habit_number",
-                            name: "Uống nước",
-                            required: true,
-
-                            unit: "ml",
-                            point_per_value: 0.05,
-                            goal_value: 1000,
-                        },
                         vegatable: {
                             type: "habit_check",
                             name: "Rau củ",
-                            required: true,
-                            point: 50
-                        },
-                        good_drink: {
-                            type: "habit_check",
-                            name: "Nước trái cây, nước bổ",
                             required: true,
                             point: 50
                         },
@@ -313,21 +292,9 @@ const HABITS = {
             type: "group",
             name: "Đánh giá Kế hoạch Đổi Gió",
             children: {
-                dexterity: {
-                    type: "habit_check",
-                    name: "Kĩ tính",
-                    required: true,
-                    point: 50
-                },
                 happy: {
                     type: "habit_check",
                     name: "Hạnh phúc",
-                    required: true,
-                    point: 50
-                },
-                decisive: {
-                    type: "habit_check",
-                    name: "Quyết đoán",
                     required: true,
                     point: 50
                 },
@@ -337,15 +304,15 @@ const HABITS = {
                     required: true,
                     point: 50
                 },
-                methodical: {
+                scientifical: {
                     type: "habit_check",
-                    name: "Quy củ",
+                    name: "Khoa học",
                     required: true,
                     point: 50
                 },
-                self_learning: {
+                self_made: {
                     type: "habit_check",
-                    name: "Tự học",
+                    name: "Tự lập",
                     required: true,
                     point: 50
                 },
@@ -367,12 +334,6 @@ const HABITS = {
                     required: true,
                     point: 50
                 },
-                reconciliation: {
-                    type: "habit_check",
-                    name: "Hoà giải",
-                    required: true,
-                    point: 50
-                },
                 responsibility: {
                     type: "habit_check",
                     name: "Trách nhiệm",
@@ -385,21 +346,9 @@ const HABITS = {
                     required: true,
                     point: 50
                 },
-                patience: {
-                    type: "habit_check",
-                    name: "Điềm tĩnh",
-                    required: true,
-                    point: 50
-                },
                 discipline: {
                     type: "habit_check",
                     name: "Kỉ luật",
-                    required: true,
-                    point: 50
-                },
-                prominence: {
-                    type: "habit_check",
-                    name: "Nổi bật",
                     required: true,
                     point: 50
                 }
