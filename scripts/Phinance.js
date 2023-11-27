@@ -221,8 +221,6 @@ class Actions {
                     ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `F_${timestamp.id}`]]],
                     ["Thanh toán", "receipt", "OPm", [["object_id", "value", `F_${timestamp.id}`]]],
                     ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `F_${timestamp.id}`]]],
-                    ["Liên kết với tài khoản ngân hàng", "link", "F1B", [["fund_id", "value", timestamp.id]]],
-                    ["Hủy liên kết với tài khoản ngân hàng", "unlink", "F0B", [["fund_id", "value", timestamp.id]]],
                     ["Xem nhật kí", "align-justify", false, `F_${timestamp.id}`],
                     ["Sửa thông tin", "pencil", "FEd", [
                         ["fund_id", "value", timestamp.id],
@@ -315,6 +313,17 @@ class Actions {
             ];
         else if (timestamp.constructor.name == "Object") {
             let debt = this.Data.data.debts[timestamp.id];
+            let repayment_term_html;
+            if (moment(debt.repayment_term) - moment() < 0)
+                repayment_term_html = `Quá thời hạn`;
+            else if (moment(debt.repayment_term).diff(moment(), "d"))
+                repayment_term_html = moment(debt.repayment_term).diff(moment(), "d") + " ngày nữa";
+            else if (moment(debt.repayment_term).diff(moment(), "h"))
+                repayment_term_html = moment(debt.repayment_term).diff(moment(), "h") + " giờ nữa";
+            else
+                repayment_term_html = `Ngay bây giờ`;
+            repayment_term_html = `<span title="${format_time(debt.repayment_term)}">${repayment_term_html}</span>`;
+
             return [
                 "two_info",
                 "debt",
@@ -323,7 +332,7 @@ class Actions {
                 debt.name,
                 format_currency(debt.balance),
                 [
-                    ["Thời hạn trả nợ", "calendar-exclamation", format_time(debt.repayment_term)],
+                    ["Thời hạn trả nợ", "calendar-exclamation", repayment_term_html],
                     ["Người nợ", "user", `${debt.debtor ? "Tôi" : "Người khác"} là người nợ`]
                 ],
                 [
@@ -350,7 +359,7 @@ class Actions {
             is_anb: true,
             logs: [
                 [timestamp, "sparkles", "var(--LEMON)",
-                    `Tạo khoản nợ "${debt_name}" với thời hạn trả nợ là `
+                    `Tạo khoản nợ "${debt_name}" với thời hạn trả nợ vào lúc `
                     + `${format_time(repayment_term)}, ${debtor ? "tôi" : "người khác"} là người nợ`]
             ]
         };
