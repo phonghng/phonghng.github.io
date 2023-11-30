@@ -31,7 +31,7 @@ const PAYMENT_CATEGORIES = {
     "NhuYeuPham": "Mua nhu yếu phẩm",
     "Photo": "In ấn, photocopy",
     "Qua": "Mua quà tặng",
-    "ChoPhanLoai": "Chờ phân loại"
+    "NapDienThoai": "Tiền điện thoại"
 };
 
 const NOTIFICATION_TEXTS = {
