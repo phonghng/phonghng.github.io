@@ -1,4 +1,4 @@
-/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=CSS&library_name=PPPL-CSS&version=1.3 */
+/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=CSS&library_name=PPPL-CSS&version=1.4 */
 
 html,
 body,
@@ -150,7 +150,9 @@ table {
 }
 
 * {
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 body {
@@ -161,7 +163,8 @@ body {
 }
 
 form {
-    margin-block-end: 0;
+    -webkit-margin-after: 0;
+            margin-block-end: 0;
 }
 
 button,
@@ -169,7 +172,9 @@ input:not([type="checkbox"]),
 select,
 textarea {
     border: none;
-    border-radius: 5px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
     padding: 10px;
     font-size: 15px;
     width: 100%;
@@ -199,6 +204,9 @@ textarea:disabled {
 button {
     background-color: var(--base_color);
     color: var(--WHITE);
+    -webkit-transition: background-color, color 0.25s;
+    -o-transition: background-color, color 0.25s;
+    -moz-transition: background-color, color 0.25s;
     transition: background-color, color 0.25s;
     cursor: pointer;
     font-weight: bold;
@@ -241,34 +249,58 @@ button:disabled:active {
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(3px) invert(15%);
+    -webkit-backdrop-filter: blur(3px) invert(15%);
+            backdrop-filter: blur(3px) invert(15%);
     display: none;
-    justify-content: center;
-    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+       -moz-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
 }
 
 [PPPL-WUIC="popup"].container .main {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: 1fr 10px -webkit-min-content;
+    -ms-grid-columns: 1fr 10px min-content;
+    grid-template-columns: 1fr -webkit-min-content;
     grid-template-columns: 1fr min-content;
+    -ms-grid-rows: -webkit-min-content 10px 1fr;
+    -ms-grid-rows: min-content 10px 1fr;
+    grid-template-rows: -webkit-min-content 1fr;
     grid-template-rows: min-content 1fr;
     gap: 10px 10px;
     grid-auto-flow: row;
-    grid-template-areas:
+        grid-template-areas:
         "title close_button"
         "content content";
     background-color: var(--GREY_4);
-    border-radius: 10px;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
     padding: 10px;
     width: 75vw;
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
     height: fit-content;
     max-width: 500px;
     max-height: 75vh;
 }
 
 [PPPL-WUIC="popup"].container .main .title {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
     grid-area: title;
     background-color: var(--GREY_3);
-    border-radius: 5px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
     padding: 10px;
     font-weight: bold;
     text-align: center;
@@ -281,9 +313,14 @@ button:disabled:active {
 }
 
 [PPPL-WUIC="popup"].container .main .content {
+    -ms-grid-row: 3;
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 3;
     grid-area: content;
     background-color: var(--GREY_3);
-    border-radius: 5px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
     overflow: auto;
     padding: 10px;
 }
