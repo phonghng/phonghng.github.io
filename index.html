@@ -80,14 +80,14 @@
                 ["copy", "Zalo"],
                 {
                     "copy_content": "0392507161",
-                    "Zalo_QR_Code_link": "https://zaloapp.com/qr/p/14q93z8w4415"
+                    "Zalo_QR_code_link": "https://zaloapp.com/qr/p/14q93z8w4415"
                 },
                 "0392 507 161",
                 [[
-                    "QR Code",
+                    "Mã QR",
                     [],
                     {},
-                    generate_QR_Code_element("https://zaloapp.com/qr/p/14q93z8w4415")
+                    generate_QR_code_element("https://zaloapp.com/qr/p/14q93z8w4415")
                 ]]
             ], [
                 "Trường học",
@@ -139,10 +139,10 @@
                 { copy_content: "0392507161" },
                 "0392 507 161",
                 [[
-                    "QR Code chuyển tiền (bởi MoMo)",
+                    "Mã QR chuyển tiền (bởi MoMo)",
                     [],
                     {},
-                    generate_QR_Code_element("2|99|0392507161|Nguyen Hai Phong||0|0|0||transfer_myqr")
+                    generate_QR_code_element("2|99|0392507161|Nguyen Hai Phong||0|0|0||transfer_myqr")
                 ]]
             ], [
                 "Tài khoản thanh toán BIDV",
@@ -150,10 +150,10 @@
                 new Protected_Information("U2FsdGVkX19rSUaBaqY9ZjjoxVunxNYSXZaM7fWsfhCsEP99Cs02u+qc2G5f+O3dQWZB5FDyTaD89+ajJrx4Yr1kQjiccnkpO3qaZ6uugG5aIjha++5nuYfPaifaTR9rMYinWabGX9ndCbvgtFwpBA=="),
                 null,
                 [[
-                    "QR Code chuyển tiền (bởi VietQR)",
+                    "Mã QR chuyển tiền (bởi VietQR)",
                     [],
                     new Protected_Information("U2FsdGVkX1985ibCYKihsePqCK+iZhPMbOmbRSAJ0ehKhxmw7IT8UhRXbf3NG5GoVkwF0cz2dxdYXTpnWWc+DFEd0Fys9rgdv9zJYeFX4Y62FES47f1bWY7QGrFdmrXvebbR37ULHQu67iU/ynwsjxEFYlpFAhAC5ijMC7kSYK5E8yno2Bnk1pEsw6LhslAskTw+4CPseOOlYSMkxf8Ysg=="),
-                    content => generate_QR_Code_element(content)
+                    content => generate_QR_code_element(content)
                 ]]
             ], [
                 "Tài khoản Chọn tên BIDV",
@@ -161,10 +161,10 @@
                 { copy_content: "0392507161" },
                 "0392 507 161 (NGUYEN HAI PHONG)",
                 [[
-                    "QR Code chuyển tiền (bởi VietQR)",
+                    "Mã QR chuyển tiền (bởi VietQR)",
                     [],
                     {},
-                    generate_QR_Code_element("00020101021138540010A00000072701240006970418011003925071610208QRIBFTTA53037045802VN6304EF02")
+                    generate_QR_code_element("00020101021138540010A00000072701240006970418011003925071610208QRIBFTTA53037045802VN6304EF02")
                 ]]
             ], [
                 "Tài khoản Chọn tên BIDV",
@@ -172,10 +172,10 @@
                 { copy_content: "PHONGHNG" },
                 "PHONGHNG (NGUYEN HAI PHONG)",
                 [[
-                    "QR Code chuyển tiền (bởi VietQR)",
+                    "Mã QR chuyển tiền (bởi VietQR)",
                     [],
                     {},
-                    generate_QR_Code_element("00020101021138520010A000000727012200069704180108PHONGHNG0208QRIBFTTA53037045802VN630487CB")
+                    generate_QR_code_element("00020101021138520010A000000727012200069704180108PHONGHNG0208QRIBFTTA53037045802VN630487CB")
                 ]]
             ]]
         };
@@ -237,7 +237,7 @@
 
             case "property": {
                 private_note_content =
-                    `"${get_url_param("property_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như QR Code, v.v.) là tài sản thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+                    `"${get_url_param("property_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
                     <br/>
                     Nếu bạn sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
                     <br/>
