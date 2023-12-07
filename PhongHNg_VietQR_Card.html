@@ -104,17 +104,17 @@
         #options .option {
             display: flex;
             align-items: baseline;
-            font-size: 20px;
+            font-size: 18px;
         }
 
         #options span {
-            color: #F12711;
+            color: #0575E6;
         }
 
         #options input {
             font-family: sans-serif;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             padding: 0;
             font-weight: bold;
             width: 200px;
@@ -123,19 +123,18 @@
         #options textarea {
             width: calc(100% - 12px);
             height: 70px;
-            font-size: 20px;
+            font-size: 18px;
             resize: none;
             border: none;
             font-family: sans-serif;
             font-weight: bold;
             padding: 0;
             text-align: justify;
-            margin-top: 5px;
         }
 
         #options span {
             text-wrap: nowrap;
-            margin-right: 3px;
+            margin-right: 5px;
             font-size: 16px;
         }
 
@@ -291,7 +290,7 @@
             if (QR_code_container.firstChild)
                 QR_code_container.removeChild(QR_code_container.firstChild);
             let data = generate_QR_code_data(
-                amount_input.value.toString(),
+                amount_input.value.replace(/ | ₫/g, ""),
                 remove_Vietnamese_tones(message_input.value)
             );
             QrCreator.render({
@@ -308,7 +307,7 @@
                 anchor_element.href = data_URL;
                 anchor_element.download =
                     "PhongHNg_VietQR_Card"
-                    + (amount_input.value ? "__" + amount_input.value : "")
+                    + (amount_input.value ? "__" + parseInt(amount_input.value.replace(/ | ₫/g, "")) : "")
                     + (message_input.value ? "__" + remove_Vietnamese_tones(message_input.value) + ".png" : "");
                 anchor_element.click();
             });
