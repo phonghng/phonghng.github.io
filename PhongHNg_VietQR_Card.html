@@ -279,7 +279,7 @@
             /**/ data += "5303704";
             /**/ data += amount ? "54" + leading_zero(amount.length) + amount : "";
             /**/ data += "5802VN";
-            /**/ data += message ? "62" + (message.length + 4) + "08" + leading_zero(message.length) + message : "";
+            /**/ data += message ? "62" + leading_zero(message.length + 4) + "08" + leading_zero(message.length) + message : "";
             /**/ data += "6304";
             /**/ data += crc16_ccitt_false(data).toUpperCase();
             return data;
