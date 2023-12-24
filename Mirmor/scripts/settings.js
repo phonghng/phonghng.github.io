@@ -250,6 +250,12 @@ const HABITS = {
                     required: true,
                     point: 25
                 },
+                study_for_tomorrow: {
+                    type: "habit_check",
+                    name: "Học, chuẩn bị bài cho ngày mai",
+                    required: true,
+                    point: 50
+                },
                 completed_all_todo: {
                     type: "habit_check",
                     name: "Hoàn thành tất cả việc cần làm",
@@ -285,72 +291,12 @@ const HABITS = {
                     name: "Ngủ sớm",
                     required: true,
                     point: 150
-                }
-            }
-        },
-        Doi_Gio_planning_review: {
-            type: "group",
-            name: "Đánh giá Kế hoạch Đổi Gió",
-            children: {
-                happy: {
-                    type: "habit_check",
-                    name: "Hạnh phúc",
-                    required: true,
-                    point: 50
-                },
-                reckless: {
-                    type: "habit_check",
-                    name: "Táo bạo",
-                    required: true,
-                    point: 50
-                },
-                scientifical: {
-                    type: "habit_check",
-                    name: "Khoa học",
-                    required: true,
-                    point: 50
-                },
-                self_made: {
-                    type: "habit_check",
-                    name: "Tự lập",
-                    required: true,
-                    point: 50
-                },
-                exquisite: {
-                    type: "habit_check",
-                    name: "Tinh tế",
-                    required: true,
-                    point: 50
-                },
-                sincerely: {
-                    type: "habit_check",
-                    name: "Chân thành",
-                    required: true,
-                    point: 50
-                },
-                friendly: {
-                    type: "habit_check",
-                    name: "Thân thiện",
-                    required: true,
-                    point: 50
-                },
-                responsibility: {
-                    type: "habit_check",
-                    name: "Trách nhiệm",
-                    required: true,
-                    point: 50
-                },
-                humble: {
-                    type: "habit_check",
-                    name: "Khiêm tốn",
-                    required: true,
-                    point: 50
                 },
                 discipline: {
                     type: "habit_check",
-                    name: "Kỉ luật",
+                    name: "Đạt tinh thần kỉ luật trong cả ngày",
                     required: true,
-                    point: 50
+                    point: 150
                 }
             }
         },
