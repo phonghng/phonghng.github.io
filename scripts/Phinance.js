@@ -2,13 +2,11 @@ const OBJECT_TYPES_NAME = {
     "Q": "queue",
     "F": "fund",
     "D": "debt",
+    "G": "goal",
     "queue": "hàng đợi",
     "fund": "quỹ",
-    "payment": "thanh toán",
-    "savings": "tiết kiệm",
-    "credit_card": "thẻ tín dụng",
-    "loan": "vay vốn",
-    "debt": "khoản nợ"
+    "debt": "khoản nợ",
+    "goal": "mục tiêu"
 };
 
 const PAYMENT_METHODS = {
@@ -39,6 +37,7 @@ const NOTIFICATION_TEXTS = {
     "CANT_FIND_QUEUE": "Không thể tìm thấy hàng đợi!",
     "CANT_FIND_FUND": "Không thể tìm thấy quỹ!",
     "CANT_FIND_DEBT": "Không thể tìm thấy khoản nợ!",
+    "CANT_FIND_GOAL": "Không thể tìm thấy mục tiêu!",
     "NOT_ENOUGH_BALANCE": "Không đủ số dư!",
     "OUT_OF_RRID_SPACE": "Vượt quá giới hạn tổng phần trăm nhận phân bổ thu nhập (100%)!",
     "NO_CHANGE_IN_EDITING": "Không thể sửa thông tin (do không có sự thay đổi nào)!",
@@ -208,7 +207,7 @@ class Actions {
             let fund = this.Data.data.funds[timestamp.id];
 
             return [
-                "three_info",
+                "two_info",
                 "fund",
                 "sack-dollar",
                 "Quỹ",
@@ -411,6 +410,132 @@ class Actions {
         return arguments;
     }
 
+    GCr(
+        timestamp,
+        Actions_code,
+        goal_name,
+        amount,
+        term
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["text", "goal_name", "Tên mục tiêu"],
+                ["number", "amount", "Số tiền", { min: 0 }],
+                ["datetime", "term", "Thời hạn hoàn thành"],
+                ["submit", "submit", "Tạo mục tiêu"],
+                ["cancel", "cancel", "Hủy bỏ"]
+            ];
+        else if (timestamp.constructor.name == "Object") {
+            let goal = this.Data.data.goals[timestamp.id];
+
+            let amount_html;
+            let percent_html =
+                `${format_currency(goal.balance)} / ${format_currency(goal.amount)}`
+                + ` (${(goal.balance / goal.amount * 100).toFixed(2)}%)`;
+            if (goal.amount - goal.balance > 0)
+                amount_html = `Còn ${format_currency(goal.amount - goal.balance)} nữa`;
+            else if (goal.amount - goal.balance == 0)
+                amount_html = "Đạt mục tiêu";
+            else
+                amount_html = "Vượt mục tiêu";
+            amount_html = `<span title="${percent_html}">${amount_html}</span>`;
+
+            let term_html;
+            if (moment(goal.term) - moment() < 0)
+                term_html = `Quá thời hạn`;
+            else if (moment(goal.term).diff(moment(), "d"))
+                term_html = moment(goal.term).diff(moment(), "d") + " ngày nữa";
+            else if (moment(goal.term).diff(moment(), "h"))
+                term_html = moment(goal.term).diff(moment(), "h") + " giờ nữa";
+            else
+                term_html = `Ngay bây giờ`;
+            term_html = `<span title="${format_time(goal.term)}">${term_html}</span>`;
+
+            return [
+                "two_info",
+                "goal",
+                "bullseye",
+                "Mục tiêu",
+                goal.name,
+                format_currency(goal.balance),
+                [
+                    ["Số tiền", "check-circle", amount_html],
+                    ["Thời hạn hoàn thành", "calendar-exclamation", term_html],
+                ],
+                [
+                    ["Chuyển tiền", "inbox-out", "O2O", [["source_id", "value", `G_${timestamp.id}`]]],
+                    ["Thanh toán", "receipt", "OPm", [["object_id", "value", `G_${timestamp.id}`]]],
+                    ["Cộng/trừ tiền", "bolt", "OPM", [["object_id", "value", `G_${timestamp.id}`]]],
+                    ["Xem nhật kí", "align-justify", false, `G_${timestamp.id}`],
+                    ["Sửa thông tin", "pencil", "GEd", [
+                        ["goal_id", "value", timestamp.id],
+                        ["goal_name", "value", goal.name],
+                        ["amount", "value", goal.amount],
+                        ["term", "value", moment(goal.term).format("YYYY-MM-DDThh:mm")],
+                    ]],
+                    ["Xóa", "trash", "GRm", [["goal_id", "value", timestamp.id]]]
+                ]
+            ];
+        }
+
+        this.Data.data.goals[String(timestamp)] = {
+            name: goal_name,
+            balance: 0,
+            amount: amount,
+            term: term,
+            logs: [
+                [timestamp, "sparkles", "var(--LEMON)",
+                    `Tạo mục tiêu "${goal_name}" với số tiền ${amount} `
+                    + `và thời hạn hoàn thành vào lúc ${format_time(term)}`]
+            ]
+        };
+
+        return arguments;
+    }
+
+    GEd(
+        timestamp,
+        Actions_code,
+        goal_id,
+        goal_name,
+        amount,
+        term
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "goal_id", "Mục tiêu", () => timestamp("goal")],
+                ["text", "goal_name", "Tên mục tiêu"],
+                ["number", "amount", "Số tiền", { min: 0 }],
+                ["datetime", "term", "Thời hạn hoàn thành"],
+                ["submit", "submit", "Sửa thông tin mục tiêu"],
+                ["cancel", "cancel", "Hủy bỏ"]
+            ];
+        return this._edit_object_info(arguments, "goal", goal_id, [
+            ["tên", "name", goal_name],
+            ["số tiền", "amount", amount, new_value => format_currency(new_value)],
+            ["thời hạn hoàn thành", "term", term, new_value => format_time(new_value)],
+        ]);
+    }
+
+    GRm(
+        timestamp,
+        Actions_code,
+        goal_id
+    ) {
+        if (typeof timestamp == "function")
+            return [
+                ["select", "goal_id", "Tiết kiệm", () => timestamp("goal")],
+                ["submit", "submit", "Xóa tiết kiệm"],
+                ["cancel", "cancel", "Hủy bỏ"]
+            ];
+        if (this.error_checker({
+            "FIND_GOAL": { id: goal_id }
+        }))
+            return false;
+        delete this.Data.data.goals[goal_id];
+        return arguments;
+    }
+
     O2O(
         timestamp,
         Actions_code,
@@ -422,7 +547,7 @@ class Actions {
         if (typeof timestamp == "function")
             return [
                 ["select_group", "source_id", "Đối tượng gửi", () => timestamp()],
-                ["number", "repayment_term", "Số tiền", { min: 0 }],
+                ["number", "amount", "Số tiền", { min: 0 }],
                 ["text", "content", "Nội dung"],
                 ["select_group", "target_id", "Đối tượng nhận", () => timestamp()],
                 ["submit", "submit", "Chuyển tiền"],
@@ -495,19 +620,6 @@ class Actions {
         else
             object.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
                 `Trừ ${format_currency(-amount)} với nội dung "${content}"`]);
-
-        if (object.linked_fund) {
-            let fund = this.Data.data.funds[object.linked_fund];
-            fund.balance += amount;
-            if (amount >= 0)
-                fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
-                    `Cộng ${format_currency(amount)} (gián tiếp từ tài khoản `
-                    + `${OBJECT_TYPES_NAME[object.type]} "${object.name}") với nội dung "${content}"`]);
-            else
-                fund.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
-                    `Trừ ${format_currency(-amount)} (gián tiếp từ tài khoản `
-                    + `${OBJECT_TYPES_NAME[object.type]} "${object.name}") với nội dung "${content}"`]);
-        }
 
         return arguments;
     }
@@ -628,7 +740,8 @@ class Data {
         this.data = {
             queues: {},
             funds: {},
-            debts: {}
+            debts: {},
+            goals: {}
         };
         this.UI_changed_callback = UI_changed_callback;
         this.get_set_endpoint = get_set_endpoint;
@@ -649,7 +762,7 @@ class Data {
     parse_logs() {
         for (let log of this.logs) {
             let function_name = log[1];
-            if (/[QFBD]2[QFBD]/g.test(function_name))
+            if (/[QFDG]2[QFDG]/g.test(function_name))
                 function_name = "O2O";
             else if (function_name.endsWith("PM"))
                 function_name = "OPM";
@@ -783,6 +896,14 @@ class Notification {
                 return false;
             }
 
+            case "FIND_GOAL": {
+                if (Object.keys(args.Data.data.goals)
+                    .includes(args.id))
+                    return true;
+                this.notify("CANT_FIND_GOAL");
+                return false;
+            }
+
             case "ENOUGH_BALANCE": {
                 if (!this.validate(`FIND_${args.type.toUpperCase()}`, args))
                     return false;
@@ -874,7 +995,10 @@ class Actions_Form {
                         .map(object => [`F_${object[0]}`, object[1].name]),
                 "Khoản nợ":
                     Object.entries(this.Data.data.debts)
-                        .map(object => [`D_${object[0]}`, object[1].name])
+                        .map(object => [`D_${object[0]}`, object[1].name]),
+                "Mục tiêu":
+                    Object.entries(this.Data.data.goals)
+                        .map(object => [`G_${object[0]}`, object[1].name])
             };
     }
 
@@ -1115,7 +1239,8 @@ class UI {
         const HEADER_BUTTONS_FUNCTIONS = [
             () => this.open_Actions_popup("QCr"),
             () => this.open_Actions_popup("FCr"),
-            () => this.open_Actions_popup("DCr")
+            () => this.open_Actions_popup("DCr"),
+            () => this.open_Actions_popup("GCr")
         ];
 
         let buttons = this.elms.header_buttons.querySelectorAll("button");

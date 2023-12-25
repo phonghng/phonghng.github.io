@@ -36,6 +36,10 @@
             <i class="fas fa-badge-dollar"></i>
             Tạo khoản nợ mới
         </button>
+        <button style="--base_color: var(--LEMON);">
+            <i class="fas fa-bullseye"></i>
+            Tạo mục tiêu mới
+        </button>
     </div>
 
     <div class="popup_container" id="Actions_popup">
@@ -67,7 +71,7 @@
         let _Data = new Data(
             _Notification,
             () => _UI.update_object_card_list(),
-            `U2FsdGVkX19xpocJjhi3op1JBJAts0jgkOZfvc9fxYE1PMntuiuavPL107F9JNJsxyVmg5T7ldue7rdcJssTEQ=`
+            //`U2FsdGVkX19xpocJjhi3op1JBJAts0jgkOZfvc9fxYE1PMntuiuavPL107F9JNJsxyVmg5T7ldue7rdcJssTEQ=`
         );
         let _UI = new UI(
             _Notification,
@@ -79,7 +83,8 @@
                 logs_popup: document.querySelector("#logs_popup")
             }
         );
-        _Data.get_logs();
+        if (_Data.get_set_endpoint)
+            _Data.get_logs();
     </script>
 </body>
 
