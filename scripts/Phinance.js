@@ -433,7 +433,7 @@ class Actions {
                 `${format_currency(goal.balance)} / ${format_currency(goal.amount)}`
                 + ` (${(goal.balance / goal.amount * 100).toFixed(2)}%)`;
             if (goal.amount - goal.balance > 0)
-                amount_html = `Còn ${format_currency(goal.amount - goal.balance)} nữa`;
+                amount_html = format_currency(goal.amount - goal.balance) + " nữa";
             else if (goal.amount - goal.balance == 0)
                 amount_html = "Đạt mục tiêu";
             else
