@@ -386,7 +386,7 @@ class Actions {
             ];
         return this._edit_object_info(arguments, "debt", debt_id, [
             ["tên", "name", debt_name],
-            ["thời hạn trả nợ", "repayment_term", repayment_term, new_value => format_time[new_value]],
+            ["thời hạn trả nợ", "repayment_term", repayment_term, new_value => format_time(new_value)],
             ["người nợ", "debtor", debtor, new_value => new_value ? "tôi" : "người khác"]
         ]);
     }
