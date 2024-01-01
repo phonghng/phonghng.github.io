@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <h2>Chương trình Quản lý tài chính cá nhân Phinance</h2>
+    <h2 onclick="manually_process_fetch_queue();">Chương trình Quản lý tài chính cá nhân Phinance</h2>
 
     <div id="object_card_list"></div>
 
@@ -85,6 +85,14 @@
         );
         if (_Data.get_set_endpoint)
             _Data.get_logs();
+
+        function manually_process_fetch_queue() {
+            let is_true = confirm("Bạn có chắc muốn process_fetch_queue thủ công?");
+            if (!is_true)
+                return;
+            _Data.fetch_queue[0].fetching = false;
+            _Data.process_fetch_queue();
+        }
     </script>
 </body>
 
