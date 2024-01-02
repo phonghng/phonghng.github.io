@@ -18,11 +18,6 @@ const HABITS = {
                     required: true,
                     point: 15
                 },
-                quote: {
-                    type: "habit_ext",
-                    name: "Xem trích dẫn",
-                    extension_id: "quote"
-                },
                 check_todos: {
                     type: "habit_check",
                     name: "Kiểm tra việc cần làm",
@@ -317,10 +312,6 @@ const EXTENSIONS = {
     midinfo: {
         name: "Thống kê MID",
         filename: "midinfo.html"
-    },
-    quote: {
-        name: "Trích dẫn",
-        filename: "quote.html"
     },
     view_data: {
         name: "Xem dữ liệu",
