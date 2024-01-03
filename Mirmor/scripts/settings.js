@@ -250,12 +250,6 @@ const HABITS = {
                     name: "Học, chuẩn bị bài cho ngày mai",
                     required: true,
                     point: 50
-                },
-                completed_all_todo: {
-                    type: "habit_check",
-                    name: "Hoàn thành tất cả việc cần làm",
-                    required: true,
-                    point: 100
                 }
             }
         },
@@ -269,11 +263,11 @@ const HABITS = {
                     required: true,
                     point: 15
                 },
-                no_smartphone_before_sleep: {
+                tomorrow_plan: {
                     type: "habit_check",
-                    name: "Không sử dụng điện thoại trước khi ngủ 15 phút",
+                    name: "Lập kế hoạch cho ngày mai",
                     required: true,
-                    point: 50
+                    point: 25
                 },
                 sleep_prepare: {
                     type: "habit_check",
@@ -281,17 +275,59 @@ const HABITS = {
                     required: true,
                     point: 15
                 },
+                rethink: {
+                    type: "habit_check",
+                    name: "Tự ngẫm về ngày hôm nay",
+                    required: true,
+                    point: 50
+                },
                 sleep_early: {
                     type: "habit_check",
                     name: "Ngủ sớm",
                     required: true,
                     point: 150
-                },
+                }
+            }
+        },
+        daily_review: {
+            type: "group",
+            name: "Tổng kết ngày",
+            children: {
                 discipline: {
-                    type: "habit_check",
-                    name: "Đạt tinh thần kỉ luật trong cả ngày",
+                    type: "habit_number",
+                    name: "Đạt sự kỉ luật",
                     required: true,
-                    point: 150
+
+                    unit: "điểm/10 điểm",
+                    point_per_value: 15,
+                    goal_value: 8
+                },
+                happiness: {
+                    type: "habit_number",
+                    name: "Đạt sự hạnh phúc",
+                    required: true,
+
+                    unit: "điểm/10 điểm",
+                    point_per_value: 15,
+                    goal_value: 8
+                },
+                completed_todo: {
+                    type: "habit_number",
+                    name: "Hoàn thành việc cần làm",
+                    required: true,
+
+                    unit: "việc",
+                    point_per_value: 10,
+                    goal_value: 1
+                },
+                good_experience: {
+                    type: "habit_number",
+                    name: "Tham gia trải nghiệm giúp phát triển",
+                    required: false,
+
+                    unit: "hoạt động",
+                    point_per_value: 50,
+                    goal_value: 1
                 }
             }
         },
