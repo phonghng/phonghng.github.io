@@ -34,7 +34,7 @@
         let StatusBar_class = new StatusBar(document.body);
 
         let data = {
-            phnotion_midinfo_return: [],
+            phnotion_point_info_return: [],
             last_updated: undefined
         };
 
@@ -43,11 +43,11 @@
             data: {
                 labels: [],
                 datasets: [{
-                    label: "MID",
+                    label: "Điểm (đMirmor)",
                     data: [],
                     type: "bar"
                 }, {
-                    label: "MID luỹ kế",
+                    label: "Luỹ kế điểm (lkđMirmor)",
                     data: [],
                     type: "line"
                 }]
@@ -57,32 +57,32 @@
             }
         });
 
-        function update_data(phnotion_midinfo_return) {
-            data.phnotion_midinfo_return = phnotion_midinfo_return;
+        function update_data(phnotion_point_info_return) {
+            data.phnotion_point_info_return = phnotion_point_info_return;
             data.last_updated = Date.now();
             info_onchange();
 
-            let mid_info = data.phnotion_midinfo_return;
-            mid_info.reverse();
-            let mapped_mid_info = {
-                date: mid_info.map(date_mid_info => date_mid_info.date),
-                MID: mid_info.map(date_mid_info => date_mid_info.MID),
-                accumulated_MID: mid_info.map(date_mid_info => date_mid_info.accumulated_MID)
+            let point_info = data.phnotion_point_info_return;
+            point_info.reverse();
+            let mapped_point_info = {
+                date: point_info.map(date_point_info => date_point_info.date),
+                point: point_info.map(date_point_info => date_point_info.point),
+                accumulated_point: point_info.map(date_point_info => date_point_info.accumulated_point)
             };
 
-            update_chart(mapped_mid_info);
+            update_chart(mapped_point_info);
         }
 
-        function update_chart(mapped_mid_info) {
+        function update_chart(mapped_point_info) {
             chartjs.data = {
-                labels: mapped_mid_info.date,
+                labels: mapped_point_info.date,
                 datasets: [{
-                    label: "MID",
-                    data: mapped_mid_info.MID,
+                    label: "Điểm (Mipo)",
+                    data: mapped_point_info.point,
                     type: "bar"
                 }, {
-                    label: "MID luỹ kế",
-                    data: mapped_mid_info.accumulated_MID,
+                    label: "Luỹ kế điểm (Amipo)",
+                    data: mapped_point_info.accumulated_point,
                     type: "line"
                 }]
             };

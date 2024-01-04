@@ -146,7 +146,7 @@ class PHNotion_Hey_Mirmor {
                         fetch(`${this.endpoint}/`)
                             .then(response => response.json())
                             .then(json => {
-                                Habits_class.data.children.midinfo
+                                Habits_class.data.children.point_info
                                     .Extension_class.ExtensionPopup_class
                                     .run_function("update_data", [json]);
                             });

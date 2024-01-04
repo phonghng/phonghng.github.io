@@ -336,18 +336,18 @@ const HABITS = {
             name: "Xem dữ liệu Mirmor hôm nay",
             extension_id: "view_data"
         },
-        midinfo: {
+        point_info: {
             type: "habit_ext",
-            name: "Xem thống kê MID",
-            extension_id: "midinfo"
+            name: "Xem thống kê điểm",
+            extension_id: "point_info"
         }
     }
 };
 
 const EXTENSIONS = {
-    midinfo: {
-        name: "Thống kê MID",
-        filename: "midinfo.html"
+    point_info: {
+        name: "Thống kê điểm",
+        filename: "point_info.html"
     },
     view_data: {
         name: "Xem dữ liệu",
