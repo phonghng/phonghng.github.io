@@ -244,6 +244,14 @@
                     Nếu bạn tìm thấy tài sản này trong trường hợp tôi làm thất lạc, rất mong bạn sẽ bảo quản và giúp tôi sớm nhận lại được nó; tôi xin cảm ơn và hậu tạ!`;
                 break;
             }
+
+            case "product__self_use__phnotest": {
+                private_note_content =
+                    `Giấy kiểm tra/giấy thi có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như mã QR, v.v.) là mẫu giấy kiểm tra/giấy thi có mã "${get_url_param("template_id")}" do tôi (thông tin liên lạc được đăng tải ở dưới) sở hữu thiết kế.<br/>
+                    <br/>
+                    Lưu ý, một mẫu được coi là khác với các mẫu khác không bao gồm việc điền trước các trường thông tin.`;
+                break;
+            }
         }
         if (private_note_type) {
             document.querySelector("#private_note").innerHTML = private_note_content;
