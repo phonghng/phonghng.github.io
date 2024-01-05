@@ -247,9 +247,16 @@
 
             case "product__self_use__phnotest": {
                 private_note_content =
-                    `Giấy kiểm tra/giấy thi có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như mã QR, v.v.) là mẫu giấy kiểm tra/giấy thi có mã "${get_url_param("template_id")}" do tôi (thông tin liên lạc được đăng tải ở dưới) sở hữu thiết kế.<br/>
+                    `Giấy kiểm tra/giấy thi có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở góc phải dưới, v.v.) là mẫu giấy kiểm tra/giấy thi có mã "${get_url_param("template_id")}" do tôi (thông tin liên lạc được đăng tải ở dưới) sở hữu thiết kế.<br/>
                     <br/>
-                    Lưu ý, một mẫu được coi là khác với các mẫu khác không bao gồm việc điền trước các trường thông tin.`;
+                    <br/>
+                    Thứ tự trang trong một tờ được xác định như sau: trang thứ nhất có các trường thông tin, trang thứ hai ở vị trí mặt sau của trang thứ nhất, trang thứ ba ở vị trí bên trái của trang thứ hai, trang thứ tư ở vị trí mặt sau của trang thứ ba. Thứ tự tờ được xác định theo tính liên tục của bài làm.<br/>
+                    <br/>
+                    Yêu cầu ghi thông tin ở các trường thông tin:<br/>
+                    – Ghi đầy đủ thông tin cần thiết ở tờ thứ nhất; từ tờ thứ hai trở đi, chỉ cần kí. Giấy kiểm tra/giấy thi hợp lệ khi có chữ kí của người làm bài.<br/>
+                    – Với trường "Họ tên", có thể ghi thêm các thông tin định danh khác như số báo danh, v.v..<br/>
+                    – Với trường "Môn", có thể ghi thêm các thông tin định danh khác như mã đề, v.v..<br/>
+                    – Với chỗ trống ngay trên trường "Môn", cần ghi tên kì kiểm tra/thi hoặc/và bài kiểm/tra (có thể viết tắt). Ví dụ: "Kì kiểm tra cuối kì I", "Bài kiểm tra thường xuyên", "Kì thi TN THPT – Bài thi: KHTN"`;
                 break;
             }
         }
