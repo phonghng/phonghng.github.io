@@ -188,6 +188,12 @@ const HABITS = {
                     point_per_value: 2,
                     goal_value: 15
                 },
+                skincare: {
+                    type: "habit_check",
+                    name: "Chăm sóc da mặt",
+                    required: true,
+                    point: 15
+                },
                 bath: {
                     type: "habit_check",
                     name: "Tắm rửa, gội đầu",
