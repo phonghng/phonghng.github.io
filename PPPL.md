@@ -14,9 +14,9 @@
 | 11      | ```JSEncrypt.encrypt(public_key, message)```                         | Encrypt using JSEncrypt.                                                                                                                                                                                  |
 | 12      | ```JSEncrypt.decrypt(private_key, encrypted)```                      | Decrypt using JSEncrypt.                                                                                                                                                                                  |
 
-<sup>[1]</sup> Example options: ```[[0.25, "Option A with 25% chance"], [0.75, "Option B with 75% chance"]]```.
-<sup>[2]</sup> Example ranges: ```[[1, 10], [15, 25]]```.
-<sup>[3]</sup> Array format:
+<sup>[1]</sup> Example options: ```[[0.25, "Option A with 25% chance"], [0.75, "Option B with 75% chance"]]```.<br/>
+<sup>[2]</sup> Example ranges: ```[[1, 10], [15, 25]]```.<br/>
+<sup>[3]</sup> Array format:</br>
 ```
 [
     tag_name,
@@ -29,7 +29,7 @@
     children_as_ADOM_or_element,
     callback
 ]
-```
+```</br>
 <sup>[4]</sup> Item format: ```[item_type, item_id, item_title, item_data]```.
 
 # PPPL-CSS
