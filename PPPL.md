@@ -29,7 +29,7 @@
     children_as_ADOM_or_element,
     callback
 ]
-```</br>
+```
 <sup>[4]</sup> Item format: ```[item_type, item_id, item_title, item_data]```.
 
 # PPPL-CSS
