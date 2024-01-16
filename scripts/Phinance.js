@@ -30,7 +30,8 @@ const PAYMENT_CATEGORIES = {
     "Photo": "In ấn, photocopy",
     "Qua": "Mua quà tặng",
     "NapDienThoai": "Tiền điện thoại",
-    "SuaDo": "Sửa đồ"
+    "SuaDo": "Sửa đồ",
+    "DangKiOnline": "Đăng kí dịch vụ trực tuyến"
 };
 
 const NOTIFICATION_TEXTS = {
