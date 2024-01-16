@@ -1,8 +1,6 @@
 /* https://phonghng.github.io/?private_note_type=code__open_source__library&language=JavaScript&library_name=PPPL-JS&version=1.4 */
 
-/* PhongHNg's Personal Programming Library - JavaScript */
 const PPPL_JS = {
-    /* Seedable pseudorandom number generator */
     Nrand: (seed) => {
         const cyrb128 = (str) => {
             let h1 = 1779033703, h2 = 3144134277,
@@ -47,35 +45,15 @@ const PPPL_JS = {
         return random_function;
     },
 
-    /* Stock-style random option picker */
     Srand: (options, random_function = Math.random) => {
-        /**
-         * Pass in a two-dimensional array
-         * (the first "column" represents
-         * the number of shares of the option,
-         * the second "column" represents the
-         * corresponding option).
-         */
-
         options = options.filter(option => option[0]);
 
-        /**
-         * Cumulative calculation of the number
-         * of shares of options (to divide the
-         * ownership range of each option,
-         * serving to randomly select a range).
-         */
         let shares_sum = 0;
         for (let i = 0; i < options.length; i++) {
             shares_sum += Number(options[i][0]);
             options[i][0] = shares_sum;
         }
 
-        /**
-         * Randomly select a range (by taking
-         * a random number; then, determine the
-         * range the random number belongs to).
-         */
         let random_number = random_function() * shares_sum;
         let smallest_greater_number = Number.POSITIVE_INFINITY;
         for (let i = 0; i < options.length; i++)
@@ -86,7 +64,6 @@ const PPPL_JS = {
         return Object.fromEntries(options)[smallest_greater_number];
     },
 
-    /* Ranges-style random number picker */
     Rrand: (ranges, random_function = Math.random) => {
         const min_max_random =
             (min, max) => random_function() * (max - min) + min;
@@ -104,11 +81,9 @@ const PPPL_JS = {
         return PPPL_JS.Srand(Srand_options, random_function);
     },
 
-    /* Select random element from array */
     Arand: (array, random_function = Math.random) =>
         array[Math.floor(random_function() * array.length)],
 
-    /* Extended information on Date object */
     XDate(timestamp) {
         const is_last_day_of_years_part = years_part_name => {
             const years_parts = {
@@ -192,7 +167,6 @@ const PPPL_JS = {
         return date_object_info;
     },
 
-    /* Convert from ruled-array format to DOM format */
     ADOM(array, document) {
         let [tag_name, html_attributes, javascript_attributes, children, callback] = array;
         let DOM = document.createElement(tag_name);
@@ -216,7 +190,6 @@ const PPPL_JS = {
         return DOM;
     },
 
-    /* Extended PPPL_JS.ADOM for form */
     fADOM(form_unique_id, items, include_label, custom_item_types) {
         function process_item(item_type, item_id, item_title, item_data = {}, reset_callback) {
             if (typeof item_data == "function")
@@ -568,7 +541,6 @@ const PPPL_JS = {
         return form_element;
     },
 
-    /* Utils for PPPL-WUIC */
     PPPL_WUIC: {
         popup: {
             open(container_element, title, close_callback) {
@@ -606,7 +578,6 @@ const PPPL_JS = {
         }
     },
 
-    /* Utils for JSEncrypt */
     JSEncrypt: {
         generate_keys: (private_key) => {
             let _JSEncrypt = new JSEncrypt();
