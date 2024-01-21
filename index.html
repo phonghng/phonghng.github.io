@@ -207,12 +207,26 @@
                     – Trường: Trung học phổ thông chuyên Thái Nguyên.<br/>
                     – Giáo viên: ${teacher}.<br/>
                     – Nội dung tiết học: ${get_url_param("lesson_content")}.<br/>
-                    – Nội dung bài tập: ${get_url_param("exercise_content")}.`;
+                    – Nội dung bài tập: ${get_url_param("exercise_content")}.<br/>`;
                 let vnoj_problem_code = get_url_param("vnoj_problem_code");
                 if (vnoj_problem_code)
                     private_note_content +=
-                        `<br/>
-                        – Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.`;
+                        `– Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.<br/>`;
+                private_note_content +=
+                    `<br/>
+                    Quy tắc đặt tên trong đoạn mã:<br/>
+                    – Tên hằng: Hai chữ cái hoa (ví dụ: "AB").<br/>
+                    – Tên biến nhập từ đầu bài: Một chữ cái hoa (ví dụ: "A").<br/>
+                    – Tên biến do người lập trình đặt: Một hoặc nhiều chữ cái thường (ví dụ: "a", "abc"). Một số tên thường được sử dụng với mục đích đặc biệt:<br/>
+                    + "r": result, kết quả.<br/>
+                    + "c": counter, bộ đếm.<br/>
+                    + "i", "j": index, chỉ số.<br/>
+                    + "f": flag, đánh dấu.<br/>
+                    + "ln": (giá trị) lớn nhất.<br/>
+                    + "nn": (giá trị) nhỏ nhất.<br/>
+                    – Tên biến tạm thời: Một dấu gạch dưới (ví dụ: "_").<br/>
+                    – Tên biến dẫn xuất từ biến do người lập trình đặt: Một dấu gạch dưới theo sau bởi tên biến do người lập trình đặt (ví dụ: "_a").<br/>
+                    – Tên hàm (trừ hàm "main"): Một chữ cái hoa theo sau bởi một chữ cái thường (ví dụ: "Ab").<br/>`;
                 break;
             }
 
