@@ -306,7 +306,7 @@ const HABITS = {
 
                     unit: "điểm/10 điểm",
                     point_per_value: 15,
-                    goal_value: 8
+                    goal_value: 10
                 },
                 happiness: {
                     type: "habit_number",
@@ -315,7 +315,7 @@ const HABITS = {
 
                     unit: "điểm/10 điểm",
                     point_per_value: 15,
-                    goal_value: 8
+                    goal_value: 10
                 },
                 completed_todo: {
                     type: "habit_number",
@@ -324,7 +324,7 @@ const HABITS = {
 
                     unit: "việc",
                     point_per_value: 10,
-                    goal_value: 1
+                    goal_value: 5
                 },
                 good_experience: {
                     type: "habit_number",
