@@ -140,7 +140,9 @@ class PHNotion_Hey_Mirmor {
                     () => {
                         let status_element = document.createElement("span");
                         status_element.style.color = "var(--LIME)";
-                        status_element.innerHTML = this.texts.saved_to_Notion;
+                        let point = json_data.point || json_data._point || 0;
+                        let goal_point = json_data.goal_point || json_data._goal_point || 0;
+                        status_element.innerHTML = `${this.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
                         this.StatusBar_class.show_status(status_element);
 
                         fetch(`${this.endpoint}/`)
