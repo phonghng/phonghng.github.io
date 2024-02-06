@@ -199,9 +199,9 @@
                     "Nguyễn Thị Kim Tuyến"
                 ][parseInt(get_url_param("teacher_code"))];
                 private_note_content =
-                    `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+                    `Đoạn mã có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
+                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
                     – Trường: Trung học phổ thông chuyên Thái Nguyên.<br/>
@@ -233,9 +233,9 @@
             case "code__closed_source__vnoj": {
                 let vnoj_problem_code = get_url_param("vnoj_problem_code");
                 private_note_content =
-                    `Đoạn mã được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+                    `Đoạn mã có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
+                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải thêm dòng ghi chú có đường liên kết trỏ tới trang web này.<br/>
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/${vnoj_problem_code}">${vnoj_problem_code}</a>.`;
                 break;
@@ -243,9 +243,9 @@
 
             case "code__open_source__library": {
                 private_note_content =
-                    `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+                    `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
+                    Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
                 break;
             }
 
@@ -279,9 +279,9 @@
 
             case "product__education_use__ctn": {
                 private_note_content =
-                    `"${get_url_param("product_name")}" là sản phẩm thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới). Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trung học phổ thông chuyên Thái Nguyên.<br/>
+                    `"${get_url_param("product_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đặt đường liên kết, mã QR, v.v.) là sản phẩm thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới). Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trung học phổ thông chuyên Thái Nguyên.<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
+                    Bất kì trường hợp sử dụng nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần sản phẩm là sản phẩm trí tuệ của tôi phải thêm ghi chú có đường liên kết trỏ tới trang web này.`;
                 break;
             }
         }
