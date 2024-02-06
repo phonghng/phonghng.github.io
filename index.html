@@ -276,6 +276,14 @@
                     – Với chỗ trống ngay trên trường "Môn", cần ghi tên kì kiểm tra/thi hoặc/và bài kiểm tra/thi (có thể viết tắt). Ví dụ: "Kì kiểm tra cuối kì I", "Bài kiểm tra thường xuyên", "Kì thi TN THPT – Bài thi: KHTN"`;
                 break;
             }
+
+            case "product__education_use__ctn": {
+                private_note_content =
+                    `"${get_url_param("product_name")}" là sản phẩm thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới). Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trung học phổ thông chuyên Thái Nguyên.<br/>
+                    <br/>
+                    Bất kì trường hợp sử dụng nào, phải chấp hành theo pháp luật sở hữu trí tuệ của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải giữ nguyên hoặc thêm dòng ghi chú có đường liên kết trỏ tới trang web này.`;
+                break;
+            }
         }
         if (private_note_type) {
             document.querySelector("#private_note").innerHTML = private_note_content;
