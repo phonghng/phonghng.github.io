@@ -58,11 +58,10 @@
         });
 
         function update_data(phnotion_point_info_return) {
-            data.phnotion_point_info_return = phnotion_point_info_return;
             data.last_updated = Date.now();
             info_onchange();
 
-            let point_info = data.phnotion_point_info_return;
+            let point_info = phnotion_point_info_return;
             point_info.reverse();
             let mapped_point_info = {
                 date: point_info.map(date_point_info => date_point_info.date),
@@ -90,6 +89,7 @@
         }
 
         function import_info(exported_data) {
+            return undefined;
         }
 
         function export_info() {

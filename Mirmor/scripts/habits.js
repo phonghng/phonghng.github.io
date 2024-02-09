@@ -102,7 +102,7 @@ class Habits {
                     new Extension(
                         this.extension_database,
                         data.extension_id,
-                        () => this.data_onchange_callback(),
+                        (options) => this.data_onchange_callback(options),
                         this.XDate_function
                     );
             } else {

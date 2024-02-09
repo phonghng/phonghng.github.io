@@ -86,11 +86,11 @@ class ExtensionPopup {
         this.iframe_window = iframe.contentWindow;
 
         this.iframe_window.XDate_function = () => this.XDate_function();
-        this.iframe_window.info_onchange = () => this.update_info();
+        this.iframe_window.info_onchange = (options) => this.update_info(options);
         this.iframe_window.addEventListener("DOMContentLoaded", () => {
             this.set_detect_class_list_change(popup_wrapper);
             this.iframe_window.XDate_function = () => this.XDate_function();
-            this.iframe_window.info_onchange = () => this.update_info();
+            this.iframe_window.info_onchange = (options) => this.update_info(options);
             this.update_info();
         });
 
@@ -163,13 +163,13 @@ class ExtensionPopup {
         }, 0);
     }
 
-    update_info() {
+    update_info(options) {
         let info = this.iframe_window.export_info();
         info = JSON.parse(JSON.stringify(info));
         info.data._extension_popup_style = this.popup.style.cssText;
         info.data._extension_popup_is_focusing = this.popup.classList.contains("focus");
         if (this.info_onchange_callback) {
-            this.info_onchange_callback(info);
+            this.info_onchange_callback(info, options);
         }
     }
 

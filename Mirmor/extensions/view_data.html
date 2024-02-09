@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="../scripts/status_bar.js"></script>
-    
+
     <link rel="stylesheet" href="../stylesheets/general.css">
 
     <style>
@@ -32,13 +32,21 @@
     <script>
         let StatusBar_class = new StatusBar(document.body);
 
+        let data = {
+            string_data: ""
+        };
+
         let textarea = document.querySelector("textarea");
         let copy_button = document.querySelector("button");
 
         copy_button.onclick = (event) => copy_textarea();
 
         function update_textarea(string_data) {
+            const STRING_DATA_REGEX = /(Xem dữ liệu Mirmor hôm nay \[0 \/ 0 điểm\]\n\n +\{\n +"string_data": ).*/g;
+            string_data = string_data.replace(STRING_DATA_REGEX, "$1...,");
             textarea.innerHTML = string_data;
+            data = { string_data };
+            info_onchange({ is_from_view_data_extension: true });
         }
 
         function copy_textarea(type) {
@@ -62,7 +70,7 @@
             let exported_info = {
                 point: 0,
                 goal_point: 0,
-                data: {}
+                data: data
             };
             StatusBar_class.show_status_extension(exported_info);
             return exported_info;

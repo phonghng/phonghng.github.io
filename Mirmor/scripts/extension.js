@@ -12,15 +12,15 @@ class Extension {
         this.ExtensionPopup_class =
             new ExtensionPopup(
                 this.id,
-                info => this.info_onchange(info),
+                (info, options) => this.info_onchange(info, options),
                 XDate_function
             );
     }
 
-    info_onchange(info) {
+    info_onchange(info, options) {
         this.info = info;
         if (this.data_onchange_callback) {
-            this.data_onchange_callback();
+            this.data_onchange_callback(options);
         }
     }
 

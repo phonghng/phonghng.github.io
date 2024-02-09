@@ -125,43 +125,44 @@ class PHNotion_Hey_Mirmor {
     init_js() {
         const DataStorage_class = new DataStorage(
             this.initialization_data,
-            (data_to_set, json_data, string_data, date_string) => {
-                Habits_class.data.children.view_data
-                    .Extension_class.ExtensionPopup_class
-                    .run_function("update_textarea", [string_data]);
-
+            (options, object_data_function, json_data_function, string_data_function, date_string) => {
+                if (!options?.is_from_view_data_extension)
+                    Habits_class.data.children.view_data
+                        .Extension_class.ExtensionPopup_class
+                        .run_function("update_textarea", [string_data_function()]);
+                let json_data = json_data_function();
                 this.StatusBar_class.show_status(json_data);
+                if (Object.entries(json_data["Xem dữ liệu Mirmor hôm nay"].data).length)
+                    this.set(
+                        date_string,
+                        JSON.stringify(object_data_function()),
+                        json_data.point || json_data._point || 0,
+                        json_data.goal_point || json_data._goal_point || 0,
+                        () => {
+                            let status_element = document.createElement("span");
+                            status_element.style.color = "var(--LIME)";
+                            let point = json_data.point || json_data._point || 0;
+                            let goal_point = json_data.goal_point || json_data._goal_point || 0;
+                            status_element.innerHTML = `${this.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
+                            this.StatusBar_class.show_status(status_element);
 
-                this.set(
-                    date_string,
-                    data_to_set,
-                    json_data.point || json_data._point || 0,
-                    json_data.goal_point || json_data._goal_point || 0,
-                    () => {
-                        let status_element = document.createElement("span");
-                        status_element.style.color = "var(--LIME)";
-                        let point = json_data.point || json_data._point || 0;
-                        let goal_point = json_data.goal_point || json_data._goal_point || 0;
-                        status_element.innerHTML = `${this.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
-                        this.StatusBar_class.show_status(status_element);
-
-                        fetch(`${this.endpoint}/`)
-                            .then(response => response.json())
-                            .then(json => {
-                                Habits_class.data.children.point_info
-                                    .Extension_class.ExtensionPopup_class
-                                    .run_function("update_data", [json]);
-                            });
-                    }
-                );
+                            fetch(`${this.endpoint}/`)
+                                .then(response => response.json())
+                                .then(json => {
+                                    Habits_class.data.children.point_info
+                                        .Extension_class.ExtensionPopup_class
+                                        .run_function("update_data", [json]);
+                                });
+                        }
+                    );
             }
         );
 
         const Habits_class = new Habits(
             this.habit_database,
             this.extension_database,
-            () => {
-                DataStorage_class.set_data(Data_class, Date.now());
+            (options) => {
+                DataStorage_class.set_data(Data_class, Date.now(), options);
                 HomepageView_class.update_view();
             },
             DataStorage_class.data,
