@@ -263,6 +263,12 @@ const HABITS = {
             type: "group",
             name: "Buổi tối",
             children: {
+                make_linh_chi: {
+                    type: "habit_check",
+                    name: "Pha nước linh chi",
+                    required: true,
+                    point: 15
+                },
                 evening_hygiene: {
                     type: "habit_check",
                     name: "Đánh răng, rửa mặt tối",
