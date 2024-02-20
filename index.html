@@ -189,6 +189,15 @@
                 document.body.appendChild(generate_item_card(...item));
         }
 
+        function generate_private_note_alert(name, refer, property, include_IP) {
+            let result = `${name.charAt(0).toUpperCase() + name.slice(1)} có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như ${refer}, v.v.) thuộc sở hữu bởi tôi (thông tin liên lạc được đăng tải ở dưới) về mặt ${property}.<br/>
+            <br/>
+            Bất kì trường hợp sử dụng nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam.`;
+            if (include_IP)
+                result += `Trong đó, sử dụng toàn bộ hoặc một phần ${property} là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới các hình thức như ${refer}, v.v.).`;
+            return result;
+        }
+
         const get_url_param = key => new URL(location.href).searchParams.get(key);
         let private_note_type = get_url_param("private_note_type");
         let private_note_content = ``;
@@ -199,61 +208,61 @@
                     "Nguyễn Thị Kim Tuyến"
                 ][parseInt(get_url_param("teacher_code"))];
                 private_note_content =
-                    `Đoạn mã có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-                    <br/>
-                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.).<br/>
+                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
                     – Trường: Trung học phổ thông chuyên Thái Nguyên.<br/>
                     – Giáo viên: ${teacher}.<br/>
                     – Nội dung tiết học: ${get_url_param("lesson_content")}.<br/>
-                    – Nội dung bài tập: ${get_url_param("exercise_content")}.<br/>`;
-                let vnoj_problem_code = get_url_param("vnoj_problem_code");
-                if (vnoj_problem_code)
+                    – Nội dung bài tập: ${get_url_param("exercise_content")}.`;
+                let vnoj_problem_id = get_url_param("vnoj_problem_code");
+                if (vnoj_problem_id)
                     private_note_content +=
-                        `– Mã bài VNOJ: <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_code}">ctn_${vnoj_problem_code}</a>.<br/>`;
-                private_note_content +=
-                    `<br/>
-                    Quy tắc đặt tên trong đoạn mã:<br/>
-                    – Tên hằng: Hai chữ cái hoa (ví dụ: "AB").<br/>
-                    – Tên biến nhập từ đầu bài: Một chữ cái hoa (ví dụ: "A").<br/>
-                    – Tên biến do người lập trình đặt: Một hoặc nhiều chữ cái thường (ví dụ: "a", "abc"). Một số tên thường được sử dụng với mục đích đặc biệt:<br/>
-                    + "r": result, kết quả.<br/>
-                    + "c": counter, bộ đếm.<br/>
-                    + "i", "j": index, chỉ số.<br/>
-                    + "f": flag, đánh dấu.<br/>
-                    + "ln": (giá trị) lớn nhất.<br/>
-                    + "nn": (giá trị) nhỏ nhất.<br/>
-                    – Tên biến tạm thời: Một dấu gạch dưới (ví dụ: "_").<br/>
-                    – Tên biến dẫn xuất từ biến do người lập trình đặt: Một dấu gạch dưới theo sau bởi tên biến do người lập trình đặt (ví dụ: "_a").<br/>
-                    – Tên hàm (trừ hàm "main"): Một chữ cái hoa theo sau bởi một chữ cái thường (ví dụ: "Ab").<br/>`;
+                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}">ctn_${vnoj_problem_id}</a>.`;
                 break;
             }
 
-            case "code__closed_source__vnoj": {
-                let vnoj_problem_code = get_url_param("vnoj_problem_code");
+            case "code__closed_source__self_learning": {
                 private_note_content =
-                    `Đoạn mã có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
+                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng đoạn mã nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần đoạn mã là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã, v.v.).<br/>
+                    Đoạn mã nằm trong khuôn khổ bài tập tự luyện môn Chuyên Tin với nội dung "${get_url_param("exercise_content")}":`;
+                let vnoj_problem_id = get_url_param("vnoj_problem_id");
+                if (vnoj_problem_id)
+                    private_note_content +=
+                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}">ctn_${vnoj_problem_id}</a>.`;
+                break;
+            }
+
+            case "code__closed_source__vnoj": /* depreciated */
+            case "code__closed_source__oj": {
+                const OJ_CONFIGS = {
+                    "vnoj": ["VNOJ (VNOI Online Judge)", "https://oj.vnoi.info/problem/"],
+                    "lqdoj": ["LQDOJ (Le Quy Don Online Judge)", "https://lqdoj.edu.vn/problem/"],
+                };
+                let oj =
+                    private_note_type == "code__closed_source__vnoj"
+                        ? "vnoj"
+                        : get_url_param("oj");
+                let problem_id =
+                    private_note_type == "code__closed_source__vnoj"
+                        ? get_url_param("vnoj_problem_code")
+                        : get_url_param("problem_id");
+                private_note_content =
+                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
-                    Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên VNOJ với mã bài là <a href="https://oj.vnoi.info/problem/${vnoj_problem_code}">${vnoj_problem_code}</a>.`;
+                    Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên ${OJ_CONFIGS[oj][0]} với mã bài là <a href="${OJ_CONFIGS[oj][1]}${problem_id}">${problem_id}</a>.`;
                 break;
             }
 
             case "code__open_source__library": {
-                private_note_content =
-                    `Thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã, v.v.) được viết bởi tôi (thông tin liên lạc được đăng tải ở dưới).<br/>
-                    <br/>
-                    Bất kì trường hợp sử dụng thư viện nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thư viện là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã, v.v.).`;
+                private_note_content = generate_private_note_alert(`thư viện ${get_url_param("language")} "${get_url_param("library_name")}"`, "đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã", "nội dung", true);
                 break;
             }
 
             case "property": {
                 private_note_content =
-                    `"${get_url_param("property_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như mã QR, v.v.) là tài sản thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới). Bất kì trường hợp sử dụng nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam.<br/>
-                    <br/>
-                    Nếu bạn sử dụng tài sản này dưới sự cho phép của tôi, rất mong bạn sẽ sử dụng đúng mục đích, phương pháp, thời hạn và bảo quản nó.<br/>
+                    `${generate_private_note_alert('"' + get_url_param("property_name") + '"', "mã QR", "tài sản", false)}<br/>
                     <br/>
                     Nếu bạn tìm thấy tài sản này trong trường hợp tôi làm thất lạc, rất mong bạn sẽ bảo quản và giúp tôi sớm nhận lại được nó; tôi xin cảm ơn và hậu tạ!`;
                 break;
@@ -261,9 +270,7 @@
 
             case "product__self_use__phnotest": {
                 private_note_content =
-                    `Giấy kiểm tra/giấy thi có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết, mã QR, v.v.) là mẫu giấy kiểm tra/giấy thi có mã "${get_url_param("template_id")}" do tôi (thông tin liên lạc được đăng tải ở dưới) sở hữu thiết kế.<br/>
-                    <br/>
-                    Bất kì trường hợp sử dụng thiết kế nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần thiết kế là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đường liên kết, mã QR, v.v.).<br/>
+                    `${generate_private_note_alert("giấy kiểm tra/giấy thi mẫu " + get_url_param("template_id"), "đường liên kết, mã QR", "thiết kế", true)}<br/>
                     <br/>
                     Thứ tự tờ được xác định theo tính liên tục của bài làm (trừ khi người làm bài có ghi chú riêng). Thứ tự trang trong một tờ được xác định như sau:</br>
                     – Trường hợp tờ đơn: Trang thứ nhất có các trường thông tin, trang thứ hai ở vị trí mặt sau của trang thứ nhất.<br/>
@@ -281,9 +288,9 @@
 
             case "product__education_use__ctn": {
                 private_note_content =
-                    `"${get_url_param("product_name")}" có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đặt đường liên kết, mã QR, v.v.) là sản phẩm thuộc sở hữu của tôi (thông tin liên lạc được đăng tải ở dưới). Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại trường Trung học phổ thông chuyên Thái Nguyên.<br/>
+                    `${generate_private_note_alert('"' + get_url_param("product_name") + '"', "đường liên kết, mã QR", "sản phẩm", true)}<br/>
                     <br/>
-                    Bất kì trường hợp sử dụng nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam. Trong đó, sử dụng toàn bộ hoặc một phần sản phẩm là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như đặt đường liên kết, mã QR, v.v.).`;
+                    Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại trường Trung học phổ thông chuyên Thái Nguyên.`;
                 break;
             }
         }
