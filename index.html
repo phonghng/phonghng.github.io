@@ -256,7 +256,7 @@
             }
 
             case "code__open_source__library": {
-                private_note_content = generate_private_note_alert(`thư viện ${get_url_param("language")} "${get_url_param("library_name")}"`, "đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã", "nội dung", true);
+                private_note_content = generate_private_note_alert(`thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} `, "đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã", "nội dung", true);
                 break;
             }
 
