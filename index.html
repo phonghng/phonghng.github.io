@@ -218,7 +218,7 @@
                 let vnoj_problem_id = get_url_param("vnoj_problem_code");
                 if (vnoj_problem_id)
                     private_note_content +=
-                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}">ctn_${vnoj_problem_id}</a>.`;
+                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}" target="_blank"> ctn_${vnoj_problem_id}</a>.`;
                 break;
             }
 
@@ -247,7 +247,7 @@
                 private_note_content =
                     `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
-                    Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên ${OJ_CONFIGS[oj][0]} với mã bài là <a href="${OJ_CONFIGS[oj][1]}${problem_id}">${problem_id}</a>.`;
+                    Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên ${OJ_CONFIGS[oj][0]} với mã bài là <a href="${OJ_CONFIGS[oj][1]}${problem_id}" target="_blank">${problem_id}</a>.`;
                 break;
             }
 
