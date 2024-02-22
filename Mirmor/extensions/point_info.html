@@ -42,48 +42,77 @@
         let chartjs = new Chart(ctx, {
             data: {
                 labels: [],
-                datasets: [{
-                    label: "Điểm (đMirmor)",
-                    data: [],
-                    type: "bar"
-                }, {
-                    label: "Luỹ kế điểm (lkđMirmor)",
-                    data: [],
-                    type: "line"
-                }]
+                datasets: []
             },
             options: {
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                scales: {
+                    Mipo: {
+                        type: "linear",
+                        display: true,
+                        position: "left",
+                    },
+                    Amipo: {
+                        type: "linear",
+                        display: true,
+                        position: "right",
+                    }
+                }
             }
         });
 
-        function update_data(phnotion_point_info_return) {
+        function update_data(date_point_infos, percent_criterions) {
+            const Mipo_name = percent_criterion => `Mipo-${percent_criterion * 100}`;
+            const Amipo_name = percent_criterion => `Amipo-${percent_criterion * 100}`;
+
             data.last_updated = Date.now();
             info_onchange();
 
-            let point_info = phnotion_point_info_return;
-            point_info.reverse();
-            let mapped_point_info = {
-                date: point_info.map(date_point_info => date_point_info.date),
-                point: point_info.map(date_point_info => date_point_info.point),
-                accumulated_point: point_info.map(date_point_info => date_point_info.accumulated_point)
-            };
+            let Amipo = Object.fromEntries(
+                percent_criterions.map(
+                    percent_criterion => [percent_criterion, 0]
+                )
+            );
+            for (let i = 0; i < date_point_infos.length; i++) {
+                let point_ratio = date_point_infos[i].point / date_point_infos[i].goal_point;
+                for (let percent_criterion of percent_criterions) {
+                    date_point_infos[i][Mipo_name(percent_criterion)] =
+                        parseInt((Math.floor(point_ratio * 100) / 100 - percent_criterion) * 100)
+                    Amipo[percent_criterion] += date_point_infos[i][Mipo_name(percent_criterion)];
+                    date_point_infos[i][Amipo_name(percent_criterion)] = Amipo[percent_criterion]
+                }
+            }
 
-            update_chart(mapped_point_info);
+            let mapped_date_point_infos = {
+                date: date_point_infos.map(date_point_info => date_point_info.date)
+            };
+            for (let percent_criterion of percent_criterions) {
+                mapped_date_point_infos[Mipo_name(percent_criterion)] =
+                    date_point_infos.map(date_point_info => date_point_info[Mipo_name(percent_criterion)]);
+                mapped_date_point_infos[Amipo_name(percent_criterion)] =
+                    date_point_infos.map(date_point_info => date_point_info[Amipo_name(percent_criterion)]);
+            }
+
+            update_chart(mapped_date_point_infos);
         }
 
-        function update_chart(mapped_point_info) {
+        function generate_chart_datasets(mapped_date_point_infos) {
+            let datasets = [];
+            for (let key in mapped_date_point_infos)
+                if (key != "date")
+                    datasets.push({
+                        label: key,
+                        data: mapped_date_point_infos[key],
+                        type: key.startsWith("Mipo") ? "bar" : "line",
+                        yAxisID: key.split("-")[0]
+                    });
+            return datasets;
+        }
+
+        function update_chart(mapped_date_point_infos) {
             chartjs.data = {
-                labels: mapped_point_info.date,
-                datasets: [{
-                    label: "Điểm (Mipo)",
-                    data: mapped_point_info.point,
-                    type: "bar"
-                }, {
-                    label: "Luỹ kế điểm (Amipo)",
-                    data: mapped_point_info.accumulated_point,
-                    type: "line"
-                }]
+                labels: mapped_date_point_infos.date,
+                datasets: generate_chart_datasets(mapped_date_point_infos)
             };
             chartjs.update();
         }

@@ -1,22 +1,25 @@
 class PHNotion_Hey_Mirmor {
     constructor(
         encrypted_endpoint = ENCRYPTED_PHNOTION_HEY_MIRMOR_ENDPOINT,
-        texts,
         habit_database = HABITS,
         extension_database = EXTENSIONS,
-        homepage_top_container = document.body
+        homepage_top_container = document.body,
+        options
     ) {
         this.timestamp = Date.now();
-        this.texts = texts || {
-            password_prompt: "Nhập mật khẩu",
-            wrong_password: "Sai mật khẩu!",
-            missing_password: "Vui lòng nhập mật khẩu!",
-            saved_to_Notion: "Đã lưu vào Notion!",
-            please_wait: "Vui lòng chờ..."
-        };
         this.habit_database = habit_database;
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
+        this.options = Object.assign({}, options, {
+            percent_criterions: [1.0, 0.85],
+            texts: {
+                password_prompt: "Nhập mật khẩu",
+                wrong_password: "Sai mật khẩu!",
+                missing_password: "Vui lòng nhập mật khẩu!",
+                saved_to_Notion: "Đã lưu vào Notion!",
+                please_wait: "Vui lòng chờ..."
+            }
+        });
         this.StatusBar_class = new StatusBar(this.homepage_top_container);
 
         this.endpoint = this.get_endpoint(encrypted_endpoint);
@@ -35,11 +38,11 @@ class PHNotion_Hey_Mirmor {
     }
 
     get_endpoint(encrypted_endpoint) {
-        let password = prompt(this.texts.password_prompt);
+        let password = prompt(this.options.texts.password_prompt);
         if (!password) {
             let status_element = document.createElement("span");
             status_element.style.color = "var(--CHERRY)";
-            status_element.innerHTML = this.texts.missing_password;
+            status_element.innerHTML = this.options.texts.missing_password;
             this.StatusBar_class.show_status(status_element);
             return undefined;
         }
@@ -49,7 +52,7 @@ class PHNotion_Hey_Mirmor {
         if (!endpoint) {
             let status_element = document.createElement("span");
             status_element.style.color = "var(--CHERRY)";
-            status_element.innerHTML = this.texts.wrong_password;
+            status_element.innerHTML = this.options.texts.wrong_password;
             this.StatusBar_class.show_status(status_element);
         }
         return endpoint;
@@ -60,7 +63,7 @@ class PHNotion_Hey_Mirmor {
 
         let status_element = document.createElement("span");
         status_element.style.color = "var(--LEMON)";
-        status_element.innerHTML = this.texts.please_wait;
+        status_element.innerHTML = this.options.texts.please_wait;
         this.StatusBar_class.show_status(status_element);
 
         fetch(`${this.endpoint}/${date_string}`)
@@ -143,7 +146,7 @@ class PHNotion_Hey_Mirmor {
                             status_element.style.color = "var(--LIME)";
                             let point = json_data.point || json_data._point || 0;
                             let goal_point = json_data.goal_point || json_data._goal_point || 0;
-                            status_element.innerHTML = `${this.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
+                            status_element.innerHTML = `${this.options.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
                             this.StatusBar_class.show_status(status_element);
 
                             fetch(`${this.endpoint}/`)
@@ -151,7 +154,7 @@ class PHNotion_Hey_Mirmor {
                                 .then(json => {
                                     Habits_class.data.children.point_info
                                         .Extension_class.ExtensionPopup_class
-                                        .run_function("update_data", [json]);
+                                        .run_function("update_data", [json, this.options.percent_criterions]);
                                 });
                         }
                     );
