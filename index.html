@@ -222,15 +222,11 @@
                 break;
             }
 
-            case "code__closed_source__self_learning": {
+            case "code__closed_source__test": {
                 private_note_content =
                     `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
-                    Đoạn mã nằm trong khuôn khổ bài tập tự luyện môn Chuyên Tin với nội dung "${get_url_param("exercise_content")}":`;
-                let vnoj_problem_id = get_url_param("vnoj_problem_id");
-                if (vnoj_problem_id)
-                    private_note_content +=
-                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}">ctn_${vnoj_problem_id}</a>.`;
+                    Đoạn mã nằm trong khuôn khổ đoạn mã thử với nội dung "${get_url_param("content")}"`;
                 break;
             }
 
