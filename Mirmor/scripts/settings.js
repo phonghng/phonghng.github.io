@@ -245,12 +245,6 @@ const HABITS = {
                     point_per_value: 5,
                     goal_value: 5
                 },
-                learn_Eng_vocab: {
-                    type: "habit_check",
-                    name: "Học từ vựng tiếng Anh",
-                    required: true,
-                    point: 25
-                },
                 study_for_tomorrow: {
                     type: "habit_check",
                     name: "Học, chuẩn bị bài cho ngày mai",
