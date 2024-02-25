@@ -179,6 +179,18 @@ const HABITS = {
                         }
                     }
                 },
+                dhc_vitamin_c: {
+                    type: "habit_check",
+                    name: "Uống hai viên DHC Vitamin C sau ăn trưa",
+                    required: true,
+                    point: 15
+                },
+                dhc_canxi_lunch: {
+                    type: "habit_check",
+                    name: "Uống hai viên DHC Canxi sau ăn trưa 30 phút",
+                    required: true,
+                    point: 15
+                },
                 sport: {
                     type: "habit_number",
                     name: "Thể thao",
@@ -235,6 +247,12 @@ const HABITS = {
                             point: 50
                         }
                     }
+                },
+                dhc_canxi_dinner: {
+                    type: "habit_check",
+                    name: "Uống hai viên DHC Canxi sau ăn tối 30 phút",
+                    required: true,
+                    point: 15
                 },
                 reading_book: {
                     type: "habit_number",
