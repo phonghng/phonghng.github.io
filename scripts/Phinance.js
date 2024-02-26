@@ -31,7 +31,8 @@ const PAYMENT_CATEGORIES = {
     "Qua": "Mua quà tặng",
     "NapDienThoai": "Tiền điện thoại",
     "SuaDo": "Sửa đồ",
-    "DangKiOnline": "Đăng kí dịch vụ trực tuyến"
+    "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
+    "AnUongPhu": "Ăn uống phụ"
 };
 
 const NOTIFICATION_TEXTS = {
