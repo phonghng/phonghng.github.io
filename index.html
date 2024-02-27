@@ -189,85 +189,88 @@
                 document.body.appendChild(generate_item_card(...item));
         }
 
-        function generate_private_note_alert(name, refer, property, include_IP) {
-            let result = `${name.charAt(0).toUpperCase() + name.slice(1)} có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như ${refer}, v.v.) thuộc sở hữu bởi tôi (thông tin liên lạc được đăng tải ở dưới) về mặt ${property}.<br/>
-            <br/>
-            Bất kì trường hợp sử dụng nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam.`;
-            if (include_IP)
-                result += `Trong đó, sử dụng toàn bộ hoặc một phần ${property} là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới các hình thức như ${refer}, v.v.).`;
-            return result;
-        }
-
         const get_url_param = key => new URL(location.href).searchParams.get(key);
-        let private_note_type = get_url_param("private_note_type");
-        let private_note_content = ``;
-        switch (private_note_type) {
-            case "code__closed_source__ctn__exercise": {
-                let teacher = [
-                    "Đỗ Thị Linh",
-                    "Nguyễn Thị Kim Tuyến"
-                ][parseInt(get_url_param("teacher_code"))];
-                private_note_content =
-                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
+
+        function generate_private_note(params) {
+            function generate_private_note_alert(name, refer, property, include_IP) {
+                let result = `${name.charAt(0).toUpperCase() + name.slice(1)} có gắn đường liên kết trỏ tới trang web này (dưới mọi hình thức, như ${refer}, v.v.) thuộc sở hữu bởi tôi (thông tin liên lạc được đăng tải ở dưới) về mặt ${property}.<br/>
+                <br/>
+                Bất kì trường hợp sử dụng nào, phải chấp hành theo luật pháp của nước Cộng hoà xã hội chủ nghĩa Việt Nam.`;
+                if (include_IP)
+                    result += `Trong đó, sử dụng toàn bộ hoặc một phần ${property} là sản phẩm trí tuệ của tôi phải gắn đường liên kết trỏ tới trang web này (dưới các hình thức như ${refer}, v.v.).`;
+                return result;
+            }
+
+            const get_param = key => params[key] ? params[key] : get_url_param(key);
+
+            let private_note_content = ``;
+            switch (get_param("private_note_type")) {
+                case "code__closed_source__ctn__exercise": {
+                    let teacher = [
+                        "Đỗ Thị Linh",
+                        "Nguyễn Thị Kim Tuyến"
+                    ][parseInt(get_param("teacher_code"))];
+                    private_note_content =
+                        `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
                     – Trường: Trung học phổ thông chuyên Thái Nguyên.<br/>
                     – Giáo viên: ${teacher}.<br/>
-                    – Nội dung tiết học: ${get_url_param("lesson_content")}.<br/>
-                    – Nội dung bài tập: ${get_url_param("exercise_content")}.`;
-                let vnoj_problem_id = get_url_param("vnoj_problem_code");
-                if (vnoj_problem_id)
-                    private_note_content +=
-                        `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}" target="_blank"> ctn_${vnoj_problem_id}</a>.`;
-                break;
-            }
+                    – Nội dung tiết học: ${get_param("lesson_content")}.<br/>
+                    – Nội dung bài tập: ${get_param("exercise_content")}.`;
+                    let vnoj_problem_id = get_param("vnoj_problem_code");
+                    if (vnoj_problem_id)
+                        private_note_content +=
+                            `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}" target="_blank"> ctn_${vnoj_problem_id}</a>.`;
+                    break;
+                }
 
-            case "code__closed_source__test": {
-                private_note_content =
-                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
+                case "code__closed_source__test": {
+                    private_note_content =
+                        `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
-                    Đoạn mã nằm trong khuôn khổ đoạn mã thử với nội dung "${get_url_param("content")}"`;
-                break;
-            }
+                    Đoạn mã nằm trong khuôn khổ đoạn mã thử với nội dung "${get_param("content")}"`;
+                    break;
+                }
 
-            case "code__closed_source__vnoj": /* depreciated */
-            case "code__closed_source__oj": {
-                const OJ_CONFIGS = {
-                    "vnoj": ["VNOJ (VNOI Online Judge)", "https://oj.vnoi.info/problem/"],
-                    "lqdoj": ["LQDOJ (Le Quy Don Online Judge)", "https://lqdoj.edu.vn/problem/"],
-                    "cfs": ["Codeforces", "https://codeforces.com/problemset/problem/"]
-                };
-                let oj =
-                    private_note_type == "code__closed_source__vnoj"
-                        ? "vnoj"
-                        : get_url_param("oj");
-                let problem_id =
-                    private_note_type == "code__closed_source__vnoj"
-                        ? get_url_param("vnoj_problem_code")
-                        : get_url_param("problem_id");
-                private_note_content =
-                    `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
+                case "code__closed_source__vnoj": /* depreciated */
+                case "code__closed_source__oj": {
+                    const OJ_CONFIGS = {
+                        "vnoj": ["VNOJ (VNOI Online Judge)", "https://oj.vnoi.info/problem/"],
+                        "lqdoj": ["LQDOJ (Le Quy Don Online Judge)", "https://lqdoj.edu.vn/problem/"],
+                        "cfs": ["Codeforces", "https://codeforces.com/problemset/problem/"]
+                    };
+                    let oj =
+                        get_param("private_note_type") == "code__closed_source__vnoj"
+                            ? "vnoj"
+                            : get_param("oj");
+                    let problem_id =
+                        get_param("private_note_type") == "code__closed_source__vnoj"
+                            ? get_param("vnoj_problem_code")
+                            : get_param("problem_id");
+                    private_note_content =
+                        `${generate_private_note_alert("đoạn mã", "đường liên kết đặt ở trong dòng ghi chú đầu đoạn mã", "nội dung", true)}<br/>
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài giải được đăng tải trên ${OJ_CONFIGS[oj][0]} với mã bài là <a href="${OJ_CONFIGS[oj][1]}${problem_id}" target="_blank">${problem_id}</a>.`;
-                break;
-            }
+                    break;
+                }
 
-            case "code__open_source__library": {
-                private_note_content = generate_private_note_alert(`thư viện ${get_url_param("language")} "${get_url_param("library_name")}" phiên bản ${get_url_param("version")} `, "đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã", "nội dung", true);
-                break;
-            }
+                case "code__open_source__library": {
+                    private_note_content = generate_private_note_alert(`thư viện ${get_param("language")} "${get_param("library_name")}" phiên bản ${get_param("version")} `, "đường liên kết đặt ở trong dòng ghi chú đầu thư viện hoặc trước đoạn mã", "nội dung", true);
+                    break;
+                }
 
-            case "property": {
-                private_note_content =
-                    `${generate_private_note_alert('"' + get_url_param("property_name") + '"', "mã QR", "tài sản", false)}<br/>
+                case "property": {
+                    private_note_content =
+                        `${generate_private_note_alert('"' + get_param("property_name") + '"', "mã QR", "tài sản", false)}<br/>
                     <br/>
                     Nếu bạn tìm thấy tài sản này trong trường hợp tôi làm thất lạc, rất mong bạn sẽ bảo quản và giúp tôi sớm nhận lại được nó; tôi xin cảm ơn và hậu tạ!`;
-                break;
-            }
+                    break;
+                }
 
-            case "product__self_use__phnotest": {
-                private_note_content =
-                    `${generate_private_note_alert("giấy kiểm tra/giấy thi mẫu " + get_url_param("template_id"), "đường liên kết, mã QR", "thiết kế", true)}<br/>
+                case "product__self_use__phnotest": {
+                    private_note_content =
+                        `${generate_private_note_alert("giấy kiểm tra/giấy thi mẫu " + get_param("template_id"), "đường liên kết, mã QR", "thiết kế", true)}<br/>
                     <br/>
                     Thứ tự tờ được xác định theo tính liên tục của bài làm (trừ khi người làm bài có ghi chú riêng). Thứ tự trang trong một tờ được xác định như sau:</br>
                     – Trường hợp tờ đơn: Trang thứ nhất có các trường thông tin, trang thứ hai ở vị trí mặt sau của trang thứ nhất.<br/>
@@ -280,20 +283,20 @@
                     – Với trường "Họ tên", có thể ghi thêm số báo danh, v.v..<br/>
                     – Với trường "Môn", có thể ghi thêm mã đề, v.v..<br/>
                     – Với chỗ trống ngay trên trường "Môn", cần ghi tên kì kiểm tra/thi hoặc/và bài kiểm tra/thi (có thể viết tắt). Ví dụ: "Kì kiểm tra cuối kì I", "Bài kiểm tra thường xuyên", "Kì thi TN THPT – Bài thi: KHTN"`;
-                break;
-            }
+                    break;
+                }
 
-            case "product__education_use__ctn": {
-                private_note_content =
-                    `${generate_private_note_alert('"' + get_url_param("product_name") + '"', "đường liên kết, mã QR", "sản phẩm", true)}<br/>
+                case "product__education_use__ctn": {
+                    private_note_content =
+                        `${generate_private_note_alert('"' + get_param("product_name") + '"', "đường liên kết, mã QR", "sản phẩm", true)}<br/>
                     <br/>
                     Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trường Trung học phổ thông chuyên Thái Nguyên.`;
-                break;
-            }
+                    break;
+                }
 
-            case "product__self_use__danh_sach_lop_Thiec": {
-                private_note_content =
-                    `${generate_private_note_alert("danh sách lớp Tin, khoá 35, Trường Trung học phổ thông chuyên Thái Nguyên đa mục đích", "mã QR", "thiết kế", true)}<br/>
+                case "product__self_use__danh_sach_lop_Thiec": {
+                    private_note_content =
+                        `${generate_private_note_alert("danh sách lớp Tin, khoá 35, Trường Trung học phổ thông chuyên Thái Nguyên đa mục đích", "mã QR", "thiết kế", true)}<br/>
                     <br/>
                     Danh sách được tôi sử dụng với mục đích hỗ trợ thực hiện công tác trong lớp.<br/>
                     <br/>
@@ -303,12 +306,39 @@
                     – Với hàng cuối cùng trong bảng danh sách học sinh, có thể ghi thêm tổng cộng, v.v..<br/>
                     – Với bảng danh sách học sinh, có thể kẻ thêm cột trong cột để trống.<br/>
                     – Với các chỗ trống ngay dưới bảng danh sách học sinh, cần ghi rõ họ tên người chịu trách nhiệm với nội dung và chữ kí.`;
-                break;
+                    break;
+                }
             }
-        }
-        if (private_note_type) {
+
             document.querySelector("#private_note").innerHTML = private_note_content;
             document.querySelector("#private_note").style.display = "block";
+        }
+
+        if (get_url_param("private_note_type"))
+            generate_private_note()
+        else if (get_url_param("private_note_configs")) {
+            let configs = get_url_param("private_note_configs").split("|");
+            if (configs[0] == "ctn") /* "ctn" | teacher_code("0", "1")/oj("vnoj", "lqdoj", "cfs")/"test" | problem_id/vnoj_problem_code | content | lesson_content | exercise_content */
+                if (["0", "1"].includes(configs[1]))
+                    generate_private_note({
+                        private_note_type: "code__closed_source__ctn__exercise",
+                        teacher_code: configs[1],
+                        lesson_content: configs[4],
+                        exercise_content: configs[5],
+                        vnoj_problem_code: configs[2]
+                    });
+                else if (["vnoj", "lqdoj", "cfs"].includes(configs[1]))
+                    generate_private_note({
+                        private_note_type: "code__closed_source__oj",
+                        oj: configs[1],
+                        problem_id: configs[2]
+                    });
+                else if (["test"].includes(configs[1]))
+                    generate_private_note({
+                        private_note_type: "code__closed_source__test",
+                        content: configs[3]
+                    });
+
         }
     </script>
 </body>
