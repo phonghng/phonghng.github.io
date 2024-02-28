@@ -201,7 +201,7 @@
                 return result;
             }
 
-            const get_param = key => params[key] ? params[key] : get_url_param(key);
+            const get_param = key => params && params[key] ? params[key] : get_url_param(key);
 
             let private_note_content = ``;
             switch (get_param("private_note_type")) {
