@@ -37,6 +37,13 @@ class PHNotion_Hey_Mirmor {
         );
     }
 
+    static change_password(new_password, current_password, encrypted_endpoint = ENCRYPTED_ENDPOINT) {
+        return CryptoJS.AES.encrypt(
+            CryptoJS.AES.decrypt(encrypted_endpoint, current_password)
+                .toString(CryptoJS.enc.Utf8)
+            , new_password).toString();
+    }
+
     get_endpoint(encrypted_endpoint) {
         let password = prompt(this.options.texts.password_prompt);
         if (!password) {
