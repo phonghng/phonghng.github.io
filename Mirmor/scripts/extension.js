@@ -28,7 +28,7 @@ class Extension {
         if (!data) {
             return undefined;
         }
-        this.ExtensionPopup_class.import_info(data);
+        this.ExtensionPopup_class.import_data(data);
     }
 
     toJSON() {

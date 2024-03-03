@@ -173,13 +173,13 @@ class ExtensionPopup {
         }
     }
 
-    import_info(exported_info) {
-        let info = JSON.parse(JSON.stringify(exported_info));
+    import_data(exported_data) {
+        let info = JSON.parse(JSON.stringify(exported_data));
         this.import_popup_style(info._extension_popup_style, info._extension_popup_is_focusing);
         delete info._extension_popup_style;
         delete info._extension_popup_is_focusing;
         info = JSON.parse(JSON.stringify(info));
-        this.run_function("import_info", [info], () => this.update_info());
+        this.run_function("import_data", [info], () => this.update_info());
     }
 
     run_function(function_name, parameters, callback) {

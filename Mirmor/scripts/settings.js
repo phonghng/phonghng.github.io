@@ -140,6 +140,11 @@ const HABITS = {
             type: "group",
             name: "Trong ngày",
             children: {
+                focus: {
+                    type: "habit_ext",
+                    name: "Tập trung hoàn thành việc cần làm",
+                    extension_id: "pomodoro"
+                },
                 water: {
                     type: "habit_number",
                     name: "Uống nước",
@@ -376,5 +381,9 @@ const EXTENSIONS = {
     view_data: {
         name: "Xem dữ liệu",
         filename: "view_data.html"
+    },
+    pomodoro: {
+        name: "Tính thời gian tập trung",
+        filename: "pomodoro.html"
     }
 };

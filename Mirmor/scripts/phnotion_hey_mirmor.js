@@ -1,6 +1,6 @@
 class PHNotion_Hey_Mirmor {
     constructor(
-        encrypted_endpoint = ENCRYPTED_PHNOTION_HEY_MIRMOR_ENDPOINT,
+        encrypted_endpoint,
         habit_database = HABITS,
         extension_database = EXTENSIONS,
         homepage_top_container = document.body,
