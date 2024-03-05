@@ -212,12 +212,6 @@ const HABITS = {
                     required: true,
                     point: 15
                 },
-                washing_up: {
-                    type: "habit_check",
-                    name: "Giặt quần áo",
-                    required: true,
-                    point: 50
-                },
                 eat_dinner: {
                     type: "group",
                     name: "Ăn tối",
