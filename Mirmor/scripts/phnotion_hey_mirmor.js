@@ -11,7 +11,7 @@ class PHNotion_Hey_Mirmor {
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
         this.options = Object.assign({}, options, {
-            percent_criterions: [1.0, 0.85],
+            percent_criterions: [0.87, 0.85],
             texts: {
                 password_prompt: "Nhập mật khẩu",
                 wrong_password: "Sai mật khẩu!",
