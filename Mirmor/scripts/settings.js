@@ -335,8 +335,8 @@ const HABITS = {
                     required: true,
 
                     unit: "việc",
-                    point_per_value: 10,
-                    goal_value: 5
+                    point_per_value: 50,
+                    goal_value: 3
                 },
                 good_experience: {
                     type: "habit_number",

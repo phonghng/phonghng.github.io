@@ -222,6 +222,8 @@
                     `${timer_info.minutes} <sub>phút</sub> ${timer_info.seconds} <sub>giây</sub>`;
             },
             done: current_timer => {
+                alert(`Phiên ${_Pomodoro.timer_types[current_timer.type][2]} đã hoàn tất!`);
+
                 data.done_pomodoros.push(current_timer.logs);
                 data.summary.push([
                     current_timer.type,
