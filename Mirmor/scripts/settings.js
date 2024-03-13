@@ -26,7 +26,7 @@ const HABITS = {
                 },
                 check_news: {
                     type: "habit_check",
-                    name: "Kiểm tra tin tức trên <a href='https://www.youtube.com/feed/subscriptions' target='_blank'>YouTube</a>, <a href='https://news.google.com/home?hl=vi&gl=VN&ceid=VN:vi' target='_blank'>Google News</a>, <a href='https://www.msn.com/en-us/feed' target='_blank'>Microsoft Start</a>",
+                    name: "Kiểm tra tin tức trên <a href='https://www.youtube.com/feed/subscriptions' target='_blank'>YouTube</a>, <a href='https://news.google.com/home?hl=vi&gl=VN&ceid=VN:vi' target='_blank'>Google News</a>, <a href='https://www.msn.com/en-us/channel/topic/Top%20Stories/tp-Y_46b78bbb-31c4-4fc5-8a4a-858072348d06?ocid=windirect&cvid=d6e292ac6fb64ca8a8f20cc0b0adfb3d' target='_blank'>Microsoft Start</a>",
                     required: true,
                     point: 75
                 },
