@@ -293,6 +293,14 @@
                     Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trường Trung học phổ thông chuyên Thái Nguyên.`;
                     break;
                 }
+                
+                case "note__anotepad": {
+                    private_note_content =
+                        `${generate_private_note_alert("Ghi chú được đăng tải trên Anotepad (cả nội dung công khai, riêng tư, được bảo vệ bằng mật khẩu)", "đường liên kết", "nội dung", true)}<br/>
+                    <br/>
+                    Ghi chú được tôi sử dụng với nhiều mục đích, được cụ thể hoá qua nội dung của ghi chú.`;
+                    break;
+                }
             }
 
             document.querySelector("#private_note").innerHTML = private_note_content;
