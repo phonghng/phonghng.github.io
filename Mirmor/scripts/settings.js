@@ -349,20 +349,35 @@ const HABITS = {
                 }
             }
         },
-        view_data: {
-            type: "habit_ext",
-            name: "Xem dữ liệu Mirmor hôm nay",
-            extension_id: "view_data"
-        },
-        point_info: {
-            type: "habit_ext",
-            name: "Xem thống kê điểm",
-            extension_id: "point_info"
+        utils: {
+            type: "group",
+            name: "Tiện ích",
+            children: {
+                phinanace_viewer: {
+                    type: "habit_ext",
+                    name: "Trình xem Phinance",
+                    extension_id: "phinanace_viewer"
+                },
+                point_info: {
+                    type: "habit_ext",
+                    name: "Xem thống kê điểm",
+                    extension_id: "point_info"
+                },
+                view_data: {
+                    type: "habit_ext",
+                    name: "Xem dữ liệu Mirmor hôm nay",
+                    extension_id: "view_data"
+                }
+            }
         }
     }
 };
 
 const EXTENSIONS = {
+    phinanace_viewer: {
+        name: "Trình xem Phinance",
+        filename: "phinanace_viewer.html"
+    },
     point_info: {
         name: "Thống kê điểm",
         filename: "point_info.html"

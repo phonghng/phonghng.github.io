@@ -137,12 +137,12 @@ class PHNotion_Hey_Mirmor {
             this.initialization_data,
             (options, object_data_function, json_data_function, string_data_function, date_string) => {
                 if (!options?.is_from_view_data_extension)
-                    Habits_class.data.children.view_data
+                    Habits_class.data.children.utils.children.view_data
                         .Extension_class.ExtensionPopup_class
                         .run_function("update_textarea", [string_data_function()]);
                 let json_data = json_data_function();
                 this.StatusBar_class.show_status(json_data);
-                if (Object.entries(json_data["Xem dữ liệu Mirmor hôm nay"].data).length)
+                if (Object.entries(json_data["Tiện ích"]["Xem dữ liệu Mirmor hôm nay"].data).length)
                     this.set(
                         date_string,
                         JSON.stringify(object_data_function()),
@@ -159,7 +159,7 @@ class PHNotion_Hey_Mirmor {
                             fetch(`${this.endpoint}/`)
                                 .then(response => response.json())
                                 .then(json => {
-                                    Habits_class.data.children.point_info
+                                    Habits_class.data.children.utils.children.point_info
                                         .Extension_class.ExtensionPopup_class
                                         .run_function("update_data", [json, this.options.percent_criterions]);
                                 });
