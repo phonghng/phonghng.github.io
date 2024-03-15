@@ -215,13 +215,19 @@
                     <br/>
                     Đoạn mã nằm trong khuôn khổ bài tập môn Chuyên Tin:<br/>
                     – Trường: Trung học phổ thông chuyên Thái Nguyên.<br/>
-                    – Giáo viên: ${teacher}.<br/>
-                    – Nội dung tiết học: ${get_param("lesson_content")}.<br/>
-                    – Nội dung bài tập: ${get_param("exercise_content")}.`;
-                    let vnoj_problem_id = get_param("vnoj_problem_code");
-                    if (vnoj_problem_id)
+                    – Giáo viên: ${teacher}.`;
+                    if (get_param("content"))
                         private_note_content +=
-                            `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${vnoj_problem_id}" target="_blank"> ctn_${vnoj_problem_id}</a>.`;
+                            `<br/>– Nội dung: ${get_param("content")}.`;
+                    if (get_param("lesson_content"))
+                        private_note_content +=
+                            `<br/>– Nội dung tiết học: ${get_param("lesson_content")}.`;
+                    if (get_param("exercise_content"))
+                        private_note_content +=
+                            `<br/>– Nội dung bài tập: ${get_param("exercise_content")}.`;
+                    if (get_param("vnoj_problem_code"))
+                        private_note_content +=
+                            `<br/>– Mã bài VNOJ (VNOI Online Judge): <a href="https://oj.vnoi.info/problem/ctn_${get_param("vnoj_problem_code")}" target="_blank"> ctn_${get_param("vnoj_problem_code")}</a>.`;
                     break;
                 }
 
@@ -293,7 +299,7 @@
                     Sản phẩm được tôi sử dụng với mục đích giáo dục trong quá trình học tập tại Trường Trung học phổ thông chuyên Thái Nguyên.`;
                     break;
                 }
-                
+
                 case "note__anotepad": {
                     private_note_content =
                         `${generate_private_note_alert("Ghi chú được đăng tải trên Anotepad (cả nội dung công khai, riêng tư, được bảo vệ bằng mật khẩu)", "đường liên kết", "nội dung", true)}<br/>
@@ -311,27 +317,46 @@
             generate_private_note()
         else if (get_url_param("private_note_configs")) {
             let configs = get_url_param("private_note_configs").split(",");
-            if (configs[0] == "ctn") /* "ctn" | teacher_code["0", "1"]/oj["vnoj", "lqdoj", "cfs"]/"test" | problem_id/vnoj_problem_code | content | lesson_content | exercise_content */
-                if (["0", "1"].includes(configs[1]))
-                    generate_private_note({
-                        private_note_type: "code__closed_source__ctn__exercise",
-                        teacher_code: configs[1],
-                        lesson_content: configs[4],
-                        exercise_content: configs[5],
-                        vnoj_problem_code: configs[2]
-                    });
-                else if (["vnoj", "lqdoj", "cfs"].includes(configs[1]))
-                    generate_private_note({
-                        private_note_type: "code__closed_source__oj",
-                        oj: configs[1],
-                        problem_id: configs[2]
-                    });
-                else if (["test"].includes(configs[1]))
-                    generate_private_note({
-                        private_note_type: "code__closed_source__test",
-                        content: configs[3]
-                    });
-
+            switch (configs[0]) {
+                case "ctn": {
+                    /* "ctn" | teacher_code["0", "1"]/oj["vnoj", "lqdoj", "cfs"]/"test" | problem_id/vnoj_problem_code | content | lesson_content | exercise_content */
+                    /* "ctn" | "0"=Linh, "1"=Tuyến, "0v"=Linh+VNOJ, "1v"=Tuyến+VNOJ, "vnoj", "lqdoj", "cfs", "test" | problem_id/content */
+                    if (["0", "1", "0v", "1v"].includes(configs[1]))
+                        if (!configs[1].endsWith("v") && (configs[4] || configs[5]))
+                            generate_private_note({
+                                private_note_type: "code__closed_source__ctn__exercise",
+                                teacher_code: configs[1],
+                                lesson_content: configs[4],
+                                exercise_content: configs[5],
+                                vnoj_problem_code: configs[2]
+                            });
+                        else
+                            generate_private_note({
+                                private_note_type: "code__closed_source__ctn__exercise",
+                                teacher_code: configs[1],
+                                vnoj_problem_code: configs[1].endsWith("v") ? configs[2] : undefined,
+                                content: configs[1].endsWith("v") ? undefined : configs[2]
+                            });
+                    else if (["vnoj", "lqdoj", "cfs"].includes(configs[1]))
+                        generate_private_note({
+                            private_note_type: "code__closed_source__oj",
+                            oj: configs[1],
+                            problem_id: configs[2]
+                        });
+                    else if (["test"].includes(configs[1]))
+                        if (configs[3])
+                            generate_private_note({
+                                private_note_type: "code__closed_source__test",
+                                content: configs[3]
+                            });
+                        else
+                            generate_private_note({
+                                private_note_type: "code__closed_source__test",
+                                content: configs[2]
+                            });
+                    break;
+                }
+            }
         }
     </script>
 </body>
