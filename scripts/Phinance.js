@@ -32,7 +32,8 @@ const PAYMENT_CATEGORIES = {
     "NapDienThoai": "Tiền điện thoại",
     "SuaDo": "Sửa đồ",
     "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
-    "AnUongPhu": "Ăn uống phụ"
+    "AnUongPhu": "Ăn uống phụ",
+    "CatToc": "Cắt tóc"
 };
 
 const NOTIFICATION_TEXTS = {
