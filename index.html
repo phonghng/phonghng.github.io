@@ -11,184 +11,78 @@
     <script src="./scripts/libraries/PPPL-JS.1.4.js"></script>
     <link rel="stylesheet" href="./stylesheets/PPPL-CSS.1.4.css">
 
-    <script src="./scripts/libraries/crypto-js.min.js"></script>
-    <script src="./scripts/libraries/qr-creator.min.js"></script>
-    <script src="./scripts/index.js"></script>
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="./stylesheets/index.css">
+        body {
+            margin: auto auto;
+            padding: 25px;
+            max-width: 700px;
+            text-align: justify;
+            font-size: 20px;
+        }
+
+        #private_note {
+            display: none;
+            background-color: var(--GREY_2);
+            padding: 15px;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        b {
+            font-weight: bold;
+        }
+
+        a {
+            color: var(--BLUE);
+        }
+
+        p {
+            margin: 10px 0;
+            line-height: normal;
+        }
+
+        img {
+            height: 1rem;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            background-color: #FFFFFF;
+            padding: 1px;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-inline-start: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <div id="private_note"></div>
 
-    <div id="logo_avatar">
-        <img src="./images/PhongHNg.png" alt="Biểu tượng" title="Biểu tượng" />
-        <img src="./images/hompage_avatar.jpg" alt="Ảnh đại diện" title="Ảnh đại diện" />
-    </div>
+    <p>Xin chào, tôi là <img src="./images/PhongHNg.png" alt="Biểu tượng" title="Biểu tượng" /> <b>NGUYỄN HẢI PHONG</b>.
+    </p>
+
+    <p>Nếu bạn truy cập trang web này, có thể bạn đang cần liên lạc với tôi; bạn có thể sử dụng các phương tiện sau:</p>
+
+    <ul>
+        <li><p>Tài khoản Facebook: <a href="https://www.facebook.com/phonghng.facebook">@phonghng.facebook</a>.</p></li>
+        <li><p>Hòm thư điện tử: <a href="mailto:phonghng8420@gmail.com">phonghng8420@gmail.com</a>.</p></li>
+        <li><p>Tài khoản Zalo: <a href="https://zaloapp.com/qr/p/14q93z8w4415">0392507161</a>.</p></li>
+    </ul>
+
+    <p>Cảm ơn sự quan tâm của bạn!</p>
 
     <script>
-        const ITEM_CARDS_CONFIG = {
-            "Thông tin khái quát": [[
-                "Họ tên",
-                ["copy"],
-                {},
-                "Nguyễn Hải Phong",
-                []
-            ], [
-                "Biệt danh",
-                ["copy"],
-                {},
-                "PhongHNg",
-                []
-            ], [
-                "Số định danh cá nhân (một phần)",
-                ["copy"],
-                { "copy_content": "019208XXXXXX" },
-                "019 208 XXXXXX",
-                []
-            ], [
-                "Giới tính",
-                ["copy"],
-                {},
-                "Nam",
-                []
-            ], [
-                "Năm sinh",
-                ["copy"],
-                {},
-                "2008",
-                []
-            ]],
-            "Thông tin liên lạc cơ bản": [[
-                "Hòm thư điện tử (e-mail)",
-                ["copy", "mailto"],
-                {},
-                "phonghng8420@gmail.com",
-                []
-            ], [
-                "Số điện thoại di động",
-                ["copy", "tel"],
-                {
-                    "copy_content": "0392507161",
-                    "phone_number": "0392507161"
-                },
-                "0392 507 161",
-                []
-            ], [
-                "Số điện thoại tài khoản Zalo",
-                ["copy", "Zalo"],
-                {
-                    "copy_content": "0392507161",
-                    "Zalo_QR_code_link": "https://zaloapp.com/qr/p/14q93z8w4415"
-                },
-                "0392 507 161",
-                [[
-                    "Mã QR",
-                    [],
-                    {},
-                    generate_QR_code_element("https://zaloapp.com/qr/p/14q93z8w4415")
-                ]]
-            ], [
-                "Trường học",
-                ["copy", "locate"],
-                { "latitude": "21.602119", "longitude": "105.8501978" },
-                "Lớp Tin, khoá 35, Trường Trung học phổ thông chuyên Thái Nguyên",
-                []
-            ], [
-                "Tài khoản GitHub",
-                ["copy", "open_link"],
-                { "link": "https://github.com/phonghng/" },
-                "@phonghng",
-                []
-            ], [
-                "Tài khoản Facebook",
-                ["copy", "open_link"],
-                { "link": "https://facebook.com/phonghng.facebook/" },
-                "@phonghng.facebook",
-                []
-            ]],
-            "Thông tin liên lạc khẩn cấp": [[
-                "Số định danh cá nhân (đầy đủ)",
-                ["copy"],
-                new Protected_Information("U2FsdGVkX199kdFGQA1vTCwbSX8SX3Qr01Gg5B0oYaYr3PqfWhJ8ZmOCFqByhTDZePK91gKJV6TV4RxiW8yWW+N4IHA2xuJi/QTmSmqEjO5v14GPfryssFEbOUnxaxglFB51onJl0t4O3+9bhbdIEw=="),
-                null,
-                []
-            ], [
-                "Số điện thoại của bố",
-                ["copy", "tel"],
-                new Protected_Information("U2FsdGVkX1/8mdIkYZHhw9ai2QvLeyxydcQOweYikDXlfZSykf44+T3wvccgZnjxeFMGhI7goBEZsiJ+aP4fxAmqtKvqiRjSKB3dzU0yiYfybqVOeURiUf+SWvkp4IQchLffn5/EVW2kZsHH1nZ8oRxro3tcpiZBf4JdBOlIzZ8="),
-                null,
-                []
-            ], [
-                "Số điện thoại của mẹ",
-                ["copy", "tel"],
-                new Protected_Information("U2FsdGVkX1/La7MIy9cdDsazWjW52QtrFbQ5F/j/6UdCveiGRkJUea7KO7Wiu6EXF9VLIb/T6YJRgM1b9o/SaLrxYykeAR098rkLGBbgYfTW5DJcfd4e9arWEcGz8b9auETHSlj7TO0UZbaOB0cD27gsNawcijevkb0d1VTlLlk="),
-                null,
-                []
-            ], [
-                "Chỗ ở",
-                ["copy", "locate"],
-                new Protected_Information("U2FsdGVkX192fZbTboNXqIiKtPZ2ZTTj4uH/CK9aQE1qr+UZSS5vrrCb9AxTpARaMPoYnSWoii45zSIXgWQRcw4z1duMd3BK41QNls3VcfUS2YFkD2+4sD5iOpjjqiR3yopp7V8UymgiQPu5fP5l7bigX0FCCQZkk1kBYLUpAS68qGV7xt7s4ifcsAvypuGjuSrLrZrK2TeFvSgxibFUpm1Upz7n4OFDu54ZB4vtWWWA5PUVCZtMk2mvHztg3Xqesj7GJzj1+hefeFpwiIpAFo+A96XeQQTI4W1N3TBb18PSCa8TEly4xycnH1lSj6eF"),
-                null,
-                []
-            ]],
-            "Thông tin tài khoản dịch vụ tài chính": [[
-                "MoMo",
-                ["copy"],
-                { copy_content: "0392507161" },
-                "0392 507 161",
-                [[
-                    "Mã QR chuyển tiền (bởi MoMo)",
-                    [],
-                    {},
-                    generate_QR_code_element("2|99|0392507161|Nguyen Hai Phong||0|0|0||transfer_myqr")
-                ]]
-            ], [
-                "Tài khoản thanh toán BIDV",
-                ["copy"],
-                new Protected_Information("U2FsdGVkX19rSUaBaqY9ZjjoxVunxNYSXZaM7fWsfhCsEP99Cs02u+qc2G5f+O3dQWZB5FDyTaD89+ajJrx4Yr1kQjiccnkpO3qaZ6uugG5aIjha++5nuYfPaifaTR9rMYinWabGX9ndCbvgtFwpBA=="),
-                null,
-                [[
-                    "Mã QR chuyển tiền (bởi VietQR)",
-                    [],
-                    new Protected_Information("U2FsdGVkX1985ibCYKihsePqCK+iZhPMbOmbRSAJ0ehKhxmw7IT8UhRXbf3NG5GoVkwF0cz2dxdYXTpnWWc+DFEd0Fys9rgdv9zJYeFX4Y62FES47f1bWY7QGrFdmrXvebbR37ULHQu67iU/ynwsjxEFYlpFAhAC5ijMC7kSYK5E8yno2Bnk1pEsw6LhslAskTw+4CPseOOlYSMkxf8Ysg=="),
-                    content => generate_QR_code_element(content)
-                ]]
-            ], [
-                "Tài khoản Chọn tên BIDV",
-                ["copy"],
-                { copy_content: "0392507161" },
-                "0392 507 161 (NGUYEN HAI PHONG)",
-                [[
-                    "Mã QR chuyển tiền (bởi VietQR)",
-                    [],
-                    {},
-                    generate_QR_code_element("00020101021138540010A00000072701240006970418011003925071610208QRIBFTTA53037045802VN6304EF02")
-                ]]
-            ], [
-                "Tài khoản Chọn tên BIDV",
-                ["copy"],
-                { copy_content: "PHONGHNG" },
-                "PHONGHNG (NGUYEN HAI PHONG)",
-                [[
-                    "Mã QR chuyển tiền (bởi VietQR)",
-                    [],
-                    {},
-                    generate_QR_code_element("00020101021138520010A000000727012200069704180108PHONGHNG0208QRIBFTTA53037045802VN630487CB")
-                ]]
-            ]]
-        };
-
-        for (let [sector_title, sector_items] of Object.entries(ITEM_CARDS_CONFIG)) {
-            document.body.appendChild(PPPL_JS.ADOM(
-                ["h1", {}, { innerHTML: sector_title }, null, null],
-                document
-            ));
-            for (let item of sector_items)
-                document.body.appendChild(generate_item_card(...item));
-        }
-
         const get_url_param = key => new URL(location.href).searchParams.get(key);
 
         function generate_private_note(params) {
