@@ -353,11 +353,6 @@ const HABITS = {
             type: "group",
             name: "Tiện ích",
             children: {
-                phinanace_viewer: {
-                    type: "habit_ext",
-                    name: "Trình xem Phinance",
-                    extension_id: "phinanace_viewer"
-                },
                 point_info: {
                     type: "habit_ext",
                     name: "Xem thống kê điểm",
@@ -374,10 +369,6 @@ const HABITS = {
 };
 
 const EXTENSIONS = {
-    phinanace_viewer: {
-        name: "Trình xem Phinance",
-        filename: "phinanace_viewer.html"
-    },
     point_info: {
         name: "Thống kê điểm",
         filename: "point_info.html"
