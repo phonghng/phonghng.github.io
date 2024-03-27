@@ -138,7 +138,8 @@
                     const OJ_CONFIGS = {
                         "vnoj": ["VNOJ (VNOI Online Judge)", "https://oj.vnoi.info/problem/"],
                         "lqdoj": ["LQDOJ (Le Quy Don Online Judge)", "https://lqdoj.edu.vn/problem/"],
-                        "cfs": ["Codeforces", "https://codeforces.com/problemset/problem/"]
+                        "cfs": ["Codeforces", "https://codeforces.com/problemset/problem/"],
+                        "ptit_spoj": ["Codeforces", "https://www.spoj.com/PTIT/problems/"]
                     };
                     let oj =
                         get_param("private_note_type") == "code__closed_source__vnoj"
@@ -213,8 +214,8 @@
             let configs = get_url_param("private_note_configs").split(",");
             switch (configs[0]) {
                 case "ctn": {
-                    /* "ctn" | teacher_code["0", "1"]/oj["vnoj", "lqdoj", "cfs"]/"test" | problem_id/vnoj_problem_code | content | lesson_content | exercise_content */
-                    /* "ctn" | "0"=Linh, "1"=Tuyến, "0v"=Linh+VNOJ, "1v"=Tuyến+VNOJ, "vnoj", "lqdoj", "cfs", "test" | problem_id/content */
+                    /* "ctn" | teacher_code["0", "1"]/oj["vnoj", "lqdoj", "cfs", "ptit_spoj"]/"test" | problem_id/vnoj_problem_code | content | lesson_content | exercise_content */
+                    /* "ctn" | "0"=Linh, "1"=Tuyến, "0v"=Linh+VNOJ, "1v"=Tuyến+VNOJ, "vnoj", "lqdoj", "cfs", "ptit_spoj", "test" | problem_id/content */
                     if (["0", "1", "0v", "1v"].includes(configs[1]))
                         if (!configs[1].endsWith("v") && (configs[4] || configs[5]))
                             generate_private_note({
