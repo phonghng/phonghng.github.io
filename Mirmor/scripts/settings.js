@@ -262,7 +262,16 @@ const HABITS = {
                     name: "Học, chuẩn bị bài cho ngày mai",
                     required: true,
                     point: 50
-                }
+                },
+                code_competitive_programming: {
+                    type: "habit_number",
+                    name: "Luyện lập lập trình thi đấu",
+                    required: true,
+
+                    unit: "bài",
+                    point_per_value: 50,
+                    goal_value: 1
+                },
             }
         },
         evening: {
