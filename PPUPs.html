@@ -169,7 +169,7 @@
         let items = document.querySelectorAll(".item");
         for (let item of items) {
             item.title = item.dataset.link;
-            item.onclick = () => window.open(item.dataset.link);
+            item.onclick = () => location.href = item.dataset.link;
         }
     </script>
 </body>
