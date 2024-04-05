@@ -46,8 +46,8 @@
         }
 
         .item {
-            width: 75px;
-            height: 75px;
+            width: 10%;
+            max-width: 75px;
             background-color: #212121;
             padding: 15px;
             cursor: pointer;
@@ -56,6 +56,7 @@
             user-select: none;
             display: flex;
             align-items: flex-end;
+            aspect-ratio: 1 / 1;
         }
 
         .item:hover {
@@ -164,7 +165,10 @@
         let items = document.querySelectorAll(".item");
         for (let item of items) {
             item.title = item.dataset.link;
-            item.onclick = () => window.open(item.dataset.link);
+            if (new URL(location.href).searchParams.get("m") == "1")
+                item.onclick = () => location.href = item.dataset.link;
+            else
+                item.onclick = () => window.open(item.dataset.link);
         }
     </script>
 </body>
