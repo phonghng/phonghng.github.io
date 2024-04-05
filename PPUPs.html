@@ -113,7 +113,7 @@
         <div class="item" data-link="https://www.facebook.com/messages/t/">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg"
                 style="--base_color: #0866FF;">
-            <img src="https://static.vecteezy.com/system/resources/previews/021/495/949/non_2x/messenger-logo-icon-free-png.png"
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png"
                 style="--base_color: #0866FF;">
         </div>
         <div class="item" data-link="https://discord.com/channels/@me">
@@ -169,7 +169,7 @@
         let items = document.querySelectorAll(".item");
         for (let item of items) {
             item.title = item.dataset.link;
-            item.onclick = () => location.href = item.dataset.link;
+            item.onclick = () => window.open(item.dataset.link);
         }
     </script>
 </body>
