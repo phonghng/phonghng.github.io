@@ -162,7 +162,7 @@ const HABITS = {
                         fruit: {
                             type: "habit_check",
                             name: "Trái cây",
-                            required: false,
+                            required: true,
                             point: 50
                         },
                         seafood: {
@@ -174,7 +174,7 @@ const HABITS = {
                         nuts_and_whole_grains: {
                             type: "habit_check",
                             name: "Hạt và ngũ cốc",
-                            required: false,
+                            required: true,
                             point: 50
                         }
                     }
@@ -225,7 +225,7 @@ const HABITS = {
                         fruit: {
                             type: "habit_check",
                             name: "Trái cây",
-                            required: false,
+                            required: true,
                             point: 50
                         },
                         seafood: {
@@ -237,7 +237,7 @@ const HABITS = {
                         nuts_and_whole_grains: {
                             type: "habit_check",
                             name: "Hạt và ngũ cốc",
-                            required: false,
+                            required: true,
                             point: 50
                         }
                     }
@@ -350,7 +350,7 @@ const HABITS = {
                 good_experience: {
                     type: "habit_number",
                     name: "Tham gia trải nghiệm giúp phát triển",
-                    required: false,
+                    required: true,
 
                     unit: "hoạt động",
                     point_per_value: 50,
