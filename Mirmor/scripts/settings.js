@@ -347,6 +347,15 @@ const HABITS = {
                     point_per_value: 50,
                     goal_value: 3
                 },
+                planted_Forest_tree: {
+                    type: "habit_number",
+                    name: "Trồng cây Forest",
+                    required: true,
+
+                    unit: "cây (25 phút)",
+                    point_per_value: 50,
+                    goal_value: 1
+                },
                 good_experience: {
                     type: "habit_number",
                     name: "Tham gia trải nghiệm giúp phát triển",
