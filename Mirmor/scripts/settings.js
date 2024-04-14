@@ -168,7 +168,7 @@ const HABITS = {
                         seafood: {
                             type: "habit_check",
                             name: "Hải sản",
-                            required: false,
+                            required: true,
                             point: 100
                         },
                         nuts_and_whole_grains: {
@@ -231,7 +231,7 @@ const HABITS = {
                         seafood: {
                             type: "habit_check",
                             name: "Hải sản",
-                            required: false,
+                            required: true,
                             point: 100
                         },
                         nuts_and_whole_grains: {
