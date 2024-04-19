@@ -12,8 +12,8 @@ class PHNotion_Hey_Mirmor {
         this.homepage_top_container = homepage_top_container;
         this.options = Object.assign({}, options, {
             point_info_extension_parameters: {
-                percent_criterions: [0.75],
-                chart_date_range: ["2024-04-01", "2024-12-31"]
+                percent_criterions: [0.7],
+                chart_date_range: ["2024-04-01", "2024-08-31"]
             },
             texts: {
                 password_prompt: "Nhập mật khẩu",

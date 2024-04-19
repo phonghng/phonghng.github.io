@@ -320,23 +320,23 @@ const HABITS = {
             type: "group",
             name: "Tổng kết ngày",
             children: {
-                discipline: {
+                undiscipline: {
                     type: "habit_number",
-                    name: "Đạt sự kỉ luật",
+                    name: "Hành vi làm giảm sự kỉ luật",
                     required: true,
 
-                    unit: "điểm/10 điểm",
-                    point_per_value: 15,
-                    goal_value: 10
+                    unit: "hành vi",
+                    point_per_value: -50,
+                    goal_value: 0
                 },
-                happiness: {
+                unhappiness: {
                     type: "habit_number",
-                    name: "Đạt sự hạnh phúc",
+                    name: "Hành vi làm giảm sự hạnh phúc",
                     required: true,
 
-                    unit: "điểm/10 điểm",
-                    point_per_value: 15,
-                    goal_value: 10
+                    unit: "hành vi",
+                    point_per_value: -50,
+                    goal_value: 0
                 },
                 completed_todo: {
                     type: "habit_number",
