@@ -11,7 +11,10 @@ class PHNotion_Hey_Mirmor {
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
         this.options = Object.assign({}, options, {
-            percent_criterions: [0.75],
+            point_info_extension_parameters: {
+                percent_criterions: [0.75],
+                chart_date_range: ["2024-04-01", "2024-12-31"]
+            },
             texts: {
                 password_prompt: "Nhập mật khẩu",
                 wrong_password: "Sai mật khẩu!",
@@ -161,7 +164,11 @@ class PHNotion_Hey_Mirmor {
                                 .then(json => {
                                     Habits_class.data.children.utils.children.point_info
                                         .Extension_class.ExtensionPopup_class
-                                        .run_function("update_data", [json, this.options.percent_criterions]);
+                                        .run_function("update_data", [
+                                            json,
+                                            this.options.point_info_extension_parameters.percent_criterions,
+                                            this.options.point_info_extension_parameters.chart_date_range
+                                        ]);
                                 });
                         }
                     );

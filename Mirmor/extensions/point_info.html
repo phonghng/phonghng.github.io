@@ -34,9 +34,14 @@
         let StatusBar_class = new StatusBar(document.body);
 
         let data = {
-            phnotion_point_info_return: [],
+            /* point_infos: [], */
             last_updated: undefined
         };
+
+        function average(ctx) {
+            const values = ctx.chart.data.datasets[0].data;
+            return values.reduce((a, b) => a + b, 0) / values.length;
+        }
 
         let ctx = document.querySelector("canvas");
         let chartjs = new Chart(ctx, {
@@ -61,58 +66,68 @@
             }
         });
 
-        function update_data(date_point_infos, percent_criterions) {
+        function update_data(point_infos, percent_criterions, chart_date_range) {
             const Mipo_name = percent_criterion => `Mipo-${percent_criterion * 100}`;
             const Amipo_name = percent_criterion => `Amipo-${percent_criterion * 100}`;
-
-            data.last_updated = Date.now();
-            info_onchange();
+            const Amepo_name = percent_criterion => `Amepo-${percent_criterion * 100}`;
+            const is_in_chart_date_range = date =>
+                new Date(chart_date_range[0]).getTime() <= new Date(date).getTime()
+                && new Date(date).getTime() <= new Date(chart_date_range[1]).getTime();
 
             let Amipo = Object.fromEntries(
                 percent_criterions.map(
                     percent_criterion => [percent_criterion, 0]
                 )
             );
-            for (let i = 0; i < date_point_infos.length; i++) {
-                let point_ratio = date_point_infos[i].point / date_point_infos[i].goal_point;
+            for (let i = 0; i < point_infos.length; i++) {
+                let point_ratio = point_infos[i].point / point_infos[i].goal_point;
                 for (let percent_criterion of percent_criterions) {
-                    date_point_infos[i][Mipo_name(percent_criterion)] =
+                    point_infos[i][Mipo_name(percent_criterion)] =
                         parseInt((Math.floor(point_ratio * 100) / 100 - percent_criterion) * 100)
-                    Amipo[percent_criterion] += date_point_infos[i][Mipo_name(percent_criterion)];
-                    date_point_infos[i][Amipo_name(percent_criterion)] = Amipo[percent_criterion]
+                    Amipo[percent_criterion] += point_infos[i][Mipo_name(percent_criterion)];
+                    point_infos[i][Amipo_name(percent_criterion)] = Amipo[percent_criterion];
+                    point_infos[i][Amepo_name(percent_criterion)] =
+                        (Amipo[percent_criterion] / (i + 1)).toFixed(2);
                 }
             }
 
-            let mapped_date_point_infos = {
-                date: date_point_infos.map(date_point_info => date_point_info.date)
+            /* data.point_infos = point_infos; */
+            data.last_updated = Date.now();
+            info_onchange();
+
+            point_infos = point_infos.filter(point_info => is_in_chart_date_range(point_info.date));
+            let mapped_point_infos = {
+                date: point_infos.map(point_info => point_info.date)
             };
             for (let percent_criterion of percent_criterions) {
-                mapped_date_point_infos[Mipo_name(percent_criterion)] =
-                    date_point_infos.map(date_point_info => date_point_info[Mipo_name(percent_criterion)]);
-                mapped_date_point_infos[Amipo_name(percent_criterion)] =
-                    date_point_infos.map(date_point_info => date_point_info[Amipo_name(percent_criterion)]);
+                mapped_point_infos[Mipo_name(percent_criterion)] =
+                    point_infos.map(point_info => point_info[Mipo_name(percent_criterion)]);
+                mapped_point_infos[Amipo_name(percent_criterion)] =
+                    point_infos.map(point_info => point_info[Amipo_name(percent_criterion)]);
+                mapped_point_infos[Amepo_name(percent_criterion)] =
+                    point_infos.map(point_info => point_info[Amepo_name(percent_criterion)]);
             }
 
-            update_chart(mapped_date_point_infos);
+            update_chart(mapped_point_infos);
         }
 
-        function generate_chart_datasets(mapped_date_point_infos) {
+        function generate_chart_datasets(mapped_point_infos) {
             let datasets = [];
-            for (let key in mapped_date_point_infos)
+            for (let key in mapped_point_infos)
                 if (key != "date")
                     datasets.push({
                         label: key,
-                        data: mapped_date_point_infos[key],
+                        data: mapped_point_infos[key],
                         type: key.startsWith("Mipo") ? "bar" : "line",
-                        yAxisID: key.split("-")[0]
+                        yAxisID: key.includes("Mipo") || key.includes("Amepo") ? "Mipo" : "Amipo"
                     });
             return datasets;
         }
 
-        function update_chart(mapped_date_point_infos) {
+        function update_chart(mapped_point_infos) {
             chartjs.data = {
-                labels: mapped_date_point_infos.date,
-                datasets: generate_chart_datasets(mapped_date_point_infos)
+                labels: mapped_point_infos.date,
+                datasets: generate_chart_datasets(mapped_point_infos)
             };
             chartjs.update();
         }
