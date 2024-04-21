@@ -93,14 +93,28 @@
             border-radius: 10px;
         }
 
-        #KL2D4cd {
-            --width: 3;
-            --height: 3;
+        @media screen and (min-width: 450px) {
+            #KL2D4cd {
+                --width: 3;
+                --height: 3;
+            }
+
+            #drmN48S {
+                --width: 3;
+                --height: 2;
+            }
         }
 
-        #drmN48S {
-            --width: 3;
-            --height: 2;
+        @media screen and (max-width: 450px) {
+            #KL2D4cd {
+                --width: 2;
+                --height: 2;
+            }
+
+            #drmN48S {
+                --width: 2;
+                --height: 1;
+            }
         }
     </style>
 </head>
