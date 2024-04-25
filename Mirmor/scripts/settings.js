@@ -40,7 +40,7 @@ const HABITS = {
                     type: "habit_check",
                     name: "Ăn sáng",
                     required: true,
-                    point: 50
+                    point: 100
                 },
             }
         },
@@ -66,7 +66,7 @@ const HABITS = {
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.month;
                             },
-                            point: 100
+                            point: 50
                         },
                         review_Mirmor: {
                             type: "habit_check",
@@ -74,7 +74,7 @@ const HABITS = {
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.month;
                             },
-                            point: 100
+                            point: 50
                         },
                         summer_vacation_plan: {
                             type: "habit_check",
@@ -108,7 +108,7 @@ const HABITS = {
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.week;
                     },
-                    point: 15
+                    point: 25
                 },
                 cut_nails_toes: {
                     type: "habit_check",
@@ -116,7 +116,7 @@ const HABITS = {
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.week;
                     },
-                    point: 15
+                    point: 25
                 },
                 beard_trimming: {
                     type: "habit_check",
@@ -124,7 +124,7 @@ const HABITS = {
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.week;
                     },
-                    point: 15
+                    point: 25
                 },
                 cut_hair: {
                     type: "habit_check",
@@ -132,7 +132,7 @@ const HABITS = {
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.month;
                     },
-                    point: 15
+                    point: 25
                 }
             }
         },
@@ -162,19 +162,19 @@ const HABITS = {
                         fruit: {
                             type: "habit_check",
                             name: "Trái cây",
-                            required: true,
-                            point: 50
+                            required: false,
+                            point: 100
                         },
                         seafood: {
                             type: "habit_check",
                             name: "Hải sản",
-                            required: true,
+                            required: false,
                             point: 100
                         },
                         nuts_and_whole_grains: {
                             type: "habit_check",
                             name: "Hạt và ngũ cốc",
-                            required: true,
+                            required: false,
                             point: 50
                         }
                     }
@@ -225,19 +225,19 @@ const HABITS = {
                         fruit: {
                             type: "habit_check",
                             name: "Trái cây",
-                            required: true,
-                            point: 50
+                            required: false,
+                            point: 100
                         },
                         seafood: {
                             type: "habit_check",
                             name: "Hải sản",
-                            required: true,
+                            required: false,
                             point: 100
                         },
                         nuts_and_whole_grains: {
                             type: "habit_check",
                             name: "Hạt và ngũ cốc",
-                            required: true,
+                            required: false,
                             point: 50
                         }
                     }
@@ -278,12 +278,6 @@ const HABITS = {
             type: "group",
             name: "Buổi tối",
             children: {
-                make_linh_chi: {
-                    type: "habit_check",
-                    name: "Pha nước linh chi",
-                    required: true,
-                    point: 15
-                },
                 evening_hygiene: {
                     type: "habit_check",
                     name: "Đánh răng, rửa mặt tối",
