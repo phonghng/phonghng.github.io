@@ -314,23 +314,29 @@ const HABITS = {
             type: "group",
             name: "Tổng kết ngày",
             children: {
-                undiscipline: {
-                    type: "habit_number",
-                    name: "Hành vi làm giảm sự kỉ luật",
+                road_to_botm: {
+                    type: "habit_check",
+                    name: "Góp phần tích cực vào thực hiện mục tiêu tháng",
                     required: true,
-
-                    unit: "hành vi",
-                    point_per_value: -50,
-                    goal_value: 0
+                    point: 25
                 },
-                unhappiness: {
+                discipline: {
                     type: "habit_number",
-                    name: "Hành vi làm giảm sự hạnh phúc",
+                    name: "Hành vi làm tăng sự kỉ luật",
                     required: true,
 
                     unit: "hành vi",
-                    point_per_value: -50,
-                    goal_value: 0
+                    point_per_value: 50,
+                    goal_value: 3
+                },
+                happiness: {
+                    type: "habit_number",
+                    name: "Hành vi làm tăng sự hạnh phúc",
+                    required: true,
+
+                    unit: "hành vi",
+                    point_per_value: 75,
+                    goal_value: 1
                 },
                 completed_todo: {
                     type: "habit_number",
@@ -338,7 +344,7 @@ const HABITS = {
                     required: true,
 
                     unit: "việc",
-                    point_per_value: 50,
+                    point_per_value: 25,
                     goal_value: 3
                 },
                 planted_Forest_tree: {
@@ -347,7 +353,7 @@ const HABITS = {
                     required: true,
 
                     unit: "cây (25 phút)",
-                    point_per_value: 50,
+                    point_per_value: 25,
                     goal_value: 1
                 },
                 good_experience: {
@@ -356,8 +362,14 @@ const HABITS = {
                     required: true,
 
                     unit: "hoạt động",
-                    point_per_value: 50,
+                    point_per_value: 100,
                     goal_value: 1
+                },
+                overpass_amepo: {
+                    type: "habit_check",
+                    name: "Amipo-85 (không kể mục này) vượt Amepo-85",
+                    required: false,
+                    point: 50
                 }
             }
         },
@@ -374,6 +386,12 @@ const HABITS = {
                     type: "habit_ext",
                     name: "Xem dữ liệu Mirmor hôm nay",
                     extension_id: "view_data"
+                },
+                free_50_point: {
+                    type: "habit_check",
+                    name: "50 điểm miễn phí",
+                    required: false,
+                    point: 50
                 }
             }
         }
@@ -386,7 +404,7 @@ const EXTENSIONS = {
         filename: "point_info.html"
     },
     view_data: {
-        name: "Xem dữ liệu",
+        name: "Dữ liệu Mirmor hôm nay",
         filename: "view_data.html"
     }
 };
