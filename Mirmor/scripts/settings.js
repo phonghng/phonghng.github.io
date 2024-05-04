@@ -314,20 +314,47 @@ const HABITS = {
             type: "group",
             name: "Tổng kết ngày",
             children: {
-                road_to_botm: {
-                    type: "habit_check",
+                road_to_monthly_goal: {
+                    type: "group",
                     name: "Góp phần tích cực vào thực hiện mục tiêu tháng",
-                    required: true,
-                    point: 25
+                    children: {
+                        vnoi_wiki: {
+                            type: "habit_check",
+                            name: "Học lí thuyết 2* trên VNOI Wiki",
+                            required: true,
+                            point: 25
+                        },
+                        cp_excercise: {
+                            type: "habit_number",
+                            name: "Hoàn thành bài tập lập trình thi đấu",
+                            required: true,
+                            point: 25
+                        }
+                    }
                 },
                 discipline: {
-                    type: "habit_number",
-                    name: "Hành vi làm tăng sự kỉ luật",
-                    required: true,
-
-                    unit: "hành vi",
-                    point_per_value: 50,
-                    goal_value: 3
+                    type: "group",
+                    name: "Kỉ luật",
+                    children: {
+                        no_X: {
+                            type: "habit_check",
+                            name: "Không X",
+                            required: true,
+                            point: 50
+                        },
+                        no_coca: {
+                            type: "habit_check",
+                            name: "Không uống vặt, ăn vặt",
+                            required: true,
+                            point: 100
+                        },
+                        no_entertain_more_180: {
+                            type: "habit_check",
+                            name: "Không sử dụng TikTok, Facebook quá 180 phút",
+                            required: true,
+                            point: 50
+                        },
+                    }
                 },
                 happiness: {
                     type: "habit_number",
