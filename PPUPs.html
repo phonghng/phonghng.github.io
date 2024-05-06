@@ -42,6 +42,7 @@
         #item_list {
             height: 100%;
             margin: 0 auto;
+            transition: all 0.25s;
         }
 
         .item {
@@ -72,6 +73,7 @@
             border: 2px solid #FFFFFF;
             width: calc(100% - 4px);
             height: calc(100% - 4px);
+            transition: all 0.25s;
         }
 
         .item img:nth-child(2) {
@@ -81,6 +83,7 @@
             width: calc(35% - 4px);
             box-shadow: 3px 3px 15px 3px #18191A;
             margin-left: calc(-35%);
+            transition: all 0.25s;
         }
 
         .item.widget {
@@ -93,6 +96,42 @@
             border-radius: 10px;
         }
 
+        .folder .item.button {
+            background-color: color-mix(in srgb, var(--color) 100%, #212121 100%);
+        }
+
+        .folder .item:not(.button) {
+            display: none;
+            opacity: 0;
+            background-color: color-mix(in srgb, var(--color) 50%, #212121 100%);
+        }
+
+        .folder .item:hover {
+            background-color: color-mix(in srgb, var(--color) 100%, #212121 25%);
+        }
+
+        .folder .item:active {
+            background-color: color-mix(in srgb, var(--color) 100%, #212121 100%);
+        }
+
+        .folder[data-opened="true"] .item:not(.button) {
+            display: flex;
+            opacity: 1;
+        }
+
+        .folder[data-opened="true"] .item.button {
+            background-color: color-mix(in srgb, var(--color) 100%, #212121 25%);
+        }
+
+        .folder[data-opened="true"] .item.button img {
+            border-radius: 10px;
+        }
+
+        .folder[data-opened="false"] .item.button img {
+            border-radius: 100%;
+        }
+    </style>
+    <style>
         @media screen and (min-width: 450px) {
             #MoMo {
                 --width: 2;
@@ -131,27 +170,29 @@
 
 <body>
     <div id="item_list">
-        <div class="item widget" id="PhongHNg" data-link="https://phonghng.github.io/images/PhongHNg.png">
-            <img src="./images/PhongHNg.png" style="--base_color: #FFFFFF;">
-        </div>
         <div class="item widget" id="TKB" data-link="https://i.ibb.co/drmN48S/IMG-20240420-063714.jpg">
             <img src="https://i.ibb.co/drmN48S/IMG-20240420-063714.jpg" style="--base_color: #FFFFFF;">
         </div>
         <div class="item widget" id="MoMo" data-link="https://i.ibb.co/ZHFg8g6/image.png">
             <img src="https://i.ibb.co/ZHFg8g6/image.png" style="--base_color: #FFFFFF;">
         </div>
-        <div class="item" data-link="https://phonghng.github.io/Mirmor">
-            <img src="./images/Mirmor.png" style="--base_color: #FFFFFF;">
-        </div>
-        <div class="item" data-link="https://phonghng.github.io/Phinance">
-            <img src="./images/Phinance.png" style="--base_color: #FFFFFF;">
-        </div>
-        <div class="item" data-link="https://phonghng.github.io/NHP_TOTP">
-            <img src="./images/NHP_TOTP.png" style="--base_color: #FFFFFF;">
-        </div>
-        <div class="item"
-            data-link="https://www.notion.so/phonghng/a4091a58e4764b22a38ef9d8481b0595?v=b593d6a214174905b0c8785c1e19ecea">
-            <img src="https://i.ibb.co/DL035LX/PPUP-RMS.png" style="--base_color: #FFFFFF;">
+        <div class="folder" data-opened="false" style="--color: var(--BLUE);">
+            <div class="item button" title="PPUP và Pipi">
+                <img src="./images/PhongHNg.png" style="--base_color: #FFFFFF;">
+            </div>
+            <div class="item" data-link="https://phonghng.github.io/Mirmor">
+                <img src="./images/Mirmor.png" style="--base_color: #FFFFFF;">
+            </div>
+            <div class="item" data-link="https://phonghng.github.io/Phinance">
+                <img src="./images/Phinance.png" style="--base_color: #FFFFFF;">
+            </div>
+            <div class="item" data-link="https://phonghng.github.io/NHP_TOTP">
+                <img src="./images/NHP_TOTP.png" style="--base_color: #FFFFFF;">
+            </div>
+            <div class="item"
+                data-link="https://www.notion.so/phonghng/a4091a58e4764b22a38ef9d8481b0595?v=b593d6a214174905b0c8785c1e19ecea">
+                <img src="https://i.ibb.co/DL035LX/PPUP-RMS.png" style="--base_color: #FFFFFF;">
+            </div>
         </div>
         <div class="item" data-link="https://notion.so/">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW1JdqGvw4e2SZxFuFpb853z9Wq2XR1IbNQnnpU3jZrQ&s"
@@ -185,6 +226,10 @@
             <img src="https://i.pinimg.com/originals/ff/6a/65/ff6a655da8d0c6f5ca3ce1aa37cc904e.png"
                 style="--base_color: #FFFFFF;">
         </div>
+        <div class="item" data-link="https://www.youtube.com/">
+            <img src="https://static-00.iconduck.com/assets.00/youtube-icon-2048x2048-wiwalbpx.png"
+                style="--base_color: #FF0000;">
+        </div>
         <div class="item" data-link="https://facebook.com/">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg"
                 style="--base_color: #0866FF;">
@@ -201,9 +246,9 @@
         </div>
         <div class="item"
             data-link="https://docs.google.com/spreadsheets/d/1xO_BU7omIyCwUsq57KnWhPVAYRsxmxqq5HI9T7jkCkU/edit?usp=sharingc">
-            <img src="https://static.vecteezy.com/system/resources/previews/027/179/355/original/google-sheet-spreadsheet-icon-logo-symbol-free-png.png" style="--base_color: #FFFFFF;">
-            <img src="./images/PhongHNg.png"
+            <img src="https://static.vecteezy.com/system/resources/previews/027/179/355/original/google-sheet-spreadsheet-icon-logo-symbol-free-png.png"
                 style="--base_color: #FFFFFF;">
+            <img src="./images/PhongHNg.png" style="--base_color: #FFFFFF;">
         </div>
         <div class="item" data-link="http://thptchuyenthainguyen.edu.vn/">
             <img src="https://upload.wikimedia.org/wikipedia/vi/3/3d/Logo_CTN.png" style="--base_color: #FDE427;">
@@ -212,20 +257,33 @@
             <img src="https://i.ibb.co/727ngxD/android-chrome-192x192.png" style="--base_color: #FFFFFF;">
         </div>
         <div class="item" data-link="https://mail.google.com/mail/u/1/">
-            <img src="https://cdn1.iconfinder.com/data/icons/google-new-logos-1/32/gmail_new_logo-512.png" style="--base_color: #FFFFFF;">
+            <img src="https://cdn.iconscout.com/icon/free/png-256/free-google-mail-new-4762011-3955524.png"
+                style="--base_color: #FFFFFF;">
             <img src="./images/PhongHNg.png" style="--base_color: #FFFFFF;">
         </div>
         <div class="item" data-link="https://www.canva.com/">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Canva_logo..png" style="--base_color: #00C4CD;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Canva_logo..png"
+                style="--base_color: #00C4CD;">
+        </div>
+        <div class="item" data-link="https://www.geogebra.org/calculator">
+            <img src="https://thumbor-api.gynzy.com/fws3mYgO1ZX6IvjSxDTNwDmE2hA=/fit-in/320x288/https://media.gynzy.com/content-thumbnail%252Ftool%252F101_da_766.png"
+                style="--base_color: #FFFFFF;">
         </div>
     </div>
 
     <script>
-        let items = document.querySelectorAll(".item");
+        let items = document.querySelectorAll(".item:not(.button)");
         for (let item of items) {
             item.title = item.dataset.link;
             item.onclick = () => location.href = item.dataset.link;
         }
+
+        let folders = document.querySelectorAll(".folder");
+        for (let folder of folders)
+            folder.querySelector(".item.button").onclick = () => {
+                folder.dataset.opened = folder.dataset.opened == "false";
+                mansory.layout();
+            };
 
         let mansory = new Masonry("#item_list", {
             itemSelector: ".item",
