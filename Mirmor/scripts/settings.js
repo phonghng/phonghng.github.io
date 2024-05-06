@@ -325,7 +325,7 @@ const HABITS = {
                             point: 25
                         },
                         cp_excercise: {
-                            type: "habit_number",
+                            type: "habit_check",
                             name: "Hoàn thành bài tập lập trình thi đấu",
                             required: true,
                             point: 25
