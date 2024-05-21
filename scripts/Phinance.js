@@ -33,7 +33,8 @@ const PAYMENT_CATEGORIES = {
     "SuaDo": "Sửa đồ",
     "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
     "AnUongPhu": "Ăn uống phụ",
-    "CatToc": "Cắt tóc"
+    "CatToc": "Cắt tóc",
+    "XemPhim": "Xem phim rạp"
 };
 
 const NOTIFICATION_TEXTS = {
