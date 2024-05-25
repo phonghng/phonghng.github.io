@@ -356,15 +356,6 @@ const HABITS = {
                         },
                     }
                 },
-                happiness: {
-                    type: "habit_number",
-                    name: "Hành vi làm tăng sự hạnh phúc",
-                    required: true,
-
-                    unit: "hành vi",
-                    point_per_value: 75,
-                    goal_value: 1
-                },
                 completed_todo: {
                     type: "habit_number",
                     name: "Hoàn thành việc cần làm",
@@ -383,20 +374,62 @@ const HABITS = {
                     point_per_value: 25,
                     goal_value: 1
                 },
-                good_experience: {
-                    type: "habit_number",
-                    name: "Tham gia trải nghiệm giúp phát triển",
-                    required: true,
-
-                    unit: "hoạt động",
-                    point_per_value: 100,
-                    goal_value: 1
-                },
                 overpass_amepo: {
                     type: "habit_check",
                     name: "Amipo-85 (không kể mục này) vượt Amepo-85",
                     required: false,
                     point: 50
+                }
+            }
+        },
+        meanings_of_life: {
+            type: "group",
+            name: "Tổng kết lẽ sống",
+            children: {
+                mental_health: {
+                    type: "habit_number",
+                    name: "Sức khoẻ tinh thần",
+                    required: true,
+
+                    unit: "điểm cộng",
+                    point_per_value: 25,
+                    goal_value: 1
+                },
+                physical_health: {
+                    type: "habit_number",
+                    name: "Sức khoẻ thể chất",
+                    required: true,
+
+                    unit: "điểm cộng",
+                    point_per_value: 25,
+                    goal_value: 1
+                },
+                social_dedication: {
+                    type: "habit_number",
+                    name: "Cống hiến xã hội",
+                    required: true,
+
+                    unit: "điểm cộng",
+                    point_per_value: 25,
+                    goal_value: 1
+                },
+                social_interaction: {
+                    type: "habit_number",
+                    name: "Tương tác xã hội",
+                    required: true,
+
+                    unit: "điểm cộng",
+                    point_per_value: 25,
+                    goal_value: 1
+                },
+                individual_ability: {
+                    type: "habit_number",
+                    name: "Năng lực bản thân",
+                    required: true,
+
+                    unit: "điểm cộng",
+                    point_per_value: 25,
+                    goal_value: 1
                 }
             }
         },
