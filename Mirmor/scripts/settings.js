@@ -357,10 +357,10 @@ const HABITS = {
                 },
                 planted_Forest_tree: {
                     type: "habit_number",
-                    name: "Trồng cây Forest",
+                    name: "Trồng cây Forest hoặc tập trung làm việc",
                     required: true,
 
-                    unit: "cây (25 phút)",
+                    unit: "cây/25 phút",
                     point_per_value: 25,
                     goal_value: 1
                 },
@@ -369,56 +369,14 @@ const HABITS = {
                     name: "Amipo-85 (không kể mục này) vượt Amepo-85",
                     required: false,
                     point: 50
-                }
-            }
-        },
-        meanings_of_life: {
-            type: "group",
-            name: "Tổng kết lẽ sống",
-            children: {
-                mental_health: {
-                    type: "habit_number",
-                    name: "Sức khoẻ tinh thần",
-                    required: true,
-
-                    unit: "điểm cộng",
-                    point_per_value: 25,
-                    goal_value: 1
                 },
-                physical_health: {
+                dev_act: {
                     type: "habit_number",
-                    name: "Sức khoẻ thể chất",
-                    required: true,
+                    name: "Tham gia hoạt động giúp phát triển bản thân",
+                    required: false,
 
-                    unit: "điểm cộng",
-                    point_per_value: 25,
-                    goal_value: 1
-                },
-                social_dedication: {
-                    type: "habit_number",
-                    name: "Cống hiến xã hội",
-                    required: true,
-
-                    unit: "điểm cộng",
-                    point_per_value: 25,
-                    goal_value: 1
-                },
-                social_interaction: {
-                    type: "habit_number",
-                    name: "Tương tác xã hội",
-                    required: true,
-
-                    unit: "điểm cộng",
-                    point_per_value: 25,
-                    goal_value: 1
-                },
-                individual_ability: {
-                    type: "habit_number",
-                    name: "Năng lực bản thân",
-                    required: true,
-
-                    unit: "điểm cộng",
-                    point_per_value: 25,
+                    unit: "hoạt động",
+                    point_per_value: 50,
                     goal_value: 1
                 }
             }
