@@ -13,7 +13,7 @@ class PHNotion_Hey_Mirmor {
         this.options = Object.assign({}, options, {
             point_info_extension_parameters: {
                 percent_criterions: [0.75],
-                chart_date_range: ["2024-04-01", "2024-08-31"]
+                chart_date_range: ["2024-03-25", "2024-08-31"]
             },
             texts: {
                 password_prompt: "Nhập mật khẩu",

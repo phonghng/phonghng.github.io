@@ -57,6 +57,11 @@
                         display: true,
                         position: "left",
                     },
+                    Amepo: {
+                        type: "linear",
+                        display: true,
+                        position: "left",
+                    },
                     Amipo: {
                         type: "linear",
                         display: true,
@@ -119,7 +124,7 @@
                         label: key,
                         data: mapped_point_infos[key],
                         type: key.startsWith("Mipo") ? "bar" : "line",
-                        yAxisID: key.includes("Mipo") || key.includes("Amepo") ? "Mipo" : "Amipo"
+                        yAxisID: key.split("-")[0]
                     });
             return datasets;
         }
