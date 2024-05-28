@@ -68,17 +68,9 @@ const HABITS = {
                             },
                             point: 50
                         },
-                        review_Mirmor: {
-                            type: "habit_check",
-                            name: "Đánh giá tổng thể Mirmor",
-                            required: (arguments) => {
-                                return arguments.XDate_function().is_last_day_of.month;
-                            },
-                            point: 50
-                        },
                         summer_vacation_plan: {
                             type: "habit_check",
-                            name: "Tổng kết năm học qua, lên kế hoạch cho kì nghỉ hè tới",
+                            name: "Tổng kết năm học qua, lập kế hoạch thực hiện các mục tiêu, lập kế hoạch thực hiện năm trụ cột phát triển (sức khoẻ tinh thần, sức khoẻ thể chất, cống hiến xã hội, tương tác xã hội, năng lực bản thân) cho kì nghỉ hè tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.academic_year;
                             },
@@ -86,7 +78,7 @@ const HABITS = {
                         },
                         academic_year_plan: {
                             type: "habit_check",
-                            name: "Tổng kết kì nghỉ hè qua, lên kế hoạch cho năm học tới",
+                            name: "Tổng kết kì nghỉ hè qua, lập kế hoạch thực hiện các mục tiêu, lập kế hoạch thực hiện năm trụ cột phát triển (sức khoẻ tinh thần, sức khoẻ thể chất, cống hiến xã hội, tương tác xã hội, năng lực bản thân) cho năm học tới",
                             required: (arguments) => {
                                 return arguments.XDate_function().is_last_day_of.summer_vacation;
                             },
@@ -101,6 +93,22 @@ const HABITS = {
                             point: 150
                         }
                     }
+                },
+                review_Mirmor: {
+                    type: "habit_check",
+                    name: "Rà soát, đánh giá, sửa đổi, bổ sung tổng thể Mirmor",
+                    required: (arguments) => {
+                        return arguments.XDate_function().is_last_day_of.month;
+                    },
+                    point: 50
+                },
+                review_PPUP_RMS: {
+                    type: "habit_check",
+                    name: "Rà soát, sửa đổi, bổ sung PPUP-RMS",
+                    required: (arguments) => {
+                        return arguments.XDate_function().is_last_day_of.month;
+                    },
+                    point: 50
                 },
                 wash_face_towel: {
                     type: "habit_check",
@@ -179,15 +187,9 @@ const HABITS = {
                         }
                     }
                 },
-                dhc_vitamin_c: {
+                noon_take_medicines: {
                     type: "habit_check",
-                    name: "Uống hai viên DHC Vitamin C sau ăn trưa",
-                    required: true,
-                    point: 15
-                },
-                dhc_canxi_lunch: {
-                    type: "habit_check",
-                    name: "Uống hai viên DHC Canxi sau ăn trưa 30 phút",
+                    name: "Uống các loại thuốc (buổi trưa)",
                     required: true,
                     point: 15
                 },
@@ -242,9 +244,9 @@ const HABITS = {
                         }
                     }
                 },
-                dhc_canxi_dinner: {
+                evening_take_medicines: {
                     type: "habit_check",
-                    name: "Uống hai viên DHC Canxi sau ăn tối 30 phút",
+                    name: "Uống các loại thuốc (buổi tối)",
                     required: true,
                     point: 15
                 },
@@ -257,20 +259,26 @@ const HABITS = {
                     point_per_value: 5,
                     goal_value: 5
                 },
-                study_for_tomorrow: {
-                    type: "habit_check",
-                    name: "Học, chuẩn bị bài cho ngày mai",
-                    required: true,
-                    point: 50
-                },
-                code_competitive_programming: {
-                    type: "habit_number",
-                    name: "Luyện lập lập trình thi đấu",
-                    required: true,
-
-                    unit: "bài",
-                    point_per_value: 50,
-                    goal_value: 1
+                road_to_monthly_goal: {
+                    type: "group",
+                    name: "Góp phần tích cực vào thực hiện mục tiêu tháng",
+                    children: {
+                        vnoi_wiki: {
+                            type: "habit_check",
+                            name: "Học lí thuyết 2* trên VNOI Wiki",
+                            required: true,
+                            point: 25
+                        },
+                        code_competitive_programming: {
+                            type: "habit_number",
+                            name: "Luyện lập lập trình thi đấu",
+                            required: true,
+        
+                            unit: "bài",
+                            point_per_value: 50,
+                            goal_value: 1
+                        }
+                    }
                 },
             }
         },
@@ -314,24 +322,6 @@ const HABITS = {
             type: "group",
             name: "Tổng kết ngày",
             children: {
-                road_to_monthly_goal: {
-                    type: "group",
-                    name: "Góp phần tích cực vào thực hiện mục tiêu tháng",
-                    children: {
-                        vnoi_wiki: {
-                            type: "habit_check",
-                            name: "Học lí thuyết 2* trên VNOI Wiki",
-                            required: true,
-                            point: 25
-                        },
-                        cp_excercise: {
-                            type: "habit_check",
-                            name: "Hoàn thành bài tập lập trình thi đấu",
-                            required: true,
-                            point: 25
-                        }
-                    }
-                },
                 discipline: {
                     type: "group",
                     name: "Kỉ luật",
