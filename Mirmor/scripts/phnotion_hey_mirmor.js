@@ -13,7 +13,8 @@ class PHNotion_Hey_Mirmor {
         this.options = Object.assign({}, options, {
             point_info_extension_parameters: {
                 percent_criterions: [0.75],
-                chart_date_range: ["2024-03-25", "2024-08-31"]
+                chart_date_range: ["2024-05-31", "2024-08-31"]
+                // 29/3/2024 có Amepo-75 cao nhất với 10.08
             },
             texts: {
                 password_prompt: "Nhập mật khẩu",
