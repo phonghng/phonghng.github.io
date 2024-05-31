@@ -263,20 +263,23 @@ const HABITS = {
                     type: "group",
                     name: "Góp phần tích cực vào thực hiện mục tiêu tháng",
                     children: {
-                        vnoi_wiki: {
+                        overpass_amepo: {
                             type: "habit_check",
-                            name: "Học lí thuyết 2* trên VNOI Wiki",
+                            name: "Mipo (không kể mục này) vượt Amepo",
                             required: true,
-                            point: 25
+                            point: 50
                         },
-                        code_competitive_programming: {
-                            type: "habit_number",
-                            name: "Luyện lập lập trình thi đấu",
+                        HungVuong: {
+                            type: "habit_check",
+                            name: "Đỗ đội tuyển Hùng Vương",
                             required: true,
-        
-                            unit: "bài",
-                            point_per_value: 50,
-                            goal_value: 1
+                            point: 50
+                        },
+                        cp_exercise: {
+                            type: "habit_check",
+                            name: "Giải quyết xong cơ bản BT LTTĐ từ đội dự tuyển và lớp 6 tỉnh",
+                            required: true,
+                            point: 50
                         }
                     }
                 },
@@ -322,29 +325,23 @@ const HABITS = {
             type: "group",
             name: "Tổng kết ngày",
             children: {
-                discipline: {
-                    type: "group",
-                    name: "Kỉ luật",
-                    children: {
-                        no_X: {
-                            type: "habit_check",
-                            name: "Không X",
-                            required: true,
-                            point: 50
-                        },
-                        no_coca: {
-                            type: "habit_check",
-                            name: "Không uống vặt, ăn vặt",
-                            required: true,
-                            point: 100
-                        },
-                        no_entertain_more_180: {
-                            type: "habit_check",
-                            name: "Không sử dụng TikTok, Facebook quá 180 phút",
-                            required: true,
-                            point: 50
-                        },
-                    }
+                no_X: {
+                    type: "habit_check",
+                    name: "Không X",
+                    required: true,
+                    point: 50
+                },
+                no_coca: {
+                    type: "habit_check",
+                    name: "Không uống vặt, ăn vặt",
+                    required: true,
+                    point: 100
+                },
+                no_entertain_more_180: {
+                    type: "habit_check",
+                    name: "Không sử dụng TikTok, Facebook quá 180 phút",
+                    required: true,
+                    point: 50
                 },
                 completed_todo: {
                     type: "habit_number",
@@ -363,12 +360,6 @@ const HABITS = {
                     unit: "cây/25 phút",
                     point_per_value: 25,
                     goal_value: 1
-                },
-                overpass_amepo: {
-                    type: "habit_check",
-                    name: "Amipo-85 (không kể mục này) vượt Amepo-85",
-                    required: false,
-                    point: 50
                 },
                 dev_act: {
                     type: "habit_number",
