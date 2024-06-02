@@ -269,15 +269,9 @@ const HABITS = {
                             required: true,
                             point: 50
                         },
-                        HungVuong: {
+                        cp: {
                             type: "habit_check",
-                            name: "Đỗ đội tuyển Hùng Vương",
-                            required: true,
-                            point: 50
-                        },
-                        cp_exercise: {
-                            type: "habit_check",
-                            name: "Giải quyết xong cơ bản BT LTTĐ từ đội dự tuyển và lớp 6 tỉnh",
+                            name: "Giải quyết xong LT (CB/TB); BT CTN 23-24, HNLCQNTNTB, Dự tuyển 24-25",
                             required: true,
                             point: 50
                         }
