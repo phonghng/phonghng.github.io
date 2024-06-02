@@ -1,0 +1,131 @@
+* {
+    box-sizing: unset;
+    -webkit-box-sizing: unset;
+}
+
+:root {
+    --BLUE: #1877F2;
+    --CHERRY: #F3425F;
+    --GRAPE: #9360F7;
+    --LEMON: #F7B928;
+    --LIME: #45BD62;
+    --PINK: #FF66BF;
+    --SEAFOAM: #54C7EC;
+    --TEAL: #2ABBA7;
+    --TOMATO: #FB724B;
+}
+
+html {
+    height: fit-content;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+body {
+    background-color: #18191A;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+    padding: 20px;
+}
+
+#item_list {
+    height: 100%;
+    margin: 0 auto;
+    transition: all 0.25s;
+}
+
+.item {
+    width: 75px;
+    background-color: #212121;
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.25s;
+    user-select: none;
+    display: flex;
+    align-items: flex-end;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 20px;
+}
+
+.item:hover {
+    background-color: #3A3B3C;
+}
+
+.item:active {
+    background-color: #212121;
+}
+
+.item img:nth-child(1) {
+    border-radius: 100%;
+    background-color: var(--base_color);
+    border: 2px solid #FFFFFF;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    transition: all 0.25s;
+}
+
+.item img:nth-child(2) {
+    border-radius: 100%;
+    background-color: var(--base_color);
+    border: 2px solid #FFFFFF;
+    width: calc(35% - 4px);
+    box-shadow: 3px 3px 15px 3px #18191A;
+    margin-left: calc(-35%);
+    transition: all 0.25s;
+}
+
+.item.widget {
+    width: calc(105px * var(--width) + 20px * (var(--width) - 1) - 30px);
+    height: calc(105px * var(--height) + 20px * (var(--height) - 1) - 30px);
+    aspect-ratio: unset;
+}
+
+.item.widget img {
+    border-radius: 10px;
+}
+
+.item.widget iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border: none;
+}
+
+.folder .item.button {
+    background-color: color-mix(in srgb, var(--color) 100%, #212121 100%);
+}
+
+.folder .item:not(.button) {
+    display: none;
+    opacity: 0;
+    background-color: color-mix(in srgb, var(--color) 50%, #212121 100%);
+}
+
+.folder .item:hover {
+    background-color: color-mix(in srgb, var(--color) 100%, #212121 25%);
+}
+
+.folder .item:active {
+    background-color: color-mix(in srgb, var(--color) 100%, #212121 100%);
+}
+
+.folder[data-opened="true"] .item:not(.button) {
+    display: flex;
+    opacity: 1;
+}
+
+.folder[data-opened="true"] .item.button {
+    background-color: color-mix(in srgb, var(--color) 100%, #212121 25%);
+}
+
+.folder[data-opened="true"] .item.button img {
+    border-radius: 10px;
+}
+
+.folder[data-opened="false"] .item.button img {
+    border-radius: 100%;
+}
