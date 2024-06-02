@@ -19,19 +19,30 @@
             background-color: var(--GREY_3);
             padding: 15px;
             margin: 10px;
+            display: grid;
+            grid-template-columns: 1fr max-content;
+            grid-template-rows: 1fr;
+            gap: 0px 10px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                "title countdown";
         }
 
         .item .title {
+            grid-area: title;
             font-size: 16px;
             display: inline;
+            align-content: center;
         }
 
         .item .countdown {
+            grid-area: countdown;
             font-size: 18px;
             font-weight: bold;
             float: right;
             text-transform: uppercase;
             display: inline;
+            align-content: center;
         }
     </style>
 </head>
@@ -42,7 +53,7 @@
         <div class="countdown"></div>
     </div>
     <div class="item" data-date="2024-06-09">
-        <div class="title">Hoàn thành BT CTN 23-24, HNLCQNTNTB, Dự tuyển 24-25</div>
+        <div class="title">Hoàn thành BT CTN, lục tỉnh, dự tuyển 24-25</div>
         <div class="countdown"></div>
     </div>
     <div class="item" data-date="2024-06-16">
