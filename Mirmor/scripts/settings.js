@@ -8,7 +8,7 @@ const HABITS = {
             children: {
                 hanh_vi_hanh_phuc: {
                     type: "habit_number",
-                    name: "Hành vi làm gây sự hạnh phúc",
+                    name: "Hành vi gây sự hạnh phúc",
                     required: false,
 
                     unit: "hành vi",
@@ -17,7 +17,7 @@ const HABITS = {
                 },
                 hanh_vi_bat_hanh: {
                     type: "habit_number",
-                    name: "Hành vi làm gây sự bất hạnh, thể hiện cái tôi quá đáng",
+                    name: "Hành vi gây sự bất hạnh, thể hiện cái tôi quá đáng",
                     required: false,
 
                     unit: "hành vi",
@@ -162,8 +162,8 @@ const HABITS = {
                             required: false,
 
                             unit: "đầu việc",
-                            point_per_value: 0,
-                            goal_value: 15,
+                            point_per_value: 15,
+                            goal_value: 0,
                         },
                         tap_trung_lam_viec: {
                             type: "habit_number",
@@ -171,8 +171,8 @@ const HABITS = {
                             required: false,
 
                             unit: "phút",
-                            point_per_value: 0,
-                            goal_value: 0.5,
+                            point_per_value: 0.5,
+                            goal_value: 0,
                         },
                         hoat_dong_phat_trien: {
                             type: "habit_number",
@@ -180,8 +180,8 @@ const HABITS = {
                             required: false,
 
                             unit: "hoạt động",
-                            point_per_value: 0,
-                            goal_value: 50,
+                            point_per_value: 50,
+                            goal_value: 0,
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
@@ -204,8 +204,8 @@ const HABITS = {
                     required: true,
 
                     unit: "trang",
-                    point_per_value: 3,
-                    goal_value: 15,
+                    point_per_value: 15,
+                    goal_value: 3,
                 },
                 hoat_dong_phat_trien: {
                     type: "habit_number",
@@ -213,8 +213,8 @@ const HABITS = {
                     required: false,
 
                     unit: "hoạt động",
-                    point_per_value: 0,
-                    goal_value: 50,
+                    point_per_value: 50,
+                    goal_value: 0,
                 },
                 khong_tiktok_facebook: {
                     type: "habit_check",
