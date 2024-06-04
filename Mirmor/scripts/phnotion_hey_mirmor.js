@@ -12,16 +12,18 @@ class PHNotion_Hey_Mirmor {
         this.homepage_top_container = homepage_top_container;
         this.options = Object.assign({}, options, {
             point_info_extension_parameters: {
-                percent_criterions: [0.75],
-                chart_date_range: ["2024-05-31", "2024-08-31"]
-                // 29/3/2024 có Amepo-75 cao nhất với 10.08
-            },
-            texts: {
-                password_prompt: "Nhập mật khẩu",
-                wrong_password: "Sai mật khẩu!",
-                missing_password: "Vui lòng nhập mật khẩu!",
-                saved_to_Notion: "Đã lưu vào Notion!",
-                please_wait: "Vui lòng chờ..."
+                percent_criterions: {
+                    "2024-01-01": 0.85, // changed
+                    "2024-02-23": 0.87,
+                    "2024-02-26": 0.85, // changed
+                    "2024-03-05": 0.87,
+                    "2024-03-31": 0.85,
+                    "2024-04-11": 0.80,
+                    "2024-04-14": 0.75,
+                    "2024-04-25": 0.85,
+                    "2024-05-06": 0.75
+                },
+                chart_date_range: ["2024-03-29", "2024-08-31"]
             }
         });
         this.StatusBar_class = new StatusBar(this.homepage_top_container);
@@ -49,11 +51,11 @@ class PHNotion_Hey_Mirmor {
     }
 
     get_endpoint(encrypted_endpoint) {
-        let password = prompt(this.options.texts.password_prompt);
+        let password = prompt("Nhập mật khẩu");
         if (!password) {
             let status_element = document.createElement("span");
             status_element.style.color = "var(--CHERRY)";
-            status_element.innerHTML = this.options.texts.missing_password;
+            status_element.innerHTML = "Vui lòng nhập mật khẩu!";
             this.StatusBar_class.show_status(status_element);
             return undefined;
         }
@@ -63,7 +65,7 @@ class PHNotion_Hey_Mirmor {
         if (!endpoint) {
             let status_element = document.createElement("span");
             status_element.style.color = "var(--CHERRY)";
-            status_element.innerHTML = this.options.texts.wrong_password;
+            status_element.innerHTML = "Sai mật khẩu!";
             this.StatusBar_class.show_status(status_element);
         }
         return endpoint;
@@ -74,7 +76,7 @@ class PHNotion_Hey_Mirmor {
 
         let status_element = document.createElement("span");
         status_element.style.color = "var(--LEMON)";
-        status_element.innerHTML = this.options.texts.please_wait;
+        status_element.innerHTML = "Vui lòng chờ...";
         this.StatusBar_class.show_status(status_element);
 
         fetch(`${this.endpoint}/${date_string}`)
@@ -141,12 +143,12 @@ class PHNotion_Hey_Mirmor {
             this.initialization_data,
             (options, object_data_function, json_data_function, string_data_function, date_string) => {
                 if (!options?.is_from_view_data_extension)
-                    Habits_class.data.children.utils.children.view_data
+                    Habits_class.data.children.xem_du_lieu
                         .Extension_class.ExtensionPopup_class
                         .run_function("update_textarea", [string_data_function()]);
                 let json_data = json_data_function();
                 this.StatusBar_class.show_status(json_data);
-                if (Object.entries(json_data["Tiện ích"]["Xem dữ liệu Mirmor hôm nay"].data).length)
+                if (Object.entries(json_data["Xem dữ liệu Mirmor hôm nay"].data).length)
                     this.set(
                         date_string,
                         JSON.stringify(object_data_function()),
@@ -157,13 +159,13 @@ class PHNotion_Hey_Mirmor {
                             status_element.style.color = "var(--LIME)";
                             let point = json_data.point || json_data._point || 0;
                             let goal_point = json_data.goal_point || json_data._goal_point || 0;
-                            status_element.innerHTML = `${this.options.texts.saved_to_Notion} (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
+                            status_element.innerHTML = `Đã lưu vào Notion! (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
                             this.StatusBar_class.show_status(status_element);
 
                             fetch(`${this.endpoint}/`)
                                 .then(response => response.json())
                                 .then(json => {
-                                    Habits_class.data.children.utils.children.point_info
+                                    Habits_class.data.children.xem_thong_ke
                                         .Extension_class.ExtensionPopup_class
                                         .run_function("update_data", [
                                             json,
