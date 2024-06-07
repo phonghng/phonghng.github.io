@@ -42,7 +42,7 @@ class Data {
         }
     }
 
-    to_JSON(data = this.Habits_class.data) {
+    to_JSON(data = this.Habits_class.data, data_id = "") {
         switch (data.type) {
             case "group": {
                 let children = data.children;
@@ -53,7 +53,7 @@ class Data {
 
                 for (let key in children) {
                     let child = children[key];
-                    let child_export = this.to_JSON(child);
+                    let child_export = this.to_JSON(child, data_id + " " + key);
                     children_data[child.name] = child_export;
                     children_data._point += child_export._point || child_export.point || 0;
                     children_data._goal_point += child_export._goal_point || child_export.goal_point || 0;
@@ -82,7 +82,8 @@ class Data {
                 let is_required =
                     typeof data.required == "function"
                         ? data.required({
-                            XDate_function: this.options.XDate_function
+                            XDate_function: this.options.XDate_function,
+                            get_cumulative_info: () => this.options.get_cumulative_info(data)
                         })
                         : data.required;
 
@@ -100,7 +101,8 @@ class Data {
                 let is_required =
                     typeof data.required == "function"
                         ? data.required({
-                            XDate_function: this.options.XDate_function
+                            XDate_function: this.options.XDate_function,
+                            get_cumulative_info: () => this.options.get_cumulative_info(data)
                         })
                         : data.required;
 
@@ -196,7 +198,8 @@ class Data {
                 let is_required =
                     typeof data.required == "function"
                         ? data.required({
-                            XDate_function: this.options.XDate_function
+                            XDate_function: this.options.XDate_function,
+                            get_cumulative_info: () => this.options.get_cumulative_info(data)
                         })
                         : data.required;
                 let point = data.completed_time ? data.point : 0;
@@ -229,7 +232,8 @@ class Data {
                 let is_required =
                     typeof data.required == "function"
                         ? data.required({
-                            XDate_function: this.options.XDate_function
+                            XDate_function: this.options.XDate_function,
+                            get_cumulative_info: () => this.options.get_cumulative_info(data)
                         })
                         : data.required;
                 let point = data.completed_time ? (data.point_per_value * data.goal_value) : 0;

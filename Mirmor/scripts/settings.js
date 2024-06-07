@@ -9,7 +9,7 @@ const HABITS = {
                 hanh_vi_hanh_phuc: {
                     type: "habit_number",
                     name: "Hành vi gây sự hạnh phúc",
-                    required: false,
+                    required: false, // TODO
 
                     unit: "hành vi",
                     point_per_value: 100,
@@ -18,7 +18,7 @@ const HABITS = {
                 hanh_vi_bat_hanh: {
                     type: "habit_number",
                     name: "Hành vi gây sự bất hạnh, thể hiện cái tôi quá đáng",
-                    required: false,
+                    required: false, // TODO
 
                     unit: "hành vi",
                     point_per_value: -75,
@@ -27,18 +27,26 @@ const HABITS = {
                 thoi_gian_ban_than: {
                     type: "habit_check",
                     name: "Dành thời gian tự ngẫm cho bản thân",
-                    point: 50,
+                    cumulative_period: "week",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.week;
-                    }
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
                 },
                 thoi_gian_gia_dinh: {
                     type: "habit_check",
-                    name: "Trong tuần, có dành thời gian cho gia đình",
-                    point: 50,
+                    name: "Dành thời gian cho gia đình",
+                    cumulative_period: "week",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.week;
-                    }
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
                 }
             }
         },
@@ -159,7 +167,7 @@ const HABITS = {
                         dau_viec: {
                             type: "habit_number",
                             name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
-                            required: false,
+                            required: false, // TODO
 
                             unit: "đầu việc",
                             point_per_value: 15,
@@ -168,19 +176,10 @@ const HABITS = {
                         tap_trung_lam_viec: {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
-                            required: false,
+                            required: false, // TODO
 
                             unit: "phút",
                             point_per_value: 0.5,
-                            goal_value: 0,
-                        },
-                        hoat_dong_phat_trien: {
-                            type: "habit_number",
-                            name: "Tham gia hoạt động phát triển năng lực",
-                            required: false,
-
-                            unit: "hoạt động",
-                            point_per_value: 50,
                             goal_value: 0,
                         },
                         lap_lich_ngay_mai: {
@@ -210,7 +209,7 @@ const HABITS = {
                 hoat_dong_phat_trien: {
                     type: "habit_number",
                     name: "Tham gia hoạt động phát triển năng lực",
-                    required: false,
+                    required: false, // TODO
 
                     unit: "hoạt động",
                     point_per_value: 50,
@@ -243,40 +242,60 @@ const HABITS = {
                 tong_ket_thang: {
                     type: "habit_check",
                     name: "Tổng kết tháng qua, lên kế hoạch cho tháng tới theo cấu trúc \"Vọng Nguyệt\"",
+                    cumulative_period: "month",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.month;
+                        return (arguments.get_cumulative_info().completed_count == 0
+                        && arguments.XDate_function().is_last_day_of.month)
+                        || (arguments.get_cumulative_info().completed_count == 1
+                            && arguments.get_cumulative_info().is_today_completed);
                     },
-                    point: 35
+                    point: 50
                 },
                 ra_soat_Mirmor: {
                     type: "habit_check",
                     name: "Rà soát, đánh giá, sửa đổi, bổ sung tổng thể Mirmor",
+                    cumulative_period: "month",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.month;
+                        return (arguments.get_cumulative_info().completed_count == 0
+                        && arguments.XDate_function().is_last_day_of.month)
+                        || (arguments.get_cumulative_info().completed_count == 1
+                            && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 25
                 },
                 ra_soat_PPUP_RMS: {
                     type: "habit_check",
                     name: "Rà soát, sửa đổi, bổ sung PPUP-RMS",
+                    cumulative_period: "month",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.month;
+                        return (arguments.get_cumulative_info().completed_count == 0
+                        && arguments.XDate_function().is_last_day_of.month)
+                        || (arguments.get_cumulative_info().completed_count == 1
+                            && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 15
                 },
                 tong_ket_quy: {
                     type: "habit_check",
                     name: "Tổng kết quý qua, lên kế hoạch cho quý tới về ba trụ cột phát triển (tinh thần, thể chất, năng lực), các mục tiêu, các kế hoạch",
+                    cumulative_period: "year_quarter",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.year_quarter;
+                        return (arguments.get_cumulative_info().completed_count == 0
+                        && arguments.XDate_function().is_last_day_of.year_quarter)
+                        || (arguments.get_cumulative_info().completed_count == 1
+                            && arguments.get_cumulative_info().is_today_completed);
                     },
-                    point: 75
+                    point: 100
                 },
                 tong_ket_nam: {
                     type: "habit_check",
                     name: "Tổng kết năm qua, lên kế hoạch cho năm tới về ba trụ cột phát triển (tinh thần, thể chất, năng lực), các mục tiêu, các kế hoạch",
+                    cumulative_period: "year",
                     required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.year;
+                        return (arguments.get_cumulative_info().completed_count == 0
+                        && arguments.XDate_function().is_last_day_of.year)
+                        || (arguments.get_cumulative_info().completed_count == 1
+                            && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 150
                 }

@@ -1,5 +1,3 @@
-/* https://phonghng.github.io/?private_note_type=code__open_source__library&language=JavaScript&library_name=PPPL-JS&version=1.4 */
-
 const PPPL_JS = {
     Nrand: (seed) => {
         const cyrb128 = (str) => {
@@ -132,6 +130,14 @@ const PPPL_JS = {
             return day_of_year;
         }
 
+        const set_start_end = (date_object, start_month, start_date, end_month, end_date) => {
+            let start = new Date(date_object.getFullYear(), start_month, start_date);
+            start.setHours(0, 0, 0, 0);
+            let end = new Date(date_object.getFullYear(), end_month, end_date);
+            end.setHours(23, 59, 59, 999);
+            return [start, end];
+        }
+
         let date_object = new Date(timestamp);
 
         let date_object_info = {
@@ -161,6 +167,41 @@ const PPPL_JS = {
                 academic_year: is_last_day_of_years_part("academic_year"),
                 summer_vacation: is_last_day_of_years_part("summer_vacation"),
                 year: is_last_day_of_years_part("full")
+            },
+            start_end_of_current: {
+                week: (() => {
+                    let day_of_week = date_object.getDay();
+                    let difference = date_object.getDate() - day_of_week + (day_of_week === 0 ? -6 : 1);
+                    let start = date_object;
+                    start.setDate(difference);
+                    start.setHours(0, 0, 0, 0);
+                    let end = new Date(start);
+                    end.setDate(start.getDate() + 6);
+                    end.setHours(23, 59, 59, 999);
+                    return [start, end];
+                })(),
+                month: set_start_end(
+                    date_object,
+                    date_object.getMonth(),
+                    1,
+                    date_object.getMonth(),
+                    new Date(date_object.getFullYear(), date_object.getMonth() + 1, 0).getDate()
+                ),
+                year_quarter: set_start_end(
+                    date_object,
+                    (Math.floor(date_object.getMonth() / 3) * 3),
+                    1,
+                    (Math.floor(date_object.getMonth() / 3) * 3) + 2,
+                    new Date(date_object.getFullYear(), (Math.floor(date_object.getMonth() / 3) * 3) + 3, 0).getDate()
+                ),
+                year_half: set_start_end(
+                    date_object,
+                    (date_object.getMonth() < 6 ? 0 : 6),
+                    1,
+                    (date_object.getMonth() < 6 ? 0 : 6) + 5,
+                    new Date(date_object.getFullYear(), (date_object.getMonth() < 6 ? 0 : 6) + 6, 0).getDate()
+                ),
+                year: set_start_end(date_object, 0, 1, 11, 31)
             }
         };
 
