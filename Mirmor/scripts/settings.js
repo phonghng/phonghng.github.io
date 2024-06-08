@@ -117,7 +117,7 @@ const HABITS = {
                         },
                         day_truoc_7h: {
                             type: "habit_check",
-                            name: "Thức dậy, đánh răng, rửa mặt trước 7h15",
+                            name: "Thức dậy trước 7h15",
                             required: true,
                             point: 25
                         },
@@ -247,9 +247,41 @@ const HABITS = {
                     type: "group",
                     name: "Ngoại hình",
                     children: {
+                        /**
+                         * CÁC SẢN PHẨM ĐANG DÙNG
+                         * - Sửa rửa mặt (sạch sâu, trị mụn, dưỡng ẩm): Garnier Skin Natuarals Bright Complete Anti-Acne Cleansing Foam
+                         * - Kem chống nắng: Vichy Capital Soleil Anti Brillance Mattifying SPF50+ UVB+UVA
+                         * - Kem đánh răng: Colgate Optic White 02 Aromatic Menthol
+                         * - Dầu gội, sữa tắm: 3 In 1 X-men For Boss Legend
+                         * - Viên uống: DHC Multi Vitamins, DHC Minerals, DHC Blueberry, Omega 3 Pure Alaska Omega 333mg EPA DHA
+                         */
+                        danh_rang_sang: {
+                            type: "habit_check",
+                            name: "Đánh răng, rửa mặt buổi sáng",
+                            required: true,
+                            point: 15
+                        },
+                        danh_rang_toi: {
+                            type: "habit_check",
+                            name: "Đánh răng, rửa mặt buổi tối",
+                            required: true,
+                            point: 15
+                        },
                         tam_rua: {
                             type: "habit_check",
-                            name: "Tắm, rửa mặt bằng sữa rửa mặt (sạch sâu, trị mụn, dưỡng ẩm)",
+                            name: "Tắm, rửa mặt bằng sữa rửa mặt",
+                            required: true,
+                            point: 35
+                        },
+                        uong_tpcn: {
+                            type: "habit_check",
+                            name: "Uống 1 viên Vitamins, 3 viên Minerals, 2 viên Blueberry, 3 viên Omega-3",
+                            required: true,
+                            point: 25
+                        },
+                        chuan_bi_ra_ngoai: {
+                            type: "habit_check",
+                            name: "Bôi kem chống nắng, ăn mặc, để tóc phù hợp khi ra ngoài",
                             required: true,
                             point: 35
                         },
@@ -264,18 +296,6 @@ const HABITS = {
                                         && arguments.get_cumulative_info().is_today_completed);
                             },
                             point: 25
-                        },
-                        uong_tpcn: {
-                            type: "habit_check",
-                            name: "Uống DHC Multi Vitamins, DHC Minerals, DHC Blueberry, viên omega-3",
-                            required: true,
-                            point: 25
-                        },
-                        chuan_bi_ra_ngoai: {
-                            type: "habit_check",
-                            name: "Bôi kem chống nắng, ăn mặc, để tóc phù hợp khi ra ngoài",
-                            required: true,
-                            point: 35
                         }
                     }
                 },
