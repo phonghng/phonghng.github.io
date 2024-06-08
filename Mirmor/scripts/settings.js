@@ -267,7 +267,7 @@ const HABITS = {
                         },
                         uong_tpcn: {
                             type: "habit_check",
-                            name: "Uống viên canxi, vitamin C, omega-3",
+                            name: "Uống DHC Multi Vitamins, DHC Minerals, DHC Blueberry, viên omega-3",
                             required: true,
                             point: 25
                         },
