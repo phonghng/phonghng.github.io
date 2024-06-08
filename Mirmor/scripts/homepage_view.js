@@ -114,9 +114,10 @@ class HomepageView {
             let item_point_element = document.createElement("div");
             item_point_element.className = "box item_point";
             item_point_element.innerHTML = `${item_point_info.point} / ${item_point_info.goal_point} ≈ ${Math.round(item_point_info.percent)}%`;
-            if (item_point_info.percent >= 100) {
+            if (item_data.cumulative_period && item_point_info.point == 0)
+                item_point_element.style.backgroundColor = "var(--TOMATO)";
+            else if (item_point_info.percent >= 100)
                 item_point_element.style.backgroundColor = "var(--LEMON)";
-            }
             item_element.appendChild(item_point_element);
 
             let item_button_element = document.createElement("button");
@@ -129,6 +130,14 @@ class HomepageView {
     }
 
     generate_view_item_button(item_id, item_data, item_button_element) {
+        const CUMULATIVE_PERIOD_NAME = {
+            "week": "tuần",
+            "month": "tháng",
+            "year_quarter": "quý",
+            "year_half": "nửa năm",
+            "year": "năm"
+        };
+
         switch (item_data.type) {
             case "group": {
                 item_button_element.innerHTML = "Mở";
@@ -165,6 +174,10 @@ class HomepageView {
                     item_button_element.classList.add("not_checked");
                     item_button_element.classList.remove("checked");
                 }
+                
+                if (item_data.cumulative_period)
+                    item_button_element.title =
+                        "Chu kì tích luỹ: " + CUMULATIVE_PERIOD_NAME[item_data.cumulative_period];
 
                 item_button_element.onclick = () => {
                     this.Habits_class.toggle_habit_check(item_id);
@@ -177,10 +190,16 @@ class HomepageView {
             case "habit_number": {
                 item_button_element.innerHTML = item_data.value || 0;
 
+                let cumulative_period_text = "";
+                if (item_data.cumulative_period)
+                    cumulative_period_text =
+                        "Chu kì tích luỹ: " + CUMULATIVE_PERIOD_NAME[item_data.cumulative_period] + "\n";
+
                 item_button_element.onclick = () => {
                     let prompt_text =
                         `${item_data.name.toUpperCase()}\n`
                         + `\n`
+                        + cumulative_period_text
                         + `Đơn vị tính: ${item_data.unit}\n`
                         + `Mục tiêu: ${item_data.goal_value} ${item_data.unit}\n`
                         + `\n`

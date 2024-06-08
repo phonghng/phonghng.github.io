@@ -9,16 +9,16 @@ const HABITS = {
                 hanh_vi_hanh_phuc: {
                     type: "habit_number",
                     name: "Hành vi gây sự hạnh phúc",
-                    required: false, // TODO
+                    required: true,
 
                     unit: "hành vi",
                     point_per_value: 100,
-                    goal_value: 0,
+                    goal_value: 1,
                 },
                 hanh_vi_bat_hanh: {
                     type: "habit_number",
                     name: "Hành vi gây sự bất hạnh, thể hiện cái tôi quá đáng",
-                    required: false, // TODO
+                    required: false,
 
                     unit: "hành vi",
                     point_per_value: -75,
@@ -97,12 +97,6 @@ const HABITS = {
                             point_per_value: 0.05,
                             goal_value: 2000,
                         },
-                        uong_thuoc: {
-                            type: "habit_check",
-                            name: "Uống các loại thuốc, thực phẩm chức năng (nếu cần)",
-                            required: true,
-                            point: 15
-                        },
                         khong_uong_vat_an_vat: {
                             type: "habit_check",
                             name: "Không uống vặt, ăn vặt",
@@ -145,7 +139,66 @@ const HABITS = {
                     type: "group",
                     name: "Thể dục, thể thao",
                     children: {
-                        // TODO
+                        the_duc_sang: {
+                            type: "habit_check",
+                            name: "Tập thể dục buổi sáng (theo <a href='https://www.youtube.com/watch?v=MtZmVz305P0' target='_blank'>video sau</a>)",
+                            required: true,
+                            point: 25
+                        },
+                        dap_xe: {
+                            type: "habit_number",
+                            name: "Đạp xe",
+                            required: true,
+
+                            unit: "phút",
+                            point_per_value: 3,
+                            goal_value: 10,
+                        },
+                        boi: {
+                            type: "habit_number",
+                            name: "Bơi",
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                if (![6, 7, 8].includes(
+                                    arguments.XDate_function().date_object_expanded.month + 1
+                                )) return false;
+                                return (arguments.get_cumulative_info().total_value < 60
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().total_value < 60
+                                        && arguments.get_cumulative_info().today_value > 0);
+                            },
+
+                            unit: "phút",
+                            point_per_value: 3,
+                            goal_value: 30,
+                        },
+                        bong_ro: {
+                            type: "habit_number",
+                            name: "Bóng rổ",
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                if ([6, 7, 8].includes(
+                                    arguments.XDate_function().date_object_expanded.month + 1
+                                )) return false;
+                                return (arguments.get_cumulative_info().total_value < 60
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().total_value < 60
+                                        && arguments.get_cumulative_info().today_value > 0);
+                            },
+
+                            unit: "phút",
+                            point_per_value: 4,
+                            goal_value: 30,
+                        },
+                        khac: {
+                            type: "habit_number",
+                            name: "Hoạt động khác",
+                            required: false,
+
+                            unit: "phút",
+                            point_per_value: 2,
+                            goal_value: 0,
+                        }
                     }
                 }
             }
@@ -167,20 +220,20 @@ const HABITS = {
                         dau_viec: {
                             type: "habit_number",
                             name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
-                            required: false, // TODO
+                            required: true,
 
                             unit: "đầu việc",
                             point_per_value: 15,
-                            goal_value: 0,
+                            goal_value: 1,
                         },
                         tap_trung_lam_viec: {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
-                            required: false, // TODO
+                            required: true,
 
                             unit: "phút",
                             point_per_value: 0.5,
-                            goal_value: 0,
+                            goal_value: 15,
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
@@ -194,7 +247,36 @@ const HABITS = {
                     type: "group",
                     name: "Ngoại hình",
                     children: {
-                        // TODO
+                        tam_rua: {
+                            type: "habit_check",
+                            name: "Tắm, rửa mặt bằng sữa rửa mặt (sạch sâu, trị mụn, dưỡng ẩm)",
+                            required: true,
+                            point: 35
+                        },
+                        ve_sinh_dinh_ki: {
+                            type: "habit_check",
+                            name: "Cắt móng tay, cắt móng chân, cạo râu, rửa khăn mặt",
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                return (arguments.get_cumulative_info().completed_count == 0
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().completed_count == 1
+                                        && arguments.get_cumulative_info().is_today_completed);
+                            },
+                            point: 25
+                        },
+                        uong_tpcn: {
+                            type: "habit_check",
+                            name: "Uống viên canxi, vitamin C, omega-3",
+                            required: true,
+                            point: 25
+                        },
+                        chuan_bi_ra_ngoai: {
+                            type: "habit_check",
+                            name: "Bôi kem chống nắng, ăn mặc, để tóc phù hợp khi ra ngoài",
+                            required: true,
+                            point: 35
+                        }
                     }
                 },
                 doc_sach: {
@@ -209,11 +291,17 @@ const HABITS = {
                 hoat_dong_phat_trien: {
                     type: "habit_number",
                     name: "Tham gia hoạt động phát triển năng lực",
-                    required: false, // TODO
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().total_value < 1
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().total_value < 1
+                                && arguments.get_cumulative_info().today_value > 0);
+                    },
 
                     unit: "hoạt động",
-                    point_per_value: 50,
-                    goal_value: 0,
+                    point_per_value: 100,
+                    goal_value: 1,
                 },
                 khong_tiktok_facebook: {
                     type: "habit_check",
@@ -245,9 +333,9 @@ const HABITS = {
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
-                        && arguments.XDate_function().is_last_day_of.month)
-                        || (arguments.get_cumulative_info().completed_count == 1
-                            && arguments.get_cumulative_info().is_today_completed);
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 50
                 },
@@ -257,9 +345,9 @@ const HABITS = {
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
-                        && arguments.XDate_function().is_last_day_of.month)
-                        || (arguments.get_cumulative_info().completed_count == 1
-                            && arguments.get_cumulative_info().is_today_completed);
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 25
                 },
@@ -269,9 +357,9 @@ const HABITS = {
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
-                        && arguments.XDate_function().is_last_day_of.month)
-                        || (arguments.get_cumulative_info().completed_count == 1
-                            && arguments.get_cumulative_info().is_today_completed);
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 15
                 },
@@ -281,9 +369,9 @@ const HABITS = {
                     cumulative_period: "year_quarter",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
-                        && arguments.XDate_function().is_last_day_of.year_quarter)
-                        || (arguments.get_cumulative_info().completed_count == 1
-                            && arguments.get_cumulative_info().is_today_completed);
+                            && arguments.XDate_function().is_last_day_of.year_quarter)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 100
                 },
@@ -293,9 +381,9 @@ const HABITS = {
                     cumulative_period: "year",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
-                        && arguments.XDate_function().is_last_day_of.year)
-                        || (arguments.get_cumulative_info().completed_count == 1
-                            && arguments.get_cumulative_info().is_today_completed);
+                            && arguments.XDate_function().is_last_day_of.year)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 150
                 }
