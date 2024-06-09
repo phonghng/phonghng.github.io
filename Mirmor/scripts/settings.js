@@ -2,36 +2,51 @@ const HABITS = {
     type: "group",
     name: "Chương trình Mirmor",
     children: {
-        tinh_cach: {
+        tinh_than: {
             type: "group",
-            name: "Phát triển tính cách",
+            name: "Phát triển tinh thần",
             children: {
-                khong_tiktok_facebook: {
-                    type: "habit_check",
-                    name: "Không sử dụng TikTok, Facebook quá 120 phút",
-                    required: true,
-                    point: 50
-                },
-                mipo_vuot_amepo: {
-                    type: "habit_check",
-                    name: "Mipo (không kể mục này) vượt Amepo",
-                    required: true,
-                    point: 50
-                },
-                thuc_hien_muc_bat_buoc: {
-                    type: "habit_check",
-                    name: "Thực hiện đầy đủ các mục bắt buộc",
-                    required: true,
-                    point: 75
-                },
-                the_hien_cai_toi: {
+                hanh_vi_hanh_phuc: {
                     type: "habit_number",
-                    name: "Hành vi thể hiẹn cái tôi quá đáng",
+                    name: "Hành vi gây sự hạnh phúc",
+                    required: true,
+
+                    unit: "hành vi",
+                    point_per_value: 100,
+                    goal_value: 1,
+                },
+                hanh_vi_bat_hanh: {
+                    type: "habit_number",
+                    name: "Hành vi gây sự bất hạnh",
                     required: false,
 
                     unit: "hành vi",
-                    point_per_value: -75,
+                    point_per_value: -50,
                     goal_value: 0,
+                },
+                thoi_gian_ban_than: {
+                    type: "habit_check",
+                    name: "Dành thời gian tự ngẫm cho bản thân",
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
+                },
+                thoi_gian_gia_dinh: {
+                    type: "habit_check",
+                    name: "Dành thời gian cho gia đình",
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
                 }
             }
         },
@@ -188,123 +203,36 @@ const HABITS = {
                 }
             }
         },
-        tinh_than: {
+        tinh_cach: {
             type: "group",
-            name: "Phát triển tinh thần",
+            name: "Phát triển tính cách",
             children: {
-                hanh_vi_hanh_phuc: {
-                    type: "habit_number",
-                    name: "Hành vi gây sự hạnh phúc",
+                khong_tiktok_facebook: {
+                    type: "habit_check",
+                    name: "Không sử dụng TikTok, Facebook quá 120 phút",
                     required: true,
-
-                    unit: "hành vi",
-                    point_per_value: 100,
-                    goal_value: 1,
+                    point: 50
                 },
-                hanh_vi_bat_hanh: {
+                mipo_vuot_amepo: {
+                    type: "habit_check",
+                    name: "Mipo (không kể mục này) vượt Amepo",
+                    required: true,
+                    point: 50
+                },
+                thuc_hien_muc_bat_buoc: {
+                    type: "habit_check",
+                    name: "Thực hiện đầy đủ các mục bắt buộc",
+                    required: true,
+                    point: 75
+                },
+                the_hien_cai_toi: {
                     type: "habit_number",
-                    name: "Hành vi gây sự bất hạnh",
+                    name: "Hành vi thể hiẹn cái tôi quá đáng",
                     required: false,
 
                     unit: "hành vi",
-                    point_per_value: -50,
+                    point_per_value: -75,
                     goal_value: 0,
-                },
-                thoi_gian_ban_than: {
-                    type: "habit_check",
-                    name: "Dành thời gian tự ngẫm cho bản thân",
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 50
-                },
-                thoi_gian_gia_dinh: {
-                    type: "habit_check",
-                    name: "Dành thời gian cho gia đình",
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 50
-                }
-            }
-        },
-        kien_thuc: {
-            type: "group",
-            name: "Phát triển kiến thức",
-            children: {
-                doc_tin_tuc: {
-                    type: "habit_check",
-                    name: "Đọc tin tức",
-                    required: true,
-                    point: 15
-                },
-                doc_sach: {
-                    type: "habit_number",
-                    name: "Đọc sách",
-                    required: true,
-
-                    unit: "trang",
-                    point_per_value: 15,
-                    goal_value: 3,
-                }
-            }
-        },
-        ki_nang: {
-            type: "group",
-            name: "Phát triển kĩ năng",
-            children: {
-                kiem_tra_lich: {
-                    type: "habit_check",
-                    name: "Kiểm tra lịch hoạt động, mục Mirmor hôm nay",
-                    required: true,
-                    point: 15
-                },
-                dau_viec: {
-                    type: "habit_number",
-                    name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
-                    required: true,
-
-                    unit: "đầu việc",
-                    point_per_value: 15,
-                    goal_value: 1,
-                },
-                tap_trung_lam_viec: {
-                    type: "habit_number",
-                    name: "Thời gian tập trung hoàn thành công việc",
-                    required: true,
-
-                    unit: "phút",
-                    point_per_value: 0.5,
-                    goal_value: 15,
-                },
-                lap_lich_ngay_mai: {
-                    type: "habit_check",
-                    name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor)",
-                    required: true,
-                    point: 15
-                },
-                hoat_dong_phat_trien: {
-                    type: "habit_number",
-                    name: "Tham gia hoạt động phát triển kĩ năng",
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().total_value < 1
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().total_value < 1
-                                && arguments.get_cumulative_info().today_value > 0);
-                    },
-
-                    unit: "hoạt động",
-                    point_per_value: 100,
-                    goal_value: 1,
                 }
             }
         },
@@ -448,6 +376,78 @@ const HABITS = {
                     unit: "hoạt động",
                     point_per_value: 50,
                     goal_value: 1,
+                }
+            }
+        },
+        ki_nang: {
+            type: "group",
+            name: "Phát triển kĩ năng",
+            children: {
+                kiem_tra_lich: {
+                    type: "habit_check",
+                    name: "Kiểm tra lịch hoạt động, mục Mirmor hôm nay",
+                    required: true,
+                    point: 15
+                },
+                dau_viec: {
+                    type: "habit_number",
+                    name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
+                    required: true,
+
+                    unit: "đầu việc",
+                    point_per_value: 15,
+                    goal_value: 1,
+                },
+                tap_trung_lam_viec: {
+                    type: "habit_number",
+                    name: "Thời gian tập trung hoàn thành công việc",
+                    required: true,
+
+                    unit: "phút",
+                    point_per_value: 0.5,
+                    goal_value: 15,
+                },
+                lap_lich_ngay_mai: {
+                    type: "habit_check",
+                    name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor)",
+                    required: true,
+                    point: 15
+                },
+                hoat_dong_phat_trien: {
+                    type: "habit_number",
+                    name: "Tham gia hoạt động phát triển kĩ năng",
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().total_value < 1
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().total_value < 1
+                                && arguments.get_cumulative_info().today_value > 0);
+                    },
+
+                    unit: "hoạt động",
+                    point_per_value: 100,
+                    goal_value: 1,
+                }
+            }
+        },
+        kien_thuc: {
+            type: "group",
+            name: "Phát triển kiến thức",
+            children: {
+                doc_tin_tuc: {
+                    type: "habit_check",
+                    name: "Đọc tin tức",
+                    required: true,
+                    point: 15
+                },
+                doc_sach: {
+                    type: "habit_number",
+                    name: "Đọc sách",
+                    required: true,
+
+                    unit: "trang",
+                    point_per_value: 15,
+                    goal_value: 3,
                 }
             }
         },
