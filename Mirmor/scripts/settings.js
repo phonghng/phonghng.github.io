@@ -73,7 +73,13 @@ const HABITS = {
                         an_trua_them: {
                             type: "habit_check",
                             name: "Ăn bữa trưa có thêm trái cây, hải sản hoặc ngũ cốc",
-                            required: true,
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                return (arguments.get_cumulative_info().completed_count == 0
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().completed_count == 1
+                                        && arguments.get_cumulative_info().is_today_completed);
+                            },
                             point: 50
                         },
                         an_toi: {
@@ -85,7 +91,13 @@ const HABITS = {
                         an_toi_them: {
                             type: "habit_check",
                             name: "Ăn bữa tối có thêm trái cây, hải sản hoặc ngũ cốc",
-                            required: true,
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                return (arguments.get_cumulative_info().completed_count == 0
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().completed_count == 1
+                                        && arguments.get_cumulative_info().is_today_completed);
+                            },
                             point: 50
                         },
                         uong_nuoc: {
