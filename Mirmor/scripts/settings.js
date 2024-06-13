@@ -431,6 +431,12 @@ const HABITS = {
             type: "group",
             name: "Phát triển kiến thức",
             children: {
+                kiem_tra_YouTube: {
+                    type: "habit_check",
+                    name: "Kiểm tra các nội dung đăng kí trên YouTube",
+                    required: true,
+                    point: 50
+                },
                 doc_tin_tuc: {
                     type: "habit_check",
                     name: "Đọc tin tức",
