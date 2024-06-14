@@ -42,7 +42,7 @@
         copy_button.onclick = (event) => copy_textarea();
 
         function update_textarea(string_data) {
-            const STRING_DATA_REGEX = /(Xem dữ liệu Mirmor hôm nay \[0 \/ 0 điểm\]\n\n +\{\n +"string_data": ).*/g;
+            const STRING_DATA_REGEX = /(Xem dữ liệu Mirmor hôm nay \[0 \/ 0 điểm\]\n\n +Dữ liệu tiện ích: \{\n +"string_data": ).*/g;
             string_data = string_data.replace(STRING_DATA_REGEX, "$1...,");
             textarea.innerHTML = string_data;
             data = { string_data };

@@ -121,6 +121,14 @@ class Data {
     }
 
     to_string(HomepageView_class_data, data = this.Habits_class.data, layer = 0, data_id = ``) {
+        const CUMULATIVE_PERIOD_NAME = {
+            "week": "tuần",
+            "month": "tháng",
+            "year_quarter": "quý",
+            "year_half": "nửa năm",
+            "year": "năm"
+        };
+
         let add_indent =
             (string, indent_times = layer) =>
                 this.options.line_indent.repeat(indent_times) + string;
@@ -183,6 +191,7 @@ class Data {
                         null,
                         this.options.line_indent
                     ).split(`\n`);
+                data_lines[0] = `Dữ liệu tiện ích: ` + data_lines[0];
                 for (let [index, line] of data_lines.entries()) {
                     data_lines[parseInt(index)] = add_indent(line, layer + 1);
                 }
@@ -209,18 +218,37 @@ class Data {
                     data.completed_time
                         ? (`Hoàn thành lúc ` + data.completed_time)
                         : `Chưa hoàn thành`;
+                        let cumulative_period_text =
+                            data.cumulative_period
+                                ? (` {Tích luỹ theo ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}}`)
+                                : ``;
 
                 strings.push(
                     add_indent(
                         `${data.name}`
                         + ` [${point} / ${goal_point} (${max_point}) điểm]`
+                        + `${cumulative_period_text}`
                         + ` <${completed_time_string}>`
                     )
                 );
                 if (typeof data.required != "boolean") {
                     strings.push(
-                        add_indent(data.required.toString(), layer + 1)
+                        add_indent(`Hàm xác định tính bắt buộc: ` + data.required.toString(), layer + 1)
                     );
+                }
+                if (data.cumulative_data) {
+                    let data_lines =
+                        JSON.stringify(
+                            data.cumulative_data,
+                            null,
+                            this.options.line_indent
+                        ).split(`\n`);
+                    data_lines[0] = `Dữ liệu tích luỹ: ` + data_lines[0];
+                    for (let [index, line] of data_lines.entries()) {
+                        data_lines[parseInt(index)] = add_indent(line, layer + 1);
+                    }
+                    data_lines = data_lines.join(`\n`);
+                    strings.push(data_lines);
                 }
 
                 return { strings, point, goal_point };
@@ -243,19 +271,38 @@ class Data {
                     data.last_changed_time
                         ? (`Sửa đổi lần cuối lúc ` + data.last_changed_time)
                         : `Chưa sửa đổi`;
+                let cumulative_period_text =
+                    data.cumulative_period
+                        ? (` {Tích luỹ theo ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}}`)
+                        : ``;
 
                 strings.push(
                     add_indent(
                         `${data.name}`
                         + ` [${point} / ${goal_point} (${max_point}) điểm`
                         + ` ; ${data.value || 0} / ${data.goal_value} ${data.unit}]`
+                        + `${cumulative_period_text}`
                         + ` <${last_changed_time_string}>`,
                     )
                 );
                 if (typeof data.required != "boolean") {
                     strings.push(
-                        add_indent(data.required.toString(), layer + 1)
+                        add_indent(`Hàm xác định tính bắt buộc: ` + data.required.toString(), layer + 1)
                     );
+                }
+                if (data.cumulative_data) {
+                    let data_lines =
+                        JSON.stringify(
+                            data.cumulative_data,
+                            null,
+                            this.options.line_indent
+                        ).split(`\n`);
+                    data_lines[0] = `Dữ liệu tích luỹ: ` + data_lines[0];
+                    for (let [index, line] of data_lines.entries()) {
+                        data_lines[parseInt(index)] = add_indent(line, layer + 1);
+                    }
+                    data_lines = data_lines.join(`\n`);
+                    strings.push(data_lines);
                 }
 
                 return { strings, point, goal_point };

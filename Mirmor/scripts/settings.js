@@ -266,7 +266,7 @@ const HABITS = {
                             type: "habit_number",
                             name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
                             required: true,
-        
+
                             unit: "đầu việc",
                             point_per_value: 15,
                             goal_value: 1,
@@ -275,7 +275,7 @@ const HABITS = {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
                             required: true,
-        
+
                             unit: "phút",
                             point_per_value: 0.5,
                             goal_value: 15,
