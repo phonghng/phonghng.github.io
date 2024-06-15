@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        textarea {
+        #textarea {
             outline: none;
             background-color: transparent;
             font-family: system-ui;
@@ -28,23 +28,29 @@
             height: 100%;
             transition: all .5s;
             filter: blur(3px);
+            padding: 10px;
+            line-height: normal;
         }
 
-        textarea:hover,
-        textarea:focus {
+        #textarea * {
+            font: revert;
+        }
+
+        #textarea:hover,
+        #textarea:focus {
             filter: blur(0);
         }
     </style>
 </head>
 
 <body>
-    <textarea placeholder="Nhập ghi chú..."></textarea>
+    <div id="textarea" contenteditable placeholder="Nhập ghi chú..."></div>
 
     <script>
-        let textarea = document.querySelector("textarea");
+        let textarea = document.querySelector("#textarea");
         if (localStorage.getItem("PPUPsyno"))
-            textarea.value = localStorage.getItem("PPUPsyno");
-        textarea.addEventListener("input", () => localStorage.setItem("PPUPsyno", textarea.value));
+            textarea.innerHTML = localStorage.getItem("PPUPsyno");
+        textarea.addEventListener("input", () => localStorage.setItem("PPUPsyno", textarea.innerHTML));
     </script>
 </body>
 
