@@ -86,6 +86,7 @@ body {
 
 .item.widget>img {
     border-radius: 10px;
+    border: none;
 }
 
 .item.widget>iframe {
