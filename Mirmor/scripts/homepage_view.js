@@ -114,7 +114,10 @@ class HomepageView {
             let item_point_element = document.createElement("div");
             item_point_element.className = "box item_point";
             item_point_element.innerHTML = `${item_point_info.point} / ${item_point_info.goal_point} ≈ ${Math.round(item_point_info.percent)}%`;
-            if (item_data.cumulative_period && item_point_info.point == 0)
+            if (item_data.type != "habit_ext"
+                && (typeof item_data.required != "boolean" || item_data.required)
+                && item_point_info.goal_point == 0
+                && item_point_info.point == 0)
                 item_point_element.style.backgroundColor = "var(--TOMATO)";
             else if (item_point_info.percent >= 100)
                 item_point_element.style.backgroundColor = "var(--LEMON)";
@@ -174,7 +177,7 @@ class HomepageView {
                     item_button_element.classList.add("not_checked");
                     item_button_element.classList.remove("checked");
                 }
-                
+
                 if (item_data.cumulative_period)
                     item_button_element.title =
                         "Chu kì tích luỹ: " + CUMULATIVE_PERIOD_NAME[item_data.cumulative_period];
