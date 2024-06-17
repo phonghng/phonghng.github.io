@@ -14,6 +14,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
 
     <style>
+        html,
+        body {
+            height: 100%;
+        }
+
         #textarea {
             outline: none;
             background-color: transparent;
@@ -23,6 +28,7 @@
             filter: blur(3px);
             padding: 10px;
             line-height: normal;
+            height: 100%;
         }
 
         #textarea * {
@@ -32,6 +38,15 @@
         #textarea:hover,
         #textarea:focus {
             filter: blur(0);
+        }
+
+        #textarea:empty::before {
+            content: attr(placeholder);
+            color: #555555;
+        }
+
+        #textarea:empty:focus::before {
+            content: "";
         }
     </style>
 </head>
