@@ -29,6 +29,7 @@
             padding: 10px;
             line-height: normal;
             height: 100%;
+            text-align: justify;
         }
 
         #textarea * {
@@ -48,6 +49,45 @@
         #textarea:empty:focus::before {
             content: "";
         }
+
+        p\:h1 {
+            font-size: xx-large !important;
+            font-weight: bold !important;
+        }
+
+        p\:h2 {
+            font-size: x-large !important;
+            font-weight: bold !important;
+        }
+
+        p\:h3 {
+            font-size: large !important;
+            font-weight: bold !important;
+        }
+
+        p\:h4 {
+            font-size: small !important;
+            font-weight: bold !important;
+        }
+
+        p\:h5 {
+            font-size: x-small !important;
+            font-weight: bold !important;
+        }
+
+        p\:h6 {
+            font-size: xx-small !important;
+            font-weight: bold !important;
+        }
+
+        p\:note {
+            margin: 0 0 10px 0;
+            display: block;
+            box-shadow: 5px 5px 10px 0 var(--GREY_2);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--GREY_1);
+        }
     </style>
 </head>
 
@@ -57,7 +97,7 @@
     <script>
         let textarea = document.querySelector("#textarea");
         if (localStorage.getItem("PPUPsyno"))
-            textarea.innerHTML = localStorage.getItem("PPUPsyno");
+            textarea.innerHTML = localStorage.getItem("PPUPsyno").replace(/&lt;(\/*)p:(note|h1|h2|h3|h4|h5|h6)&gt;/g, "<$1p:$2>");;
         textarea.addEventListener("input", () => localStorage.setItem("PPUPsyno", textarea.innerHTML));
     </script>
 </body>
