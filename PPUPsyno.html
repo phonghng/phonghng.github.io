@@ -17,71 +17,52 @@
         html,
         body {
             height: 100%;
+            overflow: hidden;
         }
 
-        #textarea {
-            outline: none;
+        textarea,
+        #display {
             background-color: transparent;
-            font-family: system-ui;
-            resize: none;
             transition: all .5s;
             filter: blur(3px);
-            padding: 10px;
-            line-height: normal;
-            height: 100%;
             text-align: justify;
+            padding: 10px;
+            height: 100%;
+            outline: none;
+            overflow: auto;
         }
 
-        #textarea * {
-            font: revert;
-        }
-
-        #textarea:hover,
-        #textarea:focus {
+        textarea:hover,
+        textarea:focus,
+        #display:hover,
+        #display:focus {
             filter: blur(0);
         }
 
-        #textarea:empty::before {
-            content: attr(placeholder);
-            color: #555555;
+        textarea {
+            resize: none;
         }
 
-        #textarea:empty:focus::before {
-            content: "";
+        #display {
+            font-family: system-ui;
+            line-height: normal;
+            display: none;
         }
 
-        p\:h1 {
-            font-size: xx-large !important;
-            font-weight: bold !important;
+        textarea[data-display="true"] {
+            display: none;
         }
 
-        p\:h2 {
-            font-size: x-large !important;
-            font-weight: bold !important;
+        textarea[data-display="true"]~#display {
+            display: block;
         }
 
-        p\:h3 {
-            font-size: large !important;
-            font-weight: bold !important;
+        #display * {
+            font: revert;
         }
 
-        p\:h4 {
-            font-size: small !important;
-            font-weight: bold !important;
-        }
-
-        p\:h5 {
-            font-size: x-small !important;
-            font-weight: bold !important;
-        }
-
-        p\:h6 {
-            font-size: xx-small !important;
-            font-weight: bold !important;
-        }
-
-        p\:note {
-            margin: 0 0 10px 0;
+        #display p\:note {
+            margin: 10px 0;
             display: block;
             box-shadow: 5px 5px 10px 0 var(--GREY_2);
             padding: 10px;
@@ -92,13 +73,22 @@
 </head>
 
 <body>
-    <div id="textarea" contenteditable placeholder="Nhập ghi chú..."></div>
+    <textarea placeholder="Nhập ghi chú..." data-display="true"></textarea>
+    <div id="display"></div>
 
     <script>
-        let textarea = document.querySelector("#textarea");
-        if (localStorage.getItem("PPUPsyno"))
-            textarea.innerHTML = localStorage.getItem("PPUPsyno").replace(/&lt;(\/*)p:(note|h1|h2|h3|h4|h5|h6)&gt;/g, "<$1p:$2>");;
-        textarea.addEventListener("input", () => localStorage.setItem("PPUPsyno", textarea.innerHTML));
+        let textarea = document.querySelector("textarea");
+        let display = document.querySelector("#display");
+        if (localStorage.getItem("PPUPsyno")) {
+            textarea.value = localStorage.getItem("PPUPsyno");
+            display.innerHTML = textarea.value.replace(/<(\/*)(\w+\d?)>/g, "<$1$2>");
+        }
+        textarea.addEventListener("input", () => {
+            localStorage.setItem("PPUPsyno", textarea.value);
+            display.innerHTML = textarea.value.replace(/<(\/*)(\w+\d?)>/g, "<$1$2>");
+        });
+        display.addEventListener("dblclick", () => textarea.dataset["display"] = "false");
+        textarea.addEventListener("blur", () => textarea.dataset["display"] = "true");
     </script>
 </body>
 
