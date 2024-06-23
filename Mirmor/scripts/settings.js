@@ -292,9 +292,21 @@ const HABITS = {
                     type: "group",
                     name: "Kiểm soát",
                     children: {
+                        tong_ket_tuan: {
+                            type: "habit_check",
+                            name: "Tổng kết tuần qua, lên kế hoạch cho tuần tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
+                            cumulative_period: "week",
+                            required: (arguments) => {
+                                return (arguments.get_cumulative_info().completed_count == 0
+                                    && arguments.XDate_function().is_last_day_of.week)
+                                    || (arguments.get_cumulative_info().completed_count == 1
+                                        && arguments.get_cumulative_info().is_today_completed);
+                            },
+                            point: 50
+                        },
                         tong_ket_thang: {
                             type: "habit_check",
-                            name: "Tổng kết tháng qua, lên kế hoạch cho tháng tới theo cấu trúc \"Vọng Nguyệt\"",
+                            name: "Tổng kết tháng qua, lên kế hoạch cho tháng tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
                             cumulative_period: "month",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
