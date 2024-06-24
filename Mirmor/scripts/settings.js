@@ -24,6 +24,15 @@ const HABITS = {
                     point_per_value: -50,
                     goal_value: 0,
                 },
+                the_hien_cai_toi: {
+                    type: "habit_number",
+                    name: "Hành vi thể hiện cái tôi quá đáng",
+                    required: false,
+
+                    unit: "hành vi",
+                    point_per_value: -75,
+                    goal_value: 0,
+                },
                 thoi_gian_ban_than: {
                     type: "habit_check",
                     name: "Dành thời gian tự ngẫm cho bản thân",
@@ -215,43 +224,34 @@ const HABITS = {
                 }
             }
         },
-        tinh_cach: {
-            type: "group",
-            name: "Phát triển tính cách",
-            children: {
-                khong_tiktok_facebook: {
-                    type: "habit_check",
-                    name: "Không sử dụng TikTok, Facebook quá 120 phút",
-                    required: true,
-                    point: 50
-                },
-                mipo_vuot_amepo: {
-                    type: "habit_check",
-                    name: "Mipo (không kể mục này) vượt Amepo",
-                    required: true,
-                    point: 50
-                },
-                thuc_hien_muc_bat_buoc: {
-                    type: "habit_check",
-                    name: "Thực hiện đầy đủ các mục bắt buộc",
-                    required: true,
-                    point: 75
-                },
-                the_hien_cai_toi: {
-                    type: "habit_number",
-                    name: "Hành vi thể hiện cái tôi quá đáng",
-                    required: false,
-
-                    unit: "hành vi",
-                    point_per_value: -75,
-                    goal_value: 0,
-                }
-            }
-        },
         ki_nang: {
             type: "group",
             name: "Phát triển kĩ năng",
             children: {
+                ki_luat: {
+                    type: "group",
+                    name: "Kỉ luật",
+                    children: {
+                        khong_tiktok_facebook: {
+                            type: "habit_check",
+                            name: "Không sử dụng TikTok, Facebook quá 120 phút",
+                            required: true,
+                            point: 50
+                        },
+                        mipo_vuot_amepo: {
+                            type: "habit_check",
+                            name: "Mipo (không kể mục này) vượt Amepo",
+                            required: true,
+                            point: 50
+                        },
+                        thuc_hien_muc_bat_buoc: {
+                            type: "habit_check",
+                            name: "Thực hiện đầy đủ các mục bắt buộc",
+                            required: true,
+                            point: 75
+                        }
+                    }
+                },
                 lam_viec: {
                     type: "group",
                     name: "Làm việc",
@@ -294,7 +294,7 @@ const HABITS = {
                     children: {
                         tong_ket_tuan: {
                             type: "habit_check",
-                            name: "Tổng kết tuần qua, lên kế hoạch cho tuần tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
+                            name: "Tổng kết, đánh giá, điều chỉnh, quán triệt thực hiện kế hoạch phát triển kĩ năng và kiến thức",
                             cumulative_period: "week",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -304,9 +304,9 @@ const HABITS = {
                             },
                             point: 50
                         },
-                        tong_ket_thang: {
+                        tru_cot_phat_trien: {
                             type: "habit_check",
-                            name: "Tổng kết tháng qua, lên kế hoạch cho tháng tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
+                            name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
                             cumulative_period: "month",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -318,7 +318,7 @@ const HABITS = {
                         },
                         ra_soat_Mirmor: {
                             type: "habit_check",
-                            name: "Rà soát, đánh giá, sửa đổi, bổ sung tổng thể Mirmor",
+                            name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
                             cumulative_period: "month",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -330,7 +330,7 @@ const HABITS = {
                         },
                         ra_soat_PPUP_RMS: {
                             type: "habit_check",
-                            name: "Rà soát, sửa đổi, bổ sung PPUP-RMS",
+                            name: "Rà soát, điều chỉnh PPUP-RMS",
                             cumulative_period: "month",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -340,9 +340,21 @@ const HABITS = {
                             },
                             point: 15
                         },
+                        tong_ket_thang: {
+                            type: "habit_check",
+                            name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
+                            cumulative_period: "month",
+                            required: (arguments) => {
+                                return (arguments.get_cumulative_info().completed_count == 0
+                                    && arguments.XDate_function().is_last_day_of.month)
+                                    || (arguments.get_cumulative_info().completed_count == 1
+                                        && arguments.get_cumulative_info().is_today_completed);
+                            },
+                            point: 50
+                        },
                         tong_ket_quy: {
                             type: "habit_check",
-                            name: "Tổng kết quý qua, lên kế hoạch cho quý tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
+                            name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
                             cumulative_period: "year_quarter",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -351,18 +363,6 @@ const HABITS = {
                                         && arguments.get_cumulative_info().is_today_completed);
                             },
                             point: 100
-                        },
-                        tong_ket_nam: {
-                            type: "habit_check",
-                            name: "Tổng kết năm qua, lên kế hoạch cho năm tới về các trụ cột phát triển, các mục tiêu, các kế hoạch",
-                            cumulative_period: "year",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.year)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 150
                         }
                     }
                 },
@@ -370,14 +370,6 @@ const HABITS = {
                     type: "group",
                     name: "Ngoại hình",
                     children: {
-                        /**
-                         * CÁC SẢN PHẨM ĐANG DÙNG
-                         * - Sửa rửa mặt (sạch sâu, trị mụn, dưỡng ẩm): Garnier Skin Natuarals Bright Complete Anti-Acne Cleansing Foam
-                         * - Kem chống nắng: Vichy Capital Soleil Anti Brillance Mattifying SPF50+ UVB+UVA
-                         * - Kem đánh răng: Colgate Optic White 02 Aromatic Menthol
-                         * - Dầu gội, sữa tắm: 3 In 1 X-men For Boss Legend
-                         * - Viên uống: DHC Multi Vitamins, DHC Minerals, DHC Blueberry, Omega 3 Pure Alaska Omega 333mg EPA DHA
-                         */
                         danh_rang_sang: {
                             type: "habit_check",
                             name: "Đánh răng, rửa mặt buổi sáng",
@@ -398,7 +390,7 @@ const HABITS = {
                         },
                         uong_tpcn: {
                             type: "habit_check",
-                            name: "Uống 1 viên Vitamins, 3 viên Minerals, 2 viên Blueberry, 3 viên Omega-3",
+                            name: "Uống 1 viên Vitamins, 3 viên Minerals, 3 viên Omega-3",
                             required: true,
                             point: 25
                         },
