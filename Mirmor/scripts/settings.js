@@ -422,7 +422,7 @@ const HABITS = {
                 },
                 tong_ket_thang: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết (\"Vọng Nguyệt\"), đánh giá, lập kế hoạch (\"Khởi Nguyệt\") phát triển kĩ năng và kiến thức",
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
