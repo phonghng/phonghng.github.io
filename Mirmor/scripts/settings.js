@@ -288,84 +288,6 @@ const HABITS = {
                         },
                     }
                 },
-                kiem_soat: {
-                    type: "group",
-                    name: "Kiểm soát",
-                    children: {
-                        tong_ket_tuan: {
-                            type: "habit_check",
-                            name: "Tổng kết, đánh giá, điều chỉnh, quán triệt thực hiện kế hoạch phát triển kĩ năng và kiến thức",
-                            cumulative_period: "week",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.week)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 50
-                        },
-                        tru_cot_phat_trien: {
-                            type: "habit_check",
-                            name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
-                            cumulative_period: "month",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.month)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 50
-                        },
-                        ra_soat_Mirmor: {
-                            type: "habit_check",
-                            name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
-                            cumulative_period: "month",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.month)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 25
-                        },
-                        ra_soat_PPUP_RMS: {
-                            type: "habit_check",
-                            name: "Rà soát, điều chỉnh PPUP-RMS",
-                            cumulative_period: "month",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.month)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 15
-                        },
-                        tong_ket_thang: {
-                            type: "habit_check",
-                            name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
-                            cumulative_period: "month",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.month)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 50
-                        },
-                        tong_ket_quy: {
-                            type: "habit_check",
-                            name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
-                            cumulative_period: "year_quarter",
-                            required: (arguments) => {
-                                return (arguments.get_cumulative_info().completed_count == 0
-                                    && arguments.XDate_function().is_last_day_of.year_quarter)
-                                    || (arguments.get_cumulative_info().completed_count == 1
-                                        && arguments.get_cumulative_info().is_today_completed);
-                            },
-                            point: 100
-                        }
-                    }
-                },
                 ngoai_hinh: {
                     type: "group",
                     name: "Ngoại hình",
@@ -455,6 +377,72 @@ const HABITS = {
                     unit: "trang",
                     point_per_value: 15,
                     goal_value: 3,
+                }
+            }
+        },
+        kiem_soat: {
+            type: "group",
+            name: "Kiểm soát",
+            children: {
+                tong_ket_tuan: {
+                    type: "habit_check",
+                    name: "Tổng kết, đánh giá, điều chỉnh, quán triệt thực hiện kế hoạch phát triển kĩ năng và kiến thức",
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
+                },
+                tru_cot_phat_trien: {
+                    type: "habit_check",
+                    name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
+                    cumulative_period: "month",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
+                },
+                ra_soat_Mirmor: {
+                    type: "habit_check",
+                    name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
+                    cumulative_period: "month",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 25
+                },
+                tong_ket_thang: {
+                    type: "habit_check",
+                    name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
+                    cumulative_period: "month",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.month)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
+                },
+                tong_ket_quy: {
+                    type: "habit_check",
+                    name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
+                    cumulative_period: "year_quarter",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.year_quarter)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 100
                 }
             }
         },
