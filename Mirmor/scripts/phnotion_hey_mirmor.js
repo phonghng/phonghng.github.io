@@ -6,7 +6,7 @@ class PHNotion_Hey_Mirmor {
         homepage_top_container = document.body,
         options
     ) {
-        this.timestamp = new Date(new URL(location.href).searchParams.get("date")).getTime();
+        this.timestamp = new Date(new URL(location.href).searchParams.get("date")).getTime() || new Date().getTime();
         this.habit_database = habit_database;
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
