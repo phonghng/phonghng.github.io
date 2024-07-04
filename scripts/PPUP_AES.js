@@ -45,24 +45,31 @@ const show_result = (text, color_name) => {
 };
 
 async function sign_PDF(file_input, private_key) {
-    let pdf_document = await PDFLib.PDFDocument.load(await file_input.files[0].arrayBuffer());
+    let pdf_document = await PDFLib.PDFDocument.load(
+        await file_input.files[0].arrayBuffer(),
+        { updateMetadata: false }
+    );
+    pdf_document.setSubject("");
     let signature = new KJUR.crypto.Signature({ alg: "SHA512withECDSA" });
     signature.init({ d: private_key, curve: "secp256r1" });
-    signature.updateHex(await get_PDF_hash(pdf_document));
-    pdf_document.setKeywords(["PPUP-AES:" + signature.sign()]);
+    signature.updateHex(await get_PDF_hash(await pdf_document.save()));
+    pdf_document.setSubject("PPUP-AES:1:" + signature.sign());
     return await pdf_document.save();
 }
 
 async function verify_PDF(file_input, public_key) {
-    let pdf_document = await PDFLib.PDFDocument.load(await file_input.files[0].arrayBuffer());
-    let metadata = pdf_document.getKeywords();
+    let pdf_document = await PDFLib.PDFDocument.load(
+        await file_input.files[0].arrayBuffer(),
+        { updateMetadata: false }
+    );
+    let metadata = pdf_document.getSubject();
     if (!metadata || metadata.length === 0)
         return false;
-    let retrieved_signature_hex = metadata.replace("PPUP-AES:", "");
-    pdf_document.setKeywords([]);
+    let retrieved_signature_hex = metadata.replace("PPUP-AES:1:", "");
+    pdf_document.setSubject("");
     let signature = new KJUR.crypto.Signature({ alg: "SHA512withECDSA", prov: "cryptojs/jsrsa" });
     signature.init({ xy: public_key, curve: "secp256r1" });
-    signature.updateHex(await get_PDF_hash(pdf_document));
+    signature.updateHex(await get_PDF_hash(await pdf_document.save()));
     return signature.verify(retrieved_signature_hex);
 }
 
