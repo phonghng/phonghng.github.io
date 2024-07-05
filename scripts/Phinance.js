@@ -11,8 +11,8 @@ const OBJECT_TYPES_NAME = {
 
 const PAYMENT_METHODS = {
     "cash": "Tiền mặt",
-    "internet_nanking": "Internet Banking",
-    "mobile_nanking": "Mobile Banking",
+    "internet_banking": "Internet Banking",
+    "mobile_banking": "Mobile Banking",
     "debit_card": "Thẻ ghi nợ",
     "credit_card": "Thẻ tín dụng",
     "prepaid_card": "Thẻ trả trước"
