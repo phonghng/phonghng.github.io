@@ -18,7 +18,7 @@ const PAYMENT_METHODS = {
     "prepaid_card": "Thẻ trả trước"
 };
 
-const PAYMENT_CATEGORIES = {
+const CASHFLOW_CATEGORIES = {
     "DongGopChung": "Đóng góp các khoản chung",
     "AnSang": "Ăn sáng",
     "AnTrua": "Ăn trưa",
@@ -34,7 +34,8 @@ const PAYMENT_CATEGORIES = {
     "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
     "AnUongPhu": "Ăn uống phụ",
     "CatToc": "Cắt tóc",
-    "XemPhim": "Xem phim rạp"
+    "XemPhim": "Xem phim rạp",
+    "PhuHuynhGuiTien": "Phụ huynh gửi tiền"
 };
 
 const NOTIFICATION_TEXTS = {
@@ -545,6 +546,7 @@ class Actions {
         Actions_code,
         source_id,
         amount,
+        category,
         content,
         target_id
     ) {
@@ -552,6 +554,7 @@ class Actions {
             return [
                 ["select_group", "source_id", "Đối tượng gửi", () => timestamp()],
                 ["number", "amount", "Số tiền", { min: 0 }],
+                ["select", "category", "Phân loại", CASHFLOW_CATEGORIES],
                 ["text", "content", "Nội dung"],
                 ["select_group", "target_id", "Đối tượng nhận", () => timestamp()],
                 ["submit", "submit", "Chuyển tiền"],
@@ -579,12 +582,12 @@ class Actions {
         source.balance -= amount;
         source.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
             `Chuyển ${format_currency(amount)} tới ${OBJECT_TYPES_NAME[target_type]} `
-            + `"${target.name}" với nội dung "${content}"`]);
+            + `"${target.name}" thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
         target.balance += amount;
         target.logs.push([timestamp, "inbox-in", "var(--LIME)",
             `Nhận ${format_currency(amount)} từ ${OBJECT_TYPES_NAME[source_type]} `
-            + `"${source.name}" với nội dung "${content}"`]);
+            + `"${source.name}" thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -594,12 +597,14 @@ class Actions {
         Actions_code,
         object_id,
         amount,
+        category,
         content
     ) {
         if (typeof timestamp == "function")
             return [
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
                 ["number", "amount", "Số tiền"],
+                ["select", "category", "Phân loại", CASHFLOW_CATEGORIES],
                 ["text", "content", "Nội dung"],
                 ["submit", "submit", "Cộng/trừ tiền"],
                 ["cancel", "cancel", "Hủy bỏ"]
@@ -620,10 +625,12 @@ class Actions {
         object.balance += amount;
         if (amount >= 0)
             object.logs.push([timestamp, "inbox-in", "var(--LIME)",
-                `Cộng ${format_currency(amount)} với nội dung "${content}"`]);
+                `Cộng ${format_currency(amount)} thuộc loại ${CASHFLOW_CATEGORIES[category]}`
+                + ` với nội dung "${content}"`]);
         else
             object.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
-                `Trừ ${format_currency(-amount)} với nội dung "${content}"`]);
+                `Trừ ${format_currency(-amount)} thuộc loại ${CASHFLOW_CATEGORIES[category]}`
+                + ` với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -641,8 +648,8 @@ class Actions {
             return [
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
                 ["number", "amount", "Số tiền", { min: 0 }],
-                ["select", "method", "Phương thức thanh toán", PAYMENT_METHODS],
-                ["select", "category", "Loại thanh toán", PAYMENT_CATEGORIES],
+                ["select", "method", "Phương thức", PAYMENT_METHODS],
+                ["select", "category", "Phân loại", CASHFLOW_CATEGORIES],
                 ["text", "content", "Nội dung"],
                 ["submit", "submit", "Thanh toán"],
                 ["cancel", "cancel", "Hủy bỏ"]
@@ -661,8 +668,8 @@ class Actions {
         let object = this.Data.data[`${object_type}s`][object_id];
         object.balance -= amount;
         object.logs.push([timestamp, "receipt", "var(--CHERRY)",
-            `Thanh toán (bằng ${PAYMENT_METHODS[method]}) ${format_currency(amount)} `
-            + `cho loại ${PAYMENT_CATEGORIES[category]} với nội dung "${content}"`]);
+            `Thanh toán bằng ${PAYMENT_METHODS[method]} ${format_currency(amount)}`
+            + ` thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
         return arguments;
     }
@@ -722,9 +729,11 @@ class Actions {
         let total_distribution_amount = 0;
         for (let [fund_id, distribution_amount] of distribution_info) {
             log_instruction.push({
+                timestamp: timestamp,
                 sender: queue_id,
                 receiver: fund_id,
                 amount: distribution_amount,
+                category: "Phân bổ thu nhập",
                 content: "Phân bổ thu nhập"
             });
             let fund = funds[fund_id];
@@ -1216,10 +1225,10 @@ class Actions_Form {
 
         if (Actions_function_name == "O2O") {
             let [source_type, source_id] = Actions_function_args[2].split("_");
-            let [target_type, target_id] = Actions_function_args[5].split("_");
+            let [target_type, target_id] = Actions_function_args[6].split("_");
             Actions_function_args[1] = `${source_type}2${target_type}`;
             Actions_function_args[2] = source_id;
-            Actions_function_args[5] = target_id;
+            Actions_function_args[6] = target_id;
         } else if (Actions_function_name == "OPM"
             || Actions_function_name == "OPm") {
             let [object_type, object_id] = Actions_function_args[2].split("_");
