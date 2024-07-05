@@ -35,7 +35,8 @@ const CASHFLOW_CATEGORIES = {
     "AnUongPhu": "Ăn uống phụ",
     "CatToc": "Cắt tóc",
     "XemPhim": "Xem phim rạp",
-    "PhuHuynhGuiTien": "Phụ huynh gửi tiền"
+    "PhuHuynhGuiTien": "Phụ huynh gửi tiền",
+    "PhanBoThuNhap": "Phân bổ thu nhập"
 };
 
 const NOTIFICATION_TEXTS = {
@@ -728,14 +729,15 @@ class Actions {
         let queue_log_strings = [];
         let total_distribution_amount = 0;
         for (let [fund_id, distribution_amount] of distribution_info) {
-            log_instruction.push({
-                timestamp: timestamp,
-                sender: queue_id,
-                receiver: fund_id,
-                amount: distribution_amount,
-                category: "Phân bổ thu nhập",
-                content: "Phân bổ thu nhập"
-            });
+            log_instruction.push([
+                timestamp,
+                "Q2F",
+                queue_id,
+                distribution_amount,
+                "PhanBoThuNhap",
+                "Phân bổ thu nhập",
+                fund_id
+            ]);
             let fund = funds[fund_id];
             fund.balance += distribution_amount;
             total_distribution_amount += distribution_amount;
