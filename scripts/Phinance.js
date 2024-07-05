@@ -716,9 +716,17 @@ class Actions {
                 valid_balance * fund_and_rrid[1]
             ]);
 
+        let log_instruction = [];
+
         let queue_log_strings = [];
         let total_distribution_amount = 0;
         for (let [fund_id, distribution_amount] of distribution_info) {
+            log_instruction.push({
+                sender: queue_id,
+                receiver: fund_id,
+                amount: distribution_amount,
+                content: "Phân bổ thu nhập"
+            });
             let fund = funds[fund_id];
             fund.balance += distribution_amount;
             total_distribution_amount += distribution_amount;
@@ -732,7 +740,7 @@ class Actions {
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
             + `${format_currency(total_distribution_amount)})`]);
 
-        return arguments;
+        return Object.values(arguments).concat(JSON.stringify(log_instruction));
     }
 }
 
