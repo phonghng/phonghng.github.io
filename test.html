@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        const OBJECT_TYPES_NAME = {
+            "Q": "queue",
+            "F": "fund",
+            "D": "debt",
+            "G": "goal",
+            "queue": "hàng đợi",
+            "fund": "quỹ",
+            "debt": "khoản nợ",
+            "goal": "mục tiêu"
+        };
+
+        const CASHFLOW_CATEGORIES = {
+            "DongGopChung": "Đóng góp các khoản chung",
+            "AnSang": "Ăn sáng",
+            "AnTrua": "Ăn trưa",
+            "AnToi": "Ăn tối",
+            "AnQuanHe": "Ăn/uống chung",
+            "AnVat": "Ăn vặt",
+            "UongVat": "Uống vặt",
+            "NhuYeuPham": "Mua nhu yếu phẩm",
+            "Photo": "In ấn, photocopy",
+            "Qua": "Mua quà tặng",
+            "NapDienThoai": "Tiền điện thoại",
+            "SuaDo": "Sửa đồ",
+            "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
+            "AnUongPhu": "Ăn uống phụ",
+            "CatToc": "Cắt tóc",
+            "XemPhim": "Xem phim rạp",
+            "PhuHuynhGuiTien": "Phụ huynh gửi tiền",
+            "PhanBoThuNhap": "Phân bổ thu nhập"
+        };
+
+        let data = [
+            [
+                1720186116741,
+                "QCr",
+                "Thu nhập chờ phân bổ"
+            ],
+            [
+                1720186126676,
+                "FCr",
+                "Chi tiêu",
+                true,
+                35
+            ],
+            [
+                1720186139375,
+                "FCr",
+                "Hưởng thụ",
+                true,
+                10
+            ],
+            [
+                1720186151619,
+                "FCr",
+                "Dự trữ",
+                false,
+                10
+            ],
+            [
+                1720186166219,
+                "FCr",
+                "Đầu tư",
+                false,
+                10
+            ],
+            [
+                1720186178326,
+                "FCr",
+                "Bảo hiểm",
+                false,
+                35
+            ],
+            [
+                1720201410119,
+                "QPM",
+                "1720186116741",
+                500000,
+                "AnToi",
+                "test"
+            ],
+            [
+                1720201412992,
+                "QID",
+                "1720186116741",
+                "[[1720201412992,\"Q2F\",\"1720186116741\",175000,\"PhanBoThuNhap\",\"Phân bổ thu nhập\",\"1720186126676\"],[1720201412992,\"Q2F\",\"1720186116741\",50000,\"PhanBoThuNhap\",\"Phân bổ thu nhập\",\"1720186139375\"],[1720201412992,\"Q2F\",\"1720186116741\",50000,\"PhanBoThuNhap\",\"Phân bổ thu nhập\",\"1720186151619\"],[1720201412992,\"Q2F\",\"1720186116741\",50000,\"PhanBoThuNhap\",\"Phân bổ thu nhập\",\"1720186166219\"],[1720201412992,\"Q2F\",\"1720186116741\",175000,\"PhanBoThuNhap\",\"Phân bổ thu nhập\",\"1720186178326\"]]"
+            ],
+            [
+                1720201420738,
+                "F2F",
+                "1720186139375",
+                50000,
+                "AnSang",
+                "ádffs",
+                "1720186126676"
+            ],
+            [
+                1720201428638,
+                "FPM",
+                "1720186126676",
+                -25000,
+                "AnTrua",
+                "sádf"
+            ],
+            [
+                1720201438582,
+                "FPM",
+                "1720186126676",
+                100000,
+                "Photo",
+                "ầd"
+            ],
+            [
+                1720201446851,
+                "FPm",
+                "1720186126676",
+                120000,
+                "mobile_banking",
+                "Photo",
+                "ádfsf"
+            ]
+        ];
+
+        function process_logs(logs) {
+            const capitalize_first_letter = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+            const push_flow = (timestamp, flow_type, object_id, category_id, amount, content) => {
+                if (!cashflow.objects[objects_name[object_id]])
+                    cashflow.objects[objects_name[object_id]] = [];
+                cashflow.objects[objects_name[object_id]].push({
+                    timestamp: timestamp,
+                    flow_type: (flow_type ? "in" : "out"),
+                    category: CASHFLOW_CATEGORIES[category_id],
+                    amount: Math.abs(amount),
+                    content: content
+                });
+                if (!cashflow.categories[CASHFLOW_CATEGORIES[category_id]])
+                    cashflow.categories[CASHFLOW_CATEGORIES[category_id]] = [];
+                cashflow.categories[CASHFLOW_CATEGORIES[category_id]].push({
+                    timestamp: timestamp,
+                    flow_type: (flow_type ? "in" : "out"),
+                    object: objects_name[object_id],
+                    amount: Math.abs(amount),
+                    content: content
+                });
+            };
+
+            let objects_name = {};
+            let cashflow = {
+                objects: {},
+                categories: {}
+            };
+
+            for (let log of logs) {
+                if (log[1].match(/(Q|F|D|G)(Cr|Ed)/)?.length) {
+                    let object_type = OBJECT_TYPES_NAME[log[1].match(/(Q|F|D|G)(Cr|Ed)/)[1]];
+                    let object_name = capitalize_first_letter(OBJECT_TYPES_NAME[object_type]);
+                    objects_name[log[0]] = `${object_name} ${log[2]}`;
+                } else if (log[1].match(/[QFDG]PM/)?.length)
+                    push_flow(log[0], log[3] > 0, log[2], log[4], log[3], log[5]);
+                else if (log[1].match(/[QFDG]2[QFDG]/)?.length) {
+                    push_flow(log[0], true, log[6], log[4], log[3], log[5]);
+                    push_flow(log[0], false, log[2], log[4], log[3], log[5]);
+                } else if (log[1].match(/[QFDG]Pm/)?.length)
+                    push_flow(log[0], false, log[2], log[5], log[3], log[6]);
+                else if (log[1] == "QID")
+                    JSON.parse(log[3]).forEach(child_log => {
+                        push_flow(child_log[0], true, child_log[6], child_log[4], child_log[3], child_log[5]);
+                        push_flow(child_log[0], false, child_log[2], child_log[4], child_log[3], child_log[5]);
+                    });
+            }
+            return cashflow;
+        }
+
+        function process_view(cashflow_data, base, count_type, flow_type, start_timestamp, end_timestamp) {
+            let base_counters = {};
+            let base_cashflow = [];
+            for (let [item_name, item_cashflow] of Object.entries(cashflow_data[base])) {
+                if (count_type == "times")
+                    base_counters[item_name] = item_cashflow.length;
+                else if (count_type == "amount")
+                    item_cashflow.forEach(data => {
+                        if (!base_counters[item_name])
+                            base_counters[item_name] = 0;
+                        base_counters[item_name] += data.amount
+                    });
+                base_cashflow = base_cashflow.concat(item_cashflow.filter(data =>
+                    data.flow_type == flow_type
+                    && start_timestamp <= data.timestamp
+                    && data.timestamp <= end_timestamp
+                ));
+
+            }
+            for (let index = 0; index < cashflow_data.length; index++)
+                cashflow_data[index].amount = Math.abs(cashflow_data[index].amount);
+            return {
+                cashflow: base_cashflow,
+                chart_labels: Object.keys(base_counters),
+                chart_dataset: Object.values(base_counters)
+            };
+        }
+
+        console.log(process_view(process_logs(data), "objects", "amount", "in", 0, Date.now()));
+    </script>
+</body>
+
+</html>

@@ -1,3 +1,10 @@
+/**
+ * ----- ABBREVIATIONS -----
+ * args: arguments
+ * anb: allow negative balance
+ * rrid: rate of receiving income distribution (n% out of 100%)
+ */
+
 const OBJECT_TYPES_NAME = {
     "Q": "queue",
     "F": "fund",
@@ -994,10 +1001,10 @@ class Notification {
 }
 
 class Actions_Form {
-    constructor(Notification, Data, form_elm, submit_callback, cancel_callback) {
+    constructor(Notification, Data, form_element, submit_callback, cancel_callback) {
         this.Notification = Notification;
         this.Data = Data;
-        this.form_elm = form_elm;
+        this.form_element = form_element;
         this.submit_callback = submit_callback;
         this.cancel_callback = cancel_callback;
     }
@@ -1025,13 +1032,13 @@ class Actions_Form {
             };
     }
 
-    xADOM(elm_type, name, title, data) {
+    xADOM(element_type, name, title, data) {
         /* Extended PPPL_JS.ADOM for Actions_Form */
 
         if (typeof data == "function")
             data = data();
 
-        switch (elm_type) {
+        switch (element_type) {
             case "Actions_code": {
                 return PPPL_JS.ADOM(["input", {
                     type: "text",
@@ -1053,34 +1060,34 @@ class Actions_Form {
             }
 
             case "submit": {
-                let elm = PPPL_JS.ADOM(["button", {
+                let element = PPPL_JS.ADOM(["button", {
                     title: title,
                     name: name,
                     style: "--base_color: var(--LIME);"
                 }, {
                         innerHTML: title
                     }, null], document);
-                elm.onclick = event => {
+                element.onclick = event => {
                     event.preventDefault();
                     if (this.submit_form())
                         this.submit_callback(this);
                 };
-                return elm;
+                return element;
             }
 
             case "cancel": {
-                let elm = PPPL_JS.ADOM(["button", {
+                let element = PPPL_JS.ADOM(["button", {
                     title: title,
                     name: name,
                     style: "--base_color: var(--CHERRY);"
                 }, {
                         innerHTML: title
                     }, null], document);
-                elm.onclick = event => {
+                element.onclick = event => {
                     event.preventDefault();
                     this.cancel_callback(this);
                 };
-                return elm;
+                return element;
             }
 
             case "checkbox": {
@@ -1190,11 +1197,11 @@ class Actions_Form {
         let xADOM_args_list = this.Data.Actions[Actions_code](type => this.get_object_list(type));
         xADOM_args_list.unshift(["Actions_code", "Actions_code", "Mã hành động", Actions_code]);
         for (let xADOM_args of xADOM_args_list) {
-            let elms = this.xADOM(...xADOM_args);
-            if (elms.constructor.name != "Array")
-                elms = [elms];
-            for (let elm of elms)
-                this.form_elm.appendChild(elm);
+            let elements = this.xADOM(...xADOM_args);
+            if (elements.constructor.name != "Array")
+                elements = [elements];
+            for (let element of elements)
+                this.form_element.appendChild(element);
         }
         return true;
     }
@@ -1202,25 +1209,25 @@ class Actions_Form {
     submit_form() {
         let Actions_function_args = [null];
 
-        let elms = this.form_elm.querySelectorAll("*[name]");
-        for (let elm of elms) {
-            if (elm.tagName == "BUTTON")
+        let elements = this.form_element.querySelectorAll("*[name]");
+        for (let element of elements) {
+            if (element.tagName == "BUTTON")
                 continue;
 
-            if (elm.required && elm.value == "") {
-                elm.focus();
+            if (element.required && element.value == "") {
+                element.focus();
                 this.Notification.notify("ACTIONS_FORM__EMPTY_REQUIRED_FIELD");
                 return false;
             }
 
-            if (elm.tagName == "INPUT" && elm.type == "checkbox")
-                Actions_function_args.push(elm.checked);
-            else if (elm.tagName == "INPUT" && elm.type == "number")
-                Actions_function_args.push(Number(elm.value));
-            else if (elm.tagName == "INPUT" && elm.type == "datetime-local")
-                Actions_function_args.push((new Date(elm.value)).getTime());
+            if (element.tagName == "INPUT" && element.type == "checkbox")
+                Actions_function_args.push(element.checked);
+            else if (element.tagName == "INPUT" && element.type == "number")
+                Actions_function_args.push(Number(element.value));
+            else if (element.tagName == "INPUT" && element.type == "datetime-local")
+                Actions_function_args.push((new Date(element.value)).getTime());
             else
-                Actions_function_args.push(elm.value);
+                Actions_function_args.push(element.value);
         }
 
         let Actions_function_name = Actions_function_args[1];
@@ -1243,14 +1250,14 @@ class Actions_Form {
 }
 
 class UI {
-    constructor(Notification, Data, elms) {
+    constructor(Notification, Data, elements) {
         this.Notification = Notification;
         this.Data = Data;
-        this.elms = elms;
+        this.elements = elements;
         this.Actions_Form = new Actions_Form(
             this.Notification,
             this.Data,
-            this.elms.Actions_popup.querySelector("form"),
+            this.elements.Actions_popup.querySelector("form"),
             () => this.close_Actions_popup(),
             () => this.close_Actions_popup()
         );
@@ -1266,17 +1273,17 @@ class UI {
             () => this.open_Actions_popup("GCr")
         ];
 
-        let buttons = this.elms.header_buttons.querySelectorAll("button");
+        let buttons = this.elements.header_buttons.querySelectorAll("button");
         for (let [index, button] of Object.entries(buttons))
             button.onclick = HEADER_BUTTONS_FUNCTIONS[index];
     }
 
-    open_popup(popup_elm, title, close_callback) {
-        popup_elm.querySelector(".title").innerText = title;
-        popup_elm.querySelector(".close_button").onclick = close_callback;
+    open_popup(popup_element, title, close_callback) {
+        popup_element.querySelector(".title").innerText = title;
+        popup_element.querySelector(".close_button").onclick = close_callback;
 
-        popup_elm.style.display = "flex";
-        popup_elm.querySelector(".main")
+        popup_element.style.display = "flex";
+        popup_element.querySelector(".main")
             .animate([
                 { transform: "scale(0)" },
                 { transform: "scale(1)" },
@@ -1288,8 +1295,8 @@ class UI {
         return true;
     }
 
-    close_popup(popup_elm, closed_callback) {
-        popup_elm.querySelector(".main")
+    close_popup(popup_element, closed_callback) {
+        popup_element.querySelector(".main")
             .animate([
                 { transform: "scale(1)" },
                 { transform: "scale(0)" },
@@ -1298,30 +1305,30 @@ class UI {
                 iterations: 1,
             });
         setTimeout(() => {
-            popup_elm.style.display = "none";
+            popup_element.style.display = "none";
             closed_callback();
         }, 250);
         return true;
     }
 
     open_Actions_popup(Actions_code, prefilled) {
-        this.elms.Actions_popup.querySelector("form").innerHTML = "";
+        this.elements.Actions_popup.querySelector("form").innerHTML = "";
         this.Actions_Form.generate_form(Actions_code);
         if (prefilled)
-            for (let [elm_name, attribute_name, value] of prefilled)
-                this.elms.Actions_popup.querySelector(`*[name="${elm_name}"]`)[attribute_name] = value;
+            for (let [element_name, attribute_name, value] of prefilled)
+                this.elements.Actions_popup.querySelector(`*[name="${element_name}"]`)[attribute_name] = value;
         this.open_popup(
-            this.elms.Actions_popup,
-            this.elms.Actions_popup.querySelector("button[name='submit']").innerText,
+            this.elements.Actions_popup,
+            this.elements.Actions_popup.querySelector("button[name='submit']").innerText,
             () => this.close_Actions_popup()
         );
-        this.elms.Actions_popup.querySelector("form *:nth-child(2)").focus();
+        this.elements.Actions_popup.querySelector("form *:nth-child(2)").focus();
         return true;
     }
 
     close_Actions_popup() {
-        this.close_popup(this.elms.Actions_popup, () => {
-            this.elms.Actions_popup.querySelector("form").innerHTML = "";
+        this.close_popup(this.elements.Actions_popup, () => {
+            this.elements.Actions_popup.querySelector("form").innerHTML = "";
         });
         return true;
     }
@@ -1395,7 +1402,7 @@ class UI {
     }
 
     reset_object_card_list() {
-        this.elms.object_card_list.textContent = "";
+        this.elements.object_card_list.textContent = "";
         return true;
     }
 
@@ -1403,10 +1410,10 @@ class UI {
         this.reset_object_card_list();
         for (let [type_name, objects] of Object.entries(this.Data.data))
             for (let object_id of Object.keys(objects))
-                this.elms.object_card_list.appendChild(
+                this.elements.object_card_list.appendChild(
                     this.generate_object_card(type_name.replace(/s$/g, ""), object_id)
                 );
-        new Masonry(this.elms.object_card_list, {
+        new Masonry(this.elements.object_card_list, {
             itemSelector: ".object_card",
             gutter: 10,
             fitWidth: true
@@ -1422,38 +1429,38 @@ class UI {
             return ret;
         }
 
-        this.elms.logs_popup.querySelector("table").innerHTML = "";
+        this.elements.logs_popup.querySelector("table").innerHTML = "";
 
         let object = this.Data.data[`${type_name}s`][object_id.split("_")[1]];
         let formatted_type_name = type_name + (object.type ? `_${object.type}` : "");
 
-        let table_elm = this.elms.logs_popup.querySelector("table");
+        let table_element = this.elements.logs_popup.querySelector("table");
         for (let log of reverse_array(object.logs)) {
-            let tr_elm = document.createElement("tr");
+            let tr_element = document.createElement("tr");
 
-            let timestamp_td_elm = document.createElement("td");
-            timestamp_td_elm.innerText = format_time(log[0]);
-            tr_elm.appendChild(timestamp_td_elm);
+            let timestamp_td_element = document.createElement("td");
+            timestamp_td_element.innerText = format_time(log[0]);
+            tr_element.appendChild(timestamp_td_element);
 
-            let icon_td_elm = document.createElement("td");
-            icon_td_elm.style = `color: ${log[2]};`;
-            let icon_elm = document.createElement("i");
-            icon_elm.classList.add("fas", `fa-${log[1]}`);
-            icon_td_elm.appendChild(icon_elm);
-            tr_elm.appendChild(icon_td_elm);
+            let icon_td_element = document.createElement("td");
+            icon_td_element.style = `color: ${log[2]};`;
+            let icon_element = document.createElement("i");
+            icon_element.classList.add("fas", `fa-${log[1]}`);
+            icon_td_element.appendChild(icon_element);
+            tr_element.appendChild(icon_td_element);
 
-            let content_td_elm = document.createElement("td");
-            content_td_elm.innerHTML = log[3];
-            tr_elm.appendChild(content_td_elm);
+            let content_td_element = document.createElement("td");
+            content_td_element.innerHTML = log[3];
+            tr_element.appendChild(content_td_element);
 
-            table_elm.appendChild(tr_elm);
+            table_element.appendChild(tr_element);
         }
 
         this.open_popup(
-            this.elms.logs_popup,
+            this.elements.logs_popup,
             `Nhật kí ${OBJECT_TYPES_NAME[formatted_type_name]} "${object.name}"`,
-            () => this.close_popup(this.elms.logs_popup, () => {
-                this.elms.logs_popup.querySelector("table").innerHTML = "";
+            () => this.close_popup(this.elements.logs_popup, () => {
+                this.elements.logs_popup.querySelector("table").innerHTML = "";
             })
         );
 
