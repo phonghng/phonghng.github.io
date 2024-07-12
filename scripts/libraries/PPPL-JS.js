@@ -272,6 +272,27 @@ const PPPL_JS = {
                         ], document);
                     break;
                 }
+
+                /* item_data = { required, disabled, value } */
+                case "password": {
+                    main_ADOM =
+                        PPPL_JS.ADOM([
+                            "input",
+                            {
+                                type: "password",
+                                id: _item_id,
+                                placeholder: _item_title,
+                                title: _item_title,
+                                required: item_data.required,
+                                disabled: item_data.disabled,
+                                value: item_data.value
+                            },
+                            null,
+                            null
+                        ], document);
+                    break;
+                }
+                
                 /* item_data = { required, disabled, value, style } */
                 case "textarea": {
                     main_ADOM =
