@@ -87,8 +87,12 @@ document.querySelector("#sign_submit").addEventListener("click", async () => {
     }
     password_input.value = "";
     show_result("Đang kí...", "LEMON");
+    let download_filename;
     try {
-        download_pdf_bytes(await sign_PDF(file_uploader, private_key), file_uploader.files[0].name + " (PPUP-AES signed)");
+        download_filename = file_uploader.files[0].name.split(".");
+        download_filename[download_filename.length - 2] += " (signed by PPUP-AES)";
+        download_filename = download_filename.join(".")
+        download_pdf_bytes(await sign_PDF(file_uploader, private_key), download_filename);
         return show_result("Kí thành công, vui lòng kiểm tra tệp đang được tải về!", "LIME");
     } catch (error) {
         console.log(error);
