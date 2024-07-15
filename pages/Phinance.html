@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="../scripts/Phinance.js"></script>
 
     <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet" />
@@ -40,6 +41,10 @@
             <i class="fas fa-bullseye"></i>
             Tạo mục tiêu mới
         </button>
+        <button style="--base_color: var(--LIME);">
+            <i class="fas fa-chart-pie"></i>
+            Xem thống kê
+        </button>
     </div>
 
     <div class="popup_container" id="Actions_popup">
@@ -66,6 +71,40 @@
         </div>
     </div>
 
+    <div class="popup_container" id="analytics_popup">
+        <div class="main">
+            <div class="title"></div>
+            <button class="close_button">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="content">
+                <div id="analytics_controler">
+                    <select id="analytics_count_type_select">
+                        <option value="" disabled selected>...</option>
+                        <option value="times">Mục</option>
+                        <option value="amount">Lượng</option>
+                    </select>
+                    <select id="analytics_flow_type_select">
+                        <option value="" disabled selected>...</option>
+                        <option value="out">tiền ra</option>
+                        <option value="in">tiền vào</option>
+                    </select>
+                    theo <select id="analytics_base_select">
+                        <option value="" disabled selected>...</option>
+                        <option value="objects">đối tượng</option>
+                        <option value="categories">phân loại</option>
+                    </select>
+                    từ <input type="datetime-local" id="analytics_start_timestamp_input" />
+                    đến <input type="datetime-local" id="analytics_end_timestamp_input" />
+                    <button onclick="load_analytics(_Data.logs)">Xem thống kê</button>
+                </div>
+                <div id="analytics_chart">
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let _Notification = new Notification();
         let _Data = new Data(
@@ -80,12 +119,37 @@
                 header_buttons: document.querySelector("body>.buttons"),
                 Actions_popup: document.querySelector("#Actions_popup"),
                 object_card_list: document.querySelector("#object_card_list"),
-                logs_popup: document.querySelector("#logs_popup")
+                logs_popup: document.querySelector("#logs_popup"),
+                analytics_popup: document.querySelector("#analytics_popup")
+            }
+        );
+        let analytics_chartjs = new Chart(
+            document.querySelector("#analytics_chart canvas"),
+            {
+                type: "pie",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "",
+                        data: [],
+                        backgroundColor: [
+                            "rgb(255, 99, 132)",
+                            "rgb(255, 159, 64)",
+                            "rgb(255, 205, 86)",
+                            "rgb(75, 192, 192)",
+                            "rgb(54, 162, 235)",
+                            "rgb(153, 102, 255)",
+                            "rgb(201, 203, 207)"
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
             }
         );
         if (_Data.get_set_endpoint)
             _Data.get_logs();
-
         function manually_process_fetch_queue() {
             let is_true = confirm("Bạn có chắc muốn process_fetch_queue thủ công?");
             if (!is_true)

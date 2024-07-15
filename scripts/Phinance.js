@@ -1270,7 +1270,15 @@ class UI {
             () => this.open_Actions_popup("QCr"),
             () => this.open_Actions_popup("FCr"),
             () => this.open_Actions_popup("DCr"),
-            () => this.open_Actions_popup("GCr")
+            () => this.open_Actions_popup("GCr"),
+            () => this.open_popup(
+                this.elements.analytics_popup,
+                "Thống kê",
+                () => this.close_popup(
+                    this.elements.analytics_popup,
+                    () => { }
+                )
+            )
         ];
 
         let buttons = this.elements.header_buttons.querySelectorAll("button");
@@ -1466,4 +1474,117 @@ class UI {
 
         return true;
     }
+}
+
+function load_analytics(data) {
+    function process_logs(logs) {
+        const capitalize_first_letter = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+        const push_flow = (timestamp, flow_type, object_id, category_id, amount, content) => {
+            if (!cashflow.objects[objects_name[object_id]])
+                cashflow.objects[objects_name[object_id]] = [];
+            cashflow.objects[objects_name[object_id]].push({
+                timestamp: timestamp,
+                flow_type: (flow_type ? "in" : "out"),
+                object: objects_name[object_id],
+                category: CASHFLOW_CATEGORIES[category_id],
+                amount: Math.abs(amount),
+                content: content
+            });
+            if (!cashflow.categories[CASHFLOW_CATEGORIES[category_id]])
+                cashflow.categories[CASHFLOW_CATEGORIES[category_id]] = [];
+            cashflow.categories[CASHFLOW_CATEGORIES[category_id]].push({
+                timestamp: timestamp,
+                flow_type: (flow_type ? "in" : "out"),
+                object: objects_name[object_id],
+                category: CASHFLOW_CATEGORIES[category_id],
+                amount: Math.abs(amount),
+                content: content
+            });
+        };
+
+        let objects_name = {};
+        let cashflow = {
+            objects: {},
+            categories: {}
+        };
+
+        for (let log of logs) {
+            if (log[1].match(/(Q|F|D|G)(Cr|Ed)/)?.length) {
+                let object_type = OBJECT_TYPES_NAME[log[1].match(/(Q|F|D|G)(Cr|Ed)/)[1]];
+                let object_name = capitalize_first_letter(OBJECT_TYPES_NAME[object_type]);
+                objects_name[log[0]] = `${object_name} ${log[2]}`;
+            } else if (log[1].match(/[QFDG]PM/)?.length)
+                push_flow(log[0], log[3] > 0, log[2], log[4], log[3], log[5]);
+            else if (log[1].match(/[QFDG]2[QFDG]/)?.length) {
+                push_flow(log[0], true, log[6], log[4], log[3], log[5]);
+                push_flow(log[0], false, log[2], log[4], log[3], log[5]);
+            } else if (log[1].match(/[QFDG]Pm/)?.length)
+                push_flow(log[0], false, log[2], log[5], log[3], log[6]);
+            else if (log[1] == "QID")
+                JSON.parse(log[3]).forEach(child_log => {
+                    push_flow(child_log[0], true, child_log[6], child_log[4], child_log[3], child_log[5]);
+                    push_flow(child_log[0], false, child_log[2], child_log[4], child_log[3], child_log[5]);
+                });
+        }
+        return cashflow;
+    }
+
+    function process_view(cashflow_data, base, count_type, flow_type, start_timestamp, end_timestamp) {
+        let base_counters = {};
+        let base_cashflow = [];
+        for (let [item_name, item_cashflow] of Object.entries(cashflow_data[base])) {
+            item_cashflow = item_cashflow.filter(data =>
+                data.flow_type == flow_type
+                && start_timestamp <= data.timestamp
+                && data.timestamp <= end_timestamp
+            );
+            if (count_type == "times")
+                base_counters[item_name] = item_cashflow.length;
+            else if (count_type == "amount")
+                item_cashflow.forEach(data => {
+                    if (!base_counters[item_name])
+                        base_counters[item_name] = 0;
+                    base_counters[item_name] += data.amount
+                });
+            base_cashflow = base_cashflow.concat(item_cashflow);
+
+        }
+        for (let index = 0; index < cashflow_data.length; index++)
+            cashflow_data[index].amount = Math.abs(cashflow_data[index].amount);
+        return {
+            cashflow: base_cashflow,
+            chart_labels: Object.keys(base_counters),
+            chart_dataset: Object.values(base_counters)
+        };
+    }
+
+    let base = document.querySelector("#analytics_base_select").value;
+    let count_type = document.querySelector("#analytics_count_type_select").value;
+    let flow_type = document.querySelector("#analytics_flow_type_select").value;
+    let start_timestamp = new Date(document.querySelector("#analytics_start_timestamp_input").value).getTime();
+    let end_timestamp = new Date(document.querySelector("#analytics_end_timestamp_input").value).getTime();
+    if (!base || !count_type || !flow_type
+        || !start_timestamp || !end_timestamp
+        || start_timestamp > end_timestamp)
+        return false;
+    let view_data = process_view(
+        process_logs(data),
+        base,
+        count_type,
+        flow_type,
+        start_timestamp,
+        end_timestamp
+    );
+
+    analytics_chartjs.data.labels = view_data.chart_labels;
+    let count_type_name =
+        document.querySelector(`#analytics_count_type_select option[value="${count_type}"]`)
+            .innerText.toLowerCase();
+    let flow_type_name =
+        document.querySelector(`#analytics_flow_type_select option[value="${flow_type}"]`)
+            .innerText.toLowerCase();
+    analytics_chartjs.data.datasets[0].label = `Số ${count_type_name} ${flow_type_name}`;
+    analytics_chartjs.data.datasets[0].data = view_data.chart_dataset;
+    analytics_chartjs.update();
 }

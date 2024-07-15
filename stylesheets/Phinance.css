@@ -427,3 +427,51 @@ body>.buttons button:active i {
 .popup_container#logs_popup table tr td:nth-child(3) {
     text-align: justify;
 }
+
+#analytics_controler {
+    text-align: center;
+    width: 100%;
+}
+
+#analytics_controler select,
+#analytics_controler input {
+    font-size: inherit;
+    background-color: transparent;
+    border-width: 0px 2px 2px 2px;
+    border-color: transparent transparent var(--BLUE) transparent;
+    color: inherit;
+    border-radius: 5px;
+    padding: 5px;
+    width: min-content;
+    appearance: none;
+    text-align: center;
+}
+
+#analytics_controler button {
+    font-size: inherit;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    color: var(--WHITE);
+    transition: background-color, color 0.25s;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: var(--BLUE);
+    margin: 5px;
+}
+
+#analytics_controler button:hover {
+    background-color: var(--WHITE);
+    color: var(--BLUE);
+}
+
+#analytics_controler button:active {
+    background-color: var(--BLUE);
+    color: var(--WHITE);
+}
+
+#analytics_chart {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
