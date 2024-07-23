@@ -294,31 +294,37 @@ const HABITS = {
                     children: {
                         danh_rang_sang: {
                             type: "habit_check",
-                            name: "Đánh răng, rửa mặt buổi sáng",
+                            name: "Đánh răng (...), rửa mặt buổi sáng",
                             required: true,
                             point: 15
                         },
                         danh_rang_toi: {
                             type: "habit_check",
-                            name: "Đánh răng, rửa mặt buổi tối",
+                            name: "Đánh răng (...), rửa mặt buổi tối",
                             required: true,
                             point: 15
                         },
-                        tam_rua: {
+                        rua_mat: {
                             type: "habit_check",
-                            name: "Tắm, rửa mặt bằng sữa rửa mặt",
+                            name: "Rửa mặt (Garnier Skin Natuarals Bright Complete Anti-Acne Cleansing Foam)",
                             required: true,
-                            point: 35
+                            point: 10
+                        },
+                        tam_goi: {
+                            type: "habit_check",
+                            name: "Tắm, gội đầu (Sữa tắm gội nam 3in1 RHYS MAN hương nước hoa Rhys Legend)",
+                            required: true,
+                            point: 25
                         },
                         uong_tpcn: {
                             type: "habit_check",
-                            name: "Uống 1 viên Vitamins, 3 viên Minerals, 3 viên Omega-3",
+                            name: "Uống 1 viên DHC Multi Vitamins, 3 viên DHC Minerals, 3 viên Omega 3 Pure Alaska Omega 333mg EPA DHA",
                             required: true,
                             point: 25
                         },
                         chuan_bi_ra_ngoai: {
                             type: "habit_check",
-                            name: "Bôi kem chống nắng, ăn mặc, để tóc phù hợp khi ra ngoài",
+                            name: "Bôi kem chống nắng (Vichy Capital Soleil Anti Brillance Mattifying SPF50+ UVB+UVA), ăn mặc, để tóc phù hợp khi ra ngoài",
                             required: true,
                             point: 35
                         },
