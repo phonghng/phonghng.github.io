@@ -78,28 +78,36 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="content">
-                <div id="analytics_controler">
-                    <select id="analytics_count_type_select">
-                        <option value="" disabled selected>...</option>
-                        <option value="times">Mục</option>
-                        <option value="amount">Lượng</option>
-                    </select>
-                    <select id="analytics_flow_type_select">
-                        <option value="" disabled selected>...</option>
-                        <option value="out">tiền ra</option>
-                        <option value="in">tiền vào</option>
-                    </select>
-                    theo <select id="analytics_base_select">
-                        <option value="" disabled selected>...</option>
-                        <option value="objects">đối tượng</option>
-                        <option value="categories">phân loại</option>
-                    </select>
-                    từ <input type="datetime-local" id="analytics_start_timestamp_input" />
-                    đến <input type="datetime-local" id="analytics_end_timestamp_input" />
-                    <button onclick="load_analytics(_Data.logs)">Xem thống kê</button>
-                </div>
-                <div id="analytics_chart">
-                    <canvas></canvas>
+                <div id="analytics_container">
+                    <div id="analytics_controler">
+                        <select id="analytics_count_type_select">
+                            <option value="" disabled selected>...</option>
+                            <option value="times">Mục</option>
+                            <option value="amount">Lượng</option>
+                        </select>
+                        <select id="analytics_flow_type_select">
+                            <option value="" disabled selected>...</option>
+                            <option value="out">tiền ra</option>
+                            <option value="in">tiền vào</option>
+                        </select>
+                        theo <select id="analytics_base_select">
+                            <option value="" disabled selected>...</option>
+                            <option value="objects">đối tượng</option>
+                            <option value="categories">phân loại</option>
+                        </select>
+                        từ <input type="datetime-local" id="analytics_start_timestamp_input" />
+                        đến <input type="datetime-local" id="analytics_end_timestamp_input" />
+                        <button onclick="load_analytics(_Data.logs)">Xem thống kê</button>
+                    </div>
+                    <div id="analytics_chart">
+                        <canvas></canvas>
+                    </div>
+                    <div id="analytics_cashflow">
+                        <div id="analytics_cashflow_warning">CHƯA CÓ DỮ LIỆU</div>
+                        <div id="analytics_cashflow_list"></div>
+                        <div id="analytics_cashflow_note"><i>Lưu ý: bấm vào tên đối tượng/phân loại trong biểu đồ để lọc
+                                khỏi thống kê.</i></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,7 +152,15 @@
                     }]
                 },
                 options: {
-                    responsive: true
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            onClick: (event, legend_item, legend) => {
+                                Chart.controllers.doughnut.overrides.plugins.legend.onClick(event, legend_item, legend);
+                                load_analytics(_Data.logs);
+                            }
+                        }
+                    }
                 }
             }
         );

@@ -26,22 +26,24 @@ const PAYMENT_METHODS = {
 };
 
 const CASHFLOW_CATEGORIES = {
-    "DongGopChung": "Đóng góp các khoản chung",
-    "AnSang": "Ăn sáng",
-    "AnTrua": "Ăn trưa",
-    "AnToi": "Ăn tối",
-    "AnQuanHe": "Ăn/uống chung",
+    "AnChinh": "Ăn bữa chính",
+    "AnPhu": "Ăn bữa phụ",
     "AnVat": "Ăn vặt",
     "UongVat": "Uống vặt",
+    "AnTapThe": "Ăn uống tập thể",
+
+    "XemPhim": "Xem phim rạp",
+
     "NhuYeuPham": "Mua nhu yếu phẩm",
+    "CatToc": "Cắt tóc",
     "Photo": "In ấn, photocopy",
     "Qua": "Mua quà tặng",
-    "NapDienThoai": "Tiền điện thoại",
     "SuaDo": "Sửa đồ",
+
+    "NapDienThoai": "Tiền điện thoại",
     "DangKiOnline": "Đăng kí dịch vụ trực tuyến",
-    "AnUongPhu": "Ăn uống phụ",
-    "CatToc": "Cắt tóc",
-    "XemPhim": "Xem phim rạp",
+
+    "DongGopChung": "Đóng góp các khoản tập thể",
     "PhuHuynhGuiTien": "Phụ huynh gửi tiền",
     "PhanBoThuNhap": "Phân bổ thu nhập"
 };
@@ -736,16 +738,16 @@ class Actions {
         let queue_log_strings = [];
         let total_distribution_amount = 0;
         for (let [fund_id, distribution_amount] of distribution_info) {
+            let fund = funds[fund_id];
             log_instruction.push([
                 timestamp,
                 "Q2F",
                 queue_id,
                 distribution_amount,
                 "PhanBoThuNhap",
-                "Phân bổ thu nhập",
+                `Phân bổ thu nhập đến quỹ "${fund.name}"`,
                 fund_id
             ]);
-            let fund = funds[fund_id];
             fund.balance += distribution_amount;
             total_distribution_amount += distribution_amount;
             queue.balance -= distribution_amount;
@@ -1531,8 +1533,13 @@ function load_analytics(data) {
     }
 
     function process_view(cashflow_data, base, count_type, flow_type, start_timestamp, end_timestamp) {
+        let base_hidden_flag = {};
+        for (let chart_legend of analytics_chartjs.legend.legendItems)
+            base_hidden_flag[chart_legend.text] = chart_legend.hidden;
+
         let base_counters = {};
         let base_cashflow = [];
+
         for (let [item_name, item_cashflow] of Object.entries(cashflow_data[base])) {
             item_cashflow = item_cashflow.filter(data =>
                 data.flow_type == flow_type
@@ -1545,18 +1552,53 @@ function load_analytics(data) {
                 item_cashflow.forEach(data => {
                     if (!base_counters[item_name])
                         base_counters[item_name] = 0;
-                    base_counters[item_name] += data.amount
+                    base_counters[item_name] += data.amount;
                 });
             base_cashflow = base_cashflow.concat(item_cashflow);
-
         }
-        for (let index = 0; index < cashflow_data.length; index++)
-            cashflow_data[index].amount = Math.abs(cashflow_data[index].amount);
+
+        let in_item_base_name = base == "objects" ? "object" : "category";
         return {
-            cashflow: base_cashflow,
+            cashflow: base_cashflow.filter(item => !base_hidden_flag[item[in_item_base_name]]),
             chart_labels: Object.keys(base_counters),
             chart_dataset: Object.values(base_counters)
         };
+    }
+
+    function generate_analytics_cashflow_item(cashflow_item_data) {
+        let currency_formatter =
+            new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            });
+        return PPPL_JS.ADOM([
+            "div",
+            { "class": "analytics_cashflow_item" },
+            null,
+            [[
+                "div",
+                { "class": "tag" },
+                { "innerHTML": moment(cashflow_item_data.timestamp).format("HH:MM DD/MM/YYYY") }
+            ], [
+                "div",
+                { "class": "tag" },
+                { "innerHTML": cashflow_item_data.object }
+            ], [
+                "div",
+                { "class": "tag" },
+                { "innerHTML": cashflow_item_data.category }
+            ], [
+                "div",
+                { "class": "content" },
+                {
+                    "innerHTML": `<span class="amount_${cashflow_item_data.flow_type}">`
+                        + `${currency_formatter.format(cashflow_item_data.amount)}`
+                        + `</span>`
+                        + `${cashflow_item_data.content}`
+                }
+            ]],
+            null
+        ], document);
     }
 
     let base = document.querySelector("#analytics_base_select").value;
@@ -1587,4 +1629,13 @@ function load_analytics(data) {
     analytics_chartjs.data.datasets[0].label = `Số ${count_type_name} ${flow_type_name}`;
     analytics_chartjs.data.datasets[0].data = view_data.chart_dataset;
     analytics_chartjs.update();
+
+    document.querySelector("#analytics_cashflow_warning").style.display =
+        view_data.cashflow.length ? "none" : "block";
+
+    document.querySelector("#analytics_cashflow_list").innerHTML = "";
+    for (let cashflow_item_data of view_data.cashflow)
+        document.querySelector("#analytics_cashflow_list").appendChild(
+            generate_analytics_cashflow_item(cashflow_item_data)
+        );
 }

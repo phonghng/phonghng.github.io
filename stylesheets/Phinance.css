@@ -289,9 +289,10 @@ body>.buttons button:active i {
     display: none;
     justify-content: center;
     align-items: center;
+    padding: 15px;
 }
 
-.popup_container .main {
+.popup_container>.main {
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-template-rows: min-content 1fr;
@@ -305,7 +306,7 @@ body>.buttons button:active i {
     padding: 10px;
 }
 
-.popup_container .title {
+.popup_container>.main>.title {
     grid-area: title;
     background-color: var(--GREY_3);
     border-radius: 5px;
@@ -316,7 +317,7 @@ body>.buttons button:active i {
     overflow: auto;
 }
 
-.popup_container .close_button {
+.popup_container>.main>.close_button {
     grid-area: close_button;
     border: none;
     border-radius: 5px;
@@ -328,17 +329,17 @@ body>.buttons button:active i {
     cursor: pointer;
 }
 
-.popup_container .close_button:hover {
+.popup_container>.main>.close_button:hover {
     background-color: var(--CHERRY);
     color: var(--WHITE);
 }
 
-.popup_container .close_button:active {
+.popup_container>.main>.close_button:active {
     background-color: var(--CHERRY);
     color: var(--CHERRY);
 }
 
-.popup_container .content {
+.popup_container>.main>.content {
     grid-area: content;
     background-color: var(--GREY_3);
     border-radius: 5px;
@@ -428,7 +429,20 @@ body>.buttons button:active i {
     text-align: justify;
 }
 
+#analytics_container {
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-template-rows: min-content auto;
+    gap: 10px 10px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "analytics_controler analytics_controler"
+        "analytics_chart analytics_cashflow";
+    height: 80vh;
+}
+
 #analytics_controler {
+    grid-area: analytics_controler;
     text-align: center;
     width: 100%;
 }
@@ -471,7 +485,81 @@ body>.buttons button:active i {
 }
 
 #analytics_chart {
-    max-width: 500px;
-    margin: 0 auto;
+    grid-area: analytics_chart;
+    height: 100%;
     text-align: center;
+    border-radius: 10px;
+    background-color: var(--GREY_1);
+    align-content: center;
+    padding: 10px;
+}
+
+#analytics_chart canvas {
+    width: 450px !important;
+}
+
+@media (max-width: 750px) {
+    #analytics_chart canvas {
+        width: 250px !important;
+    }
+}
+
+@media (max-width: 450px) {
+    #analytics_chart canvas {
+        width: 100px !important;
+    }
+}
+
+#analytics_cashflow {
+    grid-area: analytics_cashflow;
+    overflow: auto;
+}
+
+#analytics_cashflow_warning {
+    text-align: center;
+    text-transform: capitalize;
+    color: var(--GREY_0);
+    padding: 20px 0;
+}
+
+#analytics_cashflow_list .analytics_cashflow_item {
+    width: 100%;
+    border-radius: 10px;
+    background-color: var(--GREY_1);
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+#analytics_cashflow_list .analytics_cashflow_item .tag {
+    padding: 5px;
+    background-color: var(--GREY_2);
+    border-radius: 5px;
+    width: fit-content;
+    font-size: 14px;
+    margin: 0 5px 5px 0;
+    display: inline-block;
+}
+
+#analytics_cashflow_list .analytics_cashflow_item .content {
+    text-align: justify;
+}
+
+#analytics_cashflow_list .analytics_cashflow_item .amount_in,
+#analytics_cashflow_list .analytics_cashflow_item .amount_out {
+    font-weight: bold;
+    font-size: 30px;
+    margin-right: 10px;
+}
+
+#analytics_cashflow_list .analytics_cashflow_item .amount_in {
+    color: var(--LIME);
+}
+
+#analytics_cashflow_list .analytics_cashflow_item .amount_out {
+    color: var(--CHERRY);
+}
+
+#analytics_cashflow_note {
+    font-size: 16px;
+    text-align: justify;
 }
