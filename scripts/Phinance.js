@@ -1579,7 +1579,7 @@ function load_analytics(data) {
             [[
                 "div",
                 { "class": "tag" },
-                { "innerHTML": moment(cashflow_item_data.timestamp).format("HH:MM DD/MM/YYYY") }
+                { "innerHTML": moment(cashflow_item_data.timestamp).format("HH:mm DD/MM/YYYY") }
             ], [
                 "div",
                 { "class": "tag" },
