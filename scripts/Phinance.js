@@ -46,7 +46,8 @@ const CASHFLOW_CATEGORIES = {
     "DongGopChung": "Đóng góp các khoản tập thể",
     "PhuHuynhGuiTien": "Phụ huynh gửi tiền",
     "PhanBoThuNhap": "Phân bổ thu nhập",
-    "DuTruHoa": "Dự trữ hoá"
+    "DuTruHoa": "Dự trữ hoá",
+    "TraNo": "Trả nợ"
 };
 
 const NOTIFICATION_TEXTS = {
