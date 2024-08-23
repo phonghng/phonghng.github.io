@@ -1484,6 +1484,12 @@ class UI {
 }
 
 function load_analytics(data) {
+    const currency_formatter =
+        new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+
     function process_logs(logs) {
         const capitalize_first_letter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -1564,45 +1570,29 @@ function load_analytics(data) {
 
         let in_item_base_name = base == "objects" ? "object" : "category";
         return {
-            cashflow: base_cashflow.filter(item => !base_hidden_flag[item[in_item_base_name]]),
+            cashflow: base_cashflow
+                .filter(item => !base_hidden_flag[item[in_item_base_name]])
+                .sort((a, b) => a.timestamp - b.timestamp),
             chart_labels: Object.keys(base_counters),
             chart_dataset: Object.values(base_counters)
         };
     }
 
     function generate_analytics_cashflow_item(cashflow_item_data) {
-        let currency_formatter =
-            new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-            });
         return PPPL_JS.ADOM([
             "div",
-            { "class": "analytics_cashflow_item" },
-            null,
-            [[
-                "div",
-                { "class": "tag" },
-                { "innerHTML": moment(cashflow_item_data.timestamp).format("HH:mm DD/MM/YYYY") }
-            ], [
-                "div",
-                { "class": "tag" },
-                { "innerHTML": cashflow_item_data.object }
-            ], [
-                "div",
-                { "class": "tag" },
-                { "innerHTML": cashflow_item_data.category }
-            ], [
-                "div",
-                { "class": "content" },
-                {
-                    "innerHTML": `<span class="amount_${cashflow_item_data.flow_type}">`
-                        + `${currency_formatter.format(cashflow_item_data.amount)}`
-                        + `</span>`
-                        + `${cashflow_item_data.content}`
-                }
-            ]],
-            null
+            {
+                "class": "analytics_cashflow_item",
+                "title": `Thời điểm: ${moment(cashflow_item_data.timestamp).format("HH:mm DD/MM/YYYY")}\n`
+                    + `Đối tượng: ${cashflow_item_data.object}\n`
+                    + `Phân loại: ${cashflow_item_data.category}`
+            },
+            {
+                "innerHTML": `<span class="amount_${cashflow_item_data.flow_type}">`
+                    + `${currency_formatter.format(cashflow_item_data.amount)}`
+                    + `</span>`
+                    + `${cashflow_item_data.content}`
+            }
         ], document);
     }
 
@@ -1637,7 +1627,10 @@ function load_analytics(data) {
 
     document.querySelector("#analytics_cashflow_warning").style.display =
         view_data.cashflow.length ? "none" : "block";
-
+    document.querySelector("#analytics_cashflow_sum").innerHTML =
+        currency_formatter.format(
+            view_data.cashflow.reduce((partial_sum, data) => partial_sum + data.amount, 0)
+        );
     document.querySelector("#analytics_cashflow_list").innerHTML = "";
     for (let cashflow_item_data of view_data.cashflow)
         document.querySelector("#analytics_cashflow_list").appendChild(

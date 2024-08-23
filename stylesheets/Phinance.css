@@ -528,26 +528,13 @@ body>.buttons button:active i {
     background-color: var(--GREY_1);
     margin-bottom: 10px;
     padding: 10px;
-}
-
-#analytics_cashflow_list .analytics_cashflow_item .tag {
-    padding: 5px;
-    background-color: var(--GREY_2);
-    border-radius: 5px;
-    width: fit-content;
-    font-size: 14px;
-    margin: 0 5px 5px 0;
-    display: inline-block;
-}
-
-#analytics_cashflow_list .analytics_cashflow_item .content {
     text-align: justify;
 }
 
 #analytics_cashflow_list .analytics_cashflow_item .amount_in,
 #analytics_cashflow_list .analytics_cashflow_item .amount_out {
     font-weight: bold;
-    font-size: 30px;
+    font-size: 22px;
     margin-right: 10px;
 }
 
@@ -562,4 +549,8 @@ body>.buttons button:active i {
 #analytics_cashflow_note {
     font-size: 16px;
     text-align: justify;
+}
+
+#analytics_cashflow_note p {
+    margin-block: 10px;
 }
