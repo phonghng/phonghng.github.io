@@ -559,6 +559,7 @@ class Actions {
     O2O(
         timestamp,
         Actions_code,
+        defacto_timestamp,
         source_id,
         amount,
         category,
@@ -567,6 +568,7 @@ class Actions {
     ) {
         if (typeof timestamp == "function")
             return [
+                ["datetime", "defacto_timestamp", "Thời điểm thực hiện"],
                 ["select_group", "source_id", "Đối tượng gửi", () => timestamp()],
                 ["number", "amount", "Số tiền", { min: 0 }],
                 ["select", "category", "Phân loại", CASHFLOW_CATEGORIES],
@@ -595,12 +597,12 @@ class Actions {
         target_type = target.type ? `${target_type}_${target.type}` : target_type;
 
         source.balance -= amount;
-        source.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
+        source.logs.push([defacto_timestamp, "inbox-out", "var(--CHERRY)",
             `Chuyển ${format_currency(amount)} tới ${OBJECT_TYPES_NAME[target_type]} `
             + `"${target.name}" thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
         target.balance += amount;
-        target.logs.push([timestamp, "inbox-in", "var(--LIME)",
+        target.logs.push([defacto_timestamp, "inbox-in", "var(--LIME)",
             `Nhận ${format_currency(amount)} từ ${OBJECT_TYPES_NAME[source_type]} `
             + `"${source.name}" thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
@@ -610,6 +612,7 @@ class Actions {
     OPM(
         timestamp,
         Actions_code,
+        defacto_timestamp,
         object_id,
         amount,
         category,
@@ -617,6 +620,7 @@ class Actions {
     ) {
         if (typeof timestamp == "function")
             return [
+                ["datetime", "defacto_timestamp", "Thời điểm thực hiện"],
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
                 ["number", "amount", "Số tiền"],
                 ["select", "category", "Phân loại", CASHFLOW_CATEGORIES],
@@ -639,11 +643,11 @@ class Actions {
         let object = this.Data.data[`${object_type}s`][object_id];
         object.balance += amount;
         if (amount >= 0)
-            object.logs.push([timestamp, "inbox-in", "var(--LIME)",
+            object.logs.push([defacto_timestamp, "inbox-in", "var(--LIME)",
                 `Cộng ${format_currency(amount)} thuộc loại ${CASHFLOW_CATEGORIES[category]}`
                 + ` với nội dung "${content}"`]);
         else
-            object.logs.push([timestamp, "inbox-out", "var(--CHERRY)",
+            object.logs.push([defacto_timestamp, "inbox-out", "var(--CHERRY)",
                 `Trừ ${format_currency(-amount)} thuộc loại ${CASHFLOW_CATEGORIES[category]}`
                 + ` với nội dung "${content}"`]);
 
@@ -653,6 +657,7 @@ class Actions {
     OPm(
         timestamp,
         Actions_code,
+        defacto_timestamp,
         object_id,
         amount,
         method,
@@ -661,6 +666,7 @@ class Actions {
     ) {
         if (typeof timestamp == "function")
             return [
+                ["datetime", "defacto_timestamp", "Thời điểm thực hiện"],
                 ["select_group", "object_id", "Đối tượng", () => timestamp()],
                 ["number", "amount", "Số tiền", { min: 0 }],
                 ["select", "method", "Phương thức", PAYMENT_METHODS],
@@ -682,7 +688,7 @@ class Actions {
 
         let object = this.Data.data[`${object_type}s`][object_id];
         object.balance -= amount;
-        object.logs.push([timestamp, "receipt", "var(--CHERRY)",
+        object.logs.push([defacto_timestamp, "receipt", "var(--CHERRY)",
             `Thanh toán bằng ${PAYMENT_METHODS[method]} ${format_currency(amount)}`
             + ` thuộc loại ${CASHFLOW_CATEGORIES[category]} với nội dung "${content}"`]);
 
@@ -692,10 +698,12 @@ class Actions {
     QID(
         timestamp,
         Actions_code,
+        defacto_timestamp,
         queue_id
     ) {
         if (typeof timestamp == "function")
             return [
+                ["datetime", "defacto_timestamp", "Thời điểm thực hiện"],
                 ["select", "queue_id", "Hàng đợi", () => timestamp("queue")],
                 ["submit", "submit", "Phân bổ thu nhập"],
                 ["cancel", "cancel", "Hủy bỏ"]
@@ -745,7 +753,7 @@ class Actions {
         for (let [fund_id, distribution_amount] of distribution_info) {
             let fund = funds[fund_id];
             log_instruction.push([
-                timestamp,
+                defacto_timestamp,
                 "Q2F",
                 queue_id,
                 distribution_amount,
@@ -756,12 +764,12 @@ class Actions {
             fund.balance += distribution_amount;
             total_distribution_amount += distribution_amount;
             queue.balance -= distribution_amount;
-            fund.logs.push([timestamp, "inbox-in", "var(--LIME)",
+            fund.logs.push([defacto_timestamp, "inbox-in", "var(--LIME)",
                 `Nhận phân bổ thu nhập ${format_currency(distribution_amount)} `
                 + `từ hàng đợi "${queue.name}"`]);
             queue_log_strings.push(`${format_currency(distribution_amount)} tới quỹ "${fund.name}"`);
         }
-        queue.logs.push([timestamp, "funnel-dollar", "var(--LEMON)",
+        queue.logs.push([defacto_timestamp, "funnel-dollar", "var(--LEMON)",
             `Phân bổ thu nhập ${queue_log_strings.join(", ")} (tổng cộng `
             + `${format_currency(total_distribution_amount)})`]);
 
@@ -1240,16 +1248,16 @@ class Actions_Form {
         let Actions_function_name = Actions_function_args[1];
 
         if (Actions_function_name == "O2O") {
-            let [source_type, source_id] = Actions_function_args[2].split("_");
-            let [target_type, target_id] = Actions_function_args[6].split("_");
+            let [source_type, source_id] = Actions_function_args[3].split("_");
+            let [target_type, target_id] = Actions_function_args[7].split("_");
             Actions_function_args[1] = `${source_type}2${target_type}`;
-            Actions_function_args[2] = source_id;
-            Actions_function_args[6] = target_id;
+            Actions_function_args[3] = source_id;
+            Actions_function_args[7] = target_id;
         } else if (Actions_function_name == "OPM"
             || Actions_function_name == "OPm") {
-            let [object_type, object_id] = Actions_function_args[2].split("_");
+            let [object_type, object_id] = Actions_function_args[3].split("_");
             Actions_function_args[1] = Actions_function_name.replace("O", object_type);
-            Actions_function_args[2] = object_id;
+            Actions_function_args[3] = object_id;
         }
 
         return this.Data.do_Actions(Actions_function_name, Actions_function_args);
@@ -1528,16 +1536,16 @@ function load_analytics(data) {
                 let object_name = capitalize_first_letter(OBJECT_TYPES_NAME[object_type]);
                 objects_name[log[0]] = `${object_name} ${log[2]}`;
             } else if (log[1].match(/[QFDG]PM/)?.length)
-                push_flow(log[0], log[3] > 0, log[2], log[4], log[3], log[5]);
+                push_flow(log[2], log[4] > 0, log[3], log[5], log[4], log[6]);
             else if (log[1].match(/[QFDG]2[QFDG]/)?.length) {
-                push_flow(log[0], true, log[6], log[4], log[3], log[5]);
-                push_flow(log[0], false, log[2], log[4], log[3], log[5]);
+                push_flow(log[2], true, log[7], log[5], log[4], log[6]);
+                push_flow(log[2], false, log[3], log[5], log[4], log[6]);
             } else if (log[1].match(/[QFDG]Pm/)?.length)
-                push_flow(log[0], false, log[2], log[5], log[3], log[6]);
+                push_flow(log[2], false, log[3], log[6], log[4], log[7]);
             else if (log[1] == "QID")
-                JSON.parse(log[3]).forEach(child_log => {
-                    push_flow(child_log[0], true, child_log[6], child_log[4], child_log[3], child_log[5]);
-                    push_flow(child_log[0], false, child_log[2], child_log[4], child_log[3], child_log[5]);
+                JSON.parse(log[4]).forEach(child_log => {
+                    push_flow(child_log[2], true, child_log[7], child_log[5], child_log[4], child_log[6]);
+                    push_flow(child_log[2], false, child_log[3], child_log[5], child_log[4], child_log[6]);
                 });
         }
         return cashflow;
