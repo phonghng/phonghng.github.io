@@ -213,7 +213,8 @@ const PPPL_JS = {
         let DOM = document.createElement(tag_name);
         if (html_attributes)
             for (let [key, value] of Object.entries(html_attributes))
-                DOM.setAttribute(key, value);
+                if (![null, undefined, false].includes(value))
+                    DOM.setAttribute(key, value);
         if (javascript_attributes)
             for (let [key, value] of Object.entries(javascript_attributes))
                 DOM[key] = value;
