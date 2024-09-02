@@ -232,23 +232,23 @@ const HABITS = {
                     type: "group",
                     name: "Kỉ luật",
                     children: {
-                        khong_tiktok_facebook: {
+                        khong_tiktok: {
                             type: "habit_check",
-                            name: "Không sử dụng TikTok, Facebook quá 120 phút",
+                            name: "Không giải trí trên TikTok quá 60 phút",
                             required: true,
                             point: 50
                         },
-                        mipo_vuot_amepo: {
+                        khong_facebook: {
                             type: "habit_check",
-                            name: "Mipo (không kể mục này) vượt Amepo",
+                            name: "Không giải trí trên Facebook quá 60 phút",
                             required: true,
                             point: 50
                         },
-                        thuc_hien_muc_bat_buoc: {
+                        khong_tieu_vat: {
                             type: "habit_check",
-                            name: "Thực hiện đầy đủ các mục bắt buộc",
+                            name: "Không tiêu tiền phung phí",
                             required: true,
-                            point: 75
+                            point: 50
                         }
                     }
                 },
