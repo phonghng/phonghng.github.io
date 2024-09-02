@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <script src="https://phonghng.github.io/scripts/PPPL-JS.js"></script>
+
     <script src="../scripts/status_bar.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -69,6 +71,65 @@
             }
         });
 
+        function preprocess_reward_points(point_infos) {
+            let reward_infos = {
+                day: {},
+                week: {},
+                month: {},
+                year_quarter: {}
+            }
+
+            const init_infos = (object, id) => {
+                let count = (typeof id == "object" ? id[object][2] : 1);
+                if (typeof id == "object")
+                    id = id[object][0].getTime();
+                if (!reward_infos[object][id])
+                    reward_infos[object][id] = {
+                        sum: 0,
+                        count: count,
+                        highest_month: 0,
+                        highest_week: 0,
+                        highest_day: 0
+                    };
+                return id;
+            };
+
+            const update_sum_info = (object, id, value) => {
+                id = init_infos(object, id);
+                reward_infos[object][id].sum += value;
+                return reward_infos[object][id].sum;
+            }
+
+            const update_highest_info = (object, id, name, value) => {
+                id = init_infos(object, id);
+                if (value > reward_infos[object][id][name])
+                    reward_infos[object][id][name] = value;
+            };
+
+            for (let i = 0; i < point_infos.length; i++) {
+                let date_timestamp = new Date(point_infos[i].date).getTime();
+                let XDate_data = PPPL_JS.XDate(date_timestamp).start_end_of_current;
+                let pre_Mipo = point_infos[i].pre_Mipo;
+
+                let day_sum = update_sum_info("day", date_timestamp, pre_Mipo);
+                update_highest_info("week", XDate_data, "highest_day", day_sum);
+                update_highest_info("month", XDate_data, "highest_day", day_sum);
+                update_highest_info("year_quarter", XDate_data, "highest_day", day_sum);
+                let week_sum = update_sum_info("week", XDate_data, pre_Mipo);
+                update_highest_info("month", XDate_data, "highest_week", week_sum);
+                update_highest_info("year_quarter", XDate_data, "highest_week", week_sum);
+                let month_sum = update_sum_info("month", XDate_data, pre_Mipo);
+                update_highest_info("year_quarter", XDate_data, "highest_month", month_sum);
+                let year_quarter_sum = update_sum_info("year_quarter", XDate_data, pre_Mipo);
+            }
+
+            return reward_infos;
+        }
+
+        function calculate_reward_points(reward_infos, date_index) {
+
+        }
+
         function update_data(point_infos, percent_criterions, chart_date_range) {
             percent_criterions =
                 Object.entries(percent_criterions).map(percent_criterion => [
@@ -97,7 +158,19 @@
                     point_infos[i][Mipo_name(percent_criterion[1])] = 0;
                 let percent_criterion = get_percent_criterion(point_infos[i].date);
                 let point_ratio = point_infos[i].point / point_infos[i].goal_point;
-                let Mipo = parseInt((Math.floor(point_ratio * 100) / 100 - percent_criterion) * 100);
+                point_infos[i].pre_Mipo =
+                    parseInt((Math.floor(point_ratio * 100) / 100 - percent_criterion) * 100);
+            }
+
+            let reward_infos = preprocess_reward_points(point_infos);
+            console.log(point_infos, reward_infos);
+
+            for (let i = 0; i < point_infos.length; i++) {
+                for (let percent_criterion of percent_criterions)
+                    point_infos[i][Mipo_name(percent_criterion[1])] = 0;
+                let percent_criterion = get_percent_criterion(point_infos[i].date);
+                let point_ratio = point_infos[i].point / point_infos[i].goal_point;
+                let Mipo = point_infos[i].pre_Mipo + calculate_reward_points(reward_infos, i);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
                 point_infos[i]["Amipo"] = (i > 0 ? point_infos[i - 1]["Amipo"] : 0) + Mipo;
                 point_infos[i]["Amepo"] = (point_infos[i]["Amipo"] / (i + 1)).toFixed(2);
