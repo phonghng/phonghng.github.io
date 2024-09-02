@@ -136,7 +136,7 @@
             return reward_infos;
         }
 
-        function calculate_reward_points(reward_infos, point_info) {
+        function calculate_reward_points(reward_infos, point_info, pre_Mipo) {
             let date = new Date(point_info.date);
             let XDate_data = PPPL_JS.XDate(date.getTime()).start_end_of_current;
             XDate_data.day = [date, null, 1];
@@ -157,7 +157,7 @@
             }
 
             let reward_points = 0;
-            
+
             if (check_if_higher_previous("day", "sum")) reward_points += 1;
             if (check_if_highest("day", "week", "sum")) reward_points += 1;
             if (check_if_highest("day", "month", "sum")) reward_points += 1;
@@ -166,23 +166,23 @@
             if (check_if_highest("day", "week", "average")) reward_points += 0;
             if (check_if_highest("day", "month", "average")) reward_points += 0;
             if (check_if_highest("day", "year_quarter", "average")) reward_points += 0;
-            
+
             if (check_if_higher_previous("week", "sum")) reward_points += 1;
             if (check_if_highest("week", "month", "sum")) reward_points += 1;
             if (check_if_highest("week", "year_quarter", "sum")) reward_points += 1;
             if (check_if_higher_previous("week", "average")) reward_points += 1;
             if (check_if_highest("week", "month", "average")) reward_points += 1;
             if (check_if_highest("week", "year_quarter", "average")) reward_points += 1;
-            
+
             if (check_if_higher_previous("month", "sum")) reward_points += 1;
             if (check_if_highest("month", "year_quarter", "sum")) reward_points += 1;
             if (check_if_higher_previous("month", "average")) reward_points += 1;
             if (check_if_highest("month", "year_quarter", "average")) reward_points += 1;
-            
+
             if (check_if_higher_previous("year_quarter", "sum")) reward_points += 1;
             if (check_if_higher_previous("year_quarter", "average")) reward_points += 1;
 
-            return Math.round(reward_points);
+            return Math.round(Math.abs(pre_Mipo * reward_points / 100));
         }
 
         function update_data(point_infos, percent_criterions, chart_date_range) {
@@ -224,8 +224,9 @@
                     point_infos[i][Mipo_name(percent_criterion[1])] = 0;
                 let percent_criterion = get_percent_criterion(point_infos[i].date);
                 let point_ratio = point_infos[i].point / point_infos[i].goal_point;
-                let Mipo = point_infos[i].pre_Mipo + calculate_reward_points(reward_infos, point_infos[i]);
-                console.log(point_infos[i].date, calculate_reward_points(reward_infos, point_infos[i]));
+                let Mipo =
+                    point_infos[i].pre_Mipo
+                    + calculate_reward_points(reward_infos, point_infos[i], pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
                 point_infos[i]["Amipo"] = (i > 0 ? point_infos[i - 1]["Amipo"] : 0) + Mipo;
                 point_infos[i]["Amepo"] = (point_infos[i]["Amipo"] / (i + 1)).toFixed(2);
