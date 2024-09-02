@@ -135,7 +135,8 @@ const PPPL_JS = {
             start.setHours(0, 0, 0, 0);
             let end = new Date(date_object.getFullYear(), end_month, end_date);
             end.setHours(23, 59, 59, 999);
-            return [start, end];
+            let days = end - start / (1000 * 3600 * 24) + 1;
+            return [start, end, days];
         }
 
         let date_object = new Date(timestamp);
