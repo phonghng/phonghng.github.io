@@ -147,12 +147,6 @@ const HABITS = {
                             name: "Bắt đầu ngủ trước 23h",
                             required: true,
                             point: 35
-                        },
-                        khong_X: {
-                            type: "habit_check",
-                            name: "Không X",
-                            required: true,
-                            point: 50
                         }
                     }
                 },
@@ -232,15 +226,15 @@ const HABITS = {
                     type: "group",
                     name: "Kỉ luật",
                     children: {
-                        khong_tiktok: {
+                        mang_xa_hoi: {
                             type: "habit_check",
-                            name: "Không giải trí trên TikTok quá 60 phút",
+                            name: "Chỉ dành thời gian kiểm tra mạng xã hội vào giờ nghỉ trưa, chiều, tối",
                             required: true,
-                            point: 50
+                            point: 25
                         },
-                        khong_facebook: {
+                        khong_dopamine: {
                             type: "habit_check",
-                            name: "Không giải trí trên Facebook quá 60 phút",
+                            name: "Không thoả mãn ngắn hạn",
                             required: true,
                             point: 50
                         },
@@ -282,7 +276,7 @@ const HABITS = {
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
-                            name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor)",
+                            name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor; tạo khung thời gian ngắn)",
                             required: true,
                             point: 15
                         },
@@ -363,17 +357,17 @@ const HABITS = {
             type: "group",
             name: "Phát triển kiến thức",
             children: {
-                kiem_tra_YouTube: {
+                kiem_tra_tin_tuc: {
                     type: "habit_check",
-                    name: "Kiểm tra các nội dung đăng kí trên YouTube",
-                    required: true,
+                    name: "Kiểm tra các nội dung đăng kí trên YouTube, tin tức",
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
                     point: 50
-                },
-                doc_tin_tuc: {
-                    type: "habit_check",
-                    name: "Đọc tin tức",
-                    required: true,
-                    point: 15
                 },
                 doc_sach: {
                     type: "habit_number",
