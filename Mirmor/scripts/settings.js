@@ -234,9 +234,11 @@ const HABITS = {
                         },
                         khong_dopamine: {
                             type: "habit_check",
-                            name: "Không thoả mãn ngắn hạn",
-                            required: true,
-                            point: 50
+                            name: "Không thoả mãn ngắn hạn (trước mắt là ăn uống vặt, giải trí trên mạng, \"X\", \"KHỐI\")",
+                            required: (arguments) => {
+                                return !arguments.XDate_function().is_last_day_of.week;
+                            },
+                            point: 100
                         },
                         khong_tieu_vat: {
                             type: "habit_check",
