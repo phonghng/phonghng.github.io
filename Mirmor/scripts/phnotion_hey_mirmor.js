@@ -24,7 +24,7 @@ class PHNotion_Hey_Mirmor {
                     "2024-05-06": 0.75,
                     "2024-06-05": 0.80
                 },
-                chart_date_range: ["2024-06-05", "2024-08-31"]
+                chart_date_range: ["2024-09-01", "2024-12-31"]
             }
         });
         this.StatusBar_class = new StatusBar(this.homepage_top_container);
