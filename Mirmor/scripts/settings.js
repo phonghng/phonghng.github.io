@@ -284,13 +284,13 @@ const HABITS = {
                     children: {
                         danh_rang_sang: {
                             type: "habit_check",
-                            name: "Đánh răng (...), rửa mặt buổi sáng",
+                            name: "Đánh răng, rửa mặt buổi sáng",
                             required: true,
                             point: 15
                         },
                         danh_rang_toi: {
                             type: "habit_check",
-                            name: "Đánh răng (...), rửa mặt buổi tối",
+                            name: "Đánh răng, rửa mặt buổi tối",
                             required: true,
                             point: 15
                         },
@@ -302,7 +302,7 @@ const HABITS = {
                         },
                         tam_goi: {
                             type: "habit_check",
-                            name: "Tắm, gội đầu (Sữa tắm gội nam 3in1 RHYS MAN hương nước hoa Rhys Legend)",
+                            name: "Tắm, gội đầu",
                             required: true,
                             point: 25
                         },
