@@ -117,12 +117,6 @@ const HABITS = {
                             unit: "ml",
                             point_per_value: 0.05,
                             goal_value: 2000,
-                        },
-                        khong_uong_vat_an_vat: {
-                            type: "habit_check",
-                            name: "Không uống vặt, ăn vặt",
-                            required: true,
-                            point: 75
                         }
                     }
                 },
@@ -238,7 +232,7 @@ const HABITS = {
                             required: (arguments) => {
                                 return !arguments.XDate_function().is_last_day_of.week;
                             },
-                            point: 100
+                            point: 150
                         },
                         khong_tieu_vat: {
                             type: "habit_check",
