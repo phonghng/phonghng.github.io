@@ -226,7 +226,7 @@
                 let point_ratio = point_infos[i].point / point_infos[i].goal_point;
                 let Mipo =
                     point_infos[i].pre_Mipo
-                    + calculate_reward_points(reward_infos, point_infos[i], pre_Mipo);
+                    + calculate_reward_points(reward_infos, point_infos[i], point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
                 point_infos[i]["Amipo"] = (i > 0 ? point_infos[i - 1]["Amipo"] : 0) + Mipo;
                 point_infos[i]["Amepo"] = (point_infos[i]["Amipo"] / (i + 1)).toFixed(2);
