@@ -208,6 +208,7 @@
             }
 
             let reward_infos = preprocess_reward_points(point_infos);
+            let steak_infos = {};
 
             for (let i = 0; i < point_infos.length; i++) {
                 for (let percent_criterion of percent_criterions)
@@ -218,6 +219,7 @@
                     point_infos[i].pre_Mipo
                     + calculate_reward_points(reward_infos, point_infos[i], point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
+                steak_infos[point_infos[i].date] = Mipo >= 0;
             }
 
             /* data.point_infos = point_infos; */
@@ -233,6 +235,8 @@
                     point_infos.map(point_info => point_info[Mipo_name(percent_criterion)]);
 
             update_chart(mapped_point_infos);
+
+            return { steak_infos };
         }
 
         function generate_chart_datasets(mapped_point_infos) {
