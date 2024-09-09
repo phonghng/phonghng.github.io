@@ -444,7 +444,7 @@ const HABITS = {
         },
         xem_thong_ke: {
             type: "habit_ext",
-            name: "Xem thống kê điểm",
+            name: "Xem thống kê Mipo",
             extension_id: "point_info"
         },
         xem_du_lieu: {
@@ -457,7 +457,7 @@ const HABITS = {
 
 const EXTENSIONS = {
     point_info: {
-        name: "Thống kê điểm",
+        name: "Thống kê Mipo",
         filename: "point_info.html"
     },
     view_data: {

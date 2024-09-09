@@ -56,16 +56,6 @@
                         type: "linear",
                         display: false,
                         position: "left",
-                    },
-                    Amepo: {
-                        type: "linear",
-                        display: false,
-                        position: "left",
-                    },
-                    Amipo: {
-                        type: "linear",
-                        display: false,
-                        position: "right",
                     }
                 }
             }
@@ -228,8 +218,6 @@
                     point_infos[i].pre_Mipo
                     + calculate_reward_points(reward_infos, point_infos[i], point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
-                point_infos[i]["Amipo"] = (i > 0 ? point_infos[i - 1]["Amipo"] : 0) + Mipo;
-                point_infos[i]["Amepo"] = (point_infos[i]["Amipo"] / (i + 1)).toFixed(2);
             }
 
             /* data.point_infos = point_infos; */
@@ -238,9 +226,7 @@
 
             point_infos = point_infos.filter(point_info => is_in_chart_date_range(point_info.date));
             let mapped_point_infos = {
-                date: point_infos.map(point_info => point_info.date),
-                "Amipo": point_infos.map(point_info => point_info["Amipo"]),
-                "Amepo": point_infos.map(point_info => point_info["Amepo"])
+                date: point_infos.map(point_info => point_info.date)
             };
             for (let [start_date, percent_criterion] of percent_criterions)
                 mapped_point_infos[Mipo_name(percent_criterion)] =
@@ -256,9 +242,9 @@
                     datasets.push({
                         label: key,
                         data: mapped_point_infos[key],
-                        type: key.startsWith("Mipo") ? "bar" : "line",
+                        type: "bar",
                         yAxisID: key.split("-")[0],
-                        stack: key.startsWith("Mipo") ? "Mipo" : null,
+                        stack: "Mipo",
                     });
             return datasets;
         }

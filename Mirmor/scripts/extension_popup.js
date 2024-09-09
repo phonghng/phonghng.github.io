@@ -184,15 +184,15 @@ class ExtensionPopup {
 
     run_function(function_name, parameters, callback) {
         if (this.iframe_window[function_name]) {
-            this.iframe_window[function_name](...parameters);
+            let function_return = this.iframe_window[function_name](...parameters);
             if (callback) {
-                callback();
+                callback(function_return);
             }
         } else {
             this.iframe_window.addEventListener("DOMContentLoaded", () => {
-                this.iframe_window[function_name](...parameters);
+                let function_return = this.iframe_window[function_name](...parameters);
                 if (callback) {
-                    callback();
+                    callback(function_return);
                 }
             });
         }
