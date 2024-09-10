@@ -6,8 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="../scripts/status_bar.js"></script>
-
     <link rel="stylesheet" href="../stylesheets/general.css">
 
     <style>
@@ -30,8 +28,6 @@
     </div>
 
     <script>
-        let StatusBar_class = new StatusBar(document.body);
-
         let data = {
             string_data: ""
         };
@@ -72,7 +68,6 @@
                 goal_point: 0,
                 data: data
             };
-            StatusBar_class.show_status_extension(exported_info);
             return exported_info;
         }
     </script>

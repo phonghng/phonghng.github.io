@@ -142,7 +142,6 @@ const PPPL_JS = {
         let date_object = new Date(timestamp);
 
         let date_object_info = {
-            date_object: date_object,
             date_object_expanded: {
                 date_string: get_date_string(),
 

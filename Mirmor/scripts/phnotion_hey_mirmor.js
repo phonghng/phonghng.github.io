@@ -199,12 +199,21 @@ class PHNotion_Hey_Mirmor {
                             fetch(`${this.endpoint}/`)
                                 .then(response => response.json())
                                 .then(json => {
-                                    this.Habits_class.data.children.xem_thong_ke
+                                    let { steak_infos } =
+                                        this.Habits_class.data.children.xem_thong_ke
+                                            .Extension_class.ExtensionPopup_class
+                                            .run_function("update_data", [
+                                                json,
+                                                this.options.point_info_extension_parameters.percent_criterions,
+                                                this.options.point_info_extension_parameters.chart_date_range
+                                            ]);
+                                    this.Habits_class.data.children.xem_chuoi
                                         .Extension_class.ExtensionPopup_class
                                         .run_function("update_data", [
-                                            json,
-                                            this.options.point_info_extension_parameters.percent_criterions,
-                                            this.options.point_info_extension_parameters.chart_date_range
+                                            steak_infos,
+                                            this.timestamp,
+                                            Object.keys(this.options
+                                                .point_info_extension_parameters.percent_criterions)[0]
                                         ]);
                                 });
                         },

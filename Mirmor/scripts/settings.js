@@ -442,6 +442,11 @@ const HABITS = {
                 }
             }
         },
+        xem_chuoi: {
+            type: "habit_ext",
+            name: "Xem thống kê chuỗi",
+            extension_id: "steak_viewer"
+        },
         xem_thong_ke: {
             type: "habit_ext",
             name: "Xem thống kê Mipo",
@@ -459,6 +464,10 @@ const EXTENSIONS = {
     point_info: {
         name: "Thống kê Mipo",
         filename: "point_info.html"
+    },
+    steak_viewer: {
+        name: "Thống kê chuỗi",
+        filename: "steak_viewer.html"
     },
     view_data: {
         name: "Dữ liệu Mirmor hôm nay",
