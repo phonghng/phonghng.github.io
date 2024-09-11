@@ -444,7 +444,7 @@ const HABITS = {
         },
         xem_chuoi: {
             type: "habit_ext",
-            name: "Xem thống kê chuỗi",
+            name: "Xem thống kê chuỗi Mipo dương",
             extension_id: "streak_viewer"
         },
         xem_thong_ke: {
@@ -466,7 +466,7 @@ const EXTENSIONS = {
         filename: "point_info.html"
     },
     streak_viewer: {
-        name: "Thống kê chuỗi",
+        name: "Thống kê chuỗi Mipo dương",
         filename: "streak_viewer.html"
     },
     view_data: {

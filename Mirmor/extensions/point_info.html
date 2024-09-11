@@ -201,7 +201,7 @@
                     point_infos[i].pre_Mipo
                     + calculate_reward_points(reward_infos, point_infos[i].date, point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
-                if (Mipo >= 0)
+                if (Mipo > 0)
                     streak_infos.satisfied_dates.push(point_infos[i].date);
             }
 
