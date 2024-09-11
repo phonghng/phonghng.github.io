@@ -59,6 +59,21 @@ body {
     background-color: #212121;
 }
 
+.item.important_1 {
+    box-shadow: -5px -5px 15px -5px #0575E6,
+        5px 5px 15px -5px #00F260,
+        5px -5px 15px -5px #0575E6,
+        -5px 5px 15px -5px #00F260;
+}
+
+.item.important_2 {
+    box-shadow: -5px -5px 15px -5px #F12711,
+        5px 5px 15px -5px #F5AF19,
+        5px -5px 15px -5px #F12711,
+        -5px 5px 15px -5px #F5AF19;
+
+}
+
 .item>img:nth-child(1) {
     border-radius: 100%;
     background-color: var(--base_color);
