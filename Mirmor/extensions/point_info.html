@@ -184,7 +184,7 @@
                 month: {},
                 year_quarter: {}
             };
-            let steak_infos = {
+            let streak_infos = {
                 instruction: "Mipo >= 0",
                 satisfied_dates: []
             };
@@ -202,7 +202,7 @@
                     + calculate_reward_points(reward_infos, point_infos[i].date, point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
                 if (Mipo >= 0)
-                    steak_infos.satisfied_dates.push(point_infos[i].date);
+                    streak_infos.satisfied_dates.push(point_infos[i].date);
             }
 
             /* data.point_infos = point_infos; */
@@ -219,7 +219,7 @@
 
             update_chart(mapped_point_infos);
 
-            return { steak_infos };
+            return { streak_infos };
         }
 
         function generate_chart_datasets(mapped_point_infos) {

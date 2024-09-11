@@ -94,7 +94,7 @@
 
     <script>
         let data = {
-            steak_infos: {
+            streak_infos: {
                 instruction: "Mipo >= 0",
                 satisfied_dates: []
             }
@@ -131,25 +131,25 @@
                 return result;
             }
 
-            let steaks = find_consecutive_dates(data.steak_infos.satisfied_dates);
-            let record_steak = {
+            let streaks = find_consecutive_dates(data.streak_infos.satisfied_dates);
+            let record_streak = {
                 longest: [0],
                 shortest: [0],
                 current: 0
             };
 
-            for (let index = 0; index < steaks.length; index++) {
-                let steak = steaks[index];
-                if (steak[0] <= today_date && today_date <= steak[1])
-                    record_steak.current = index;
-                if (steak[2] == steaks[record_steak.longest[0]][2])
-                    record_steak.longest.push(index);
-                if (steak[2] > steaks[record_steak.longest[0]][2])
-                    record_steak.longest = [index];
-                if (steak[2] == steaks[record_steak.shortest[0]][2])
-                    record_steak.shortest.push(index);
-                if (steak[2] < steaks[record_steak.shortest[0]][2])
-                    record_steak.shortest = [index];
+            for (let index = 0; index < streaks.length; index++) {
+                let streak = streaks[index];
+                if (streak[0] <= today_date && today_date <= streak[1])
+                    record_streak.current = index;
+                if (streak[2] == streaks[record_streak.longest[0]][2])
+                    record_streak.longest.push(index);
+                if (streak[2] > streaks[record_streak.longest[0]][2])
+                    record_streak.longest = [index];
+                if (streak[2] == streaks[record_streak.shortest[0]][2])
+                    record_streak.shortest.push(index);
+                if (streak[2] < streaks[record_streak.shortest[0]][2])
+                    record_streak.shortest = [index];
             }
 
             document.querySelector("#month_year_display button").innerText =
@@ -189,7 +189,7 @@
                 let getting_date_string = PPPL_JS.XDate(getting_date).date_object_expanded.date_string;
                 if (getting_date < first_date || getting_date > today_date)
                     return "var(--GREY_1)";
-                if (data.steak_infos.satisfied_dates.indexOf(getting_date_string) != -1)
+                if (data.streak_infos.satisfied_dates.indexOf(getting_date_string) != -1)
                     return "var(--LIME)";
                 return "var(--CHERRY)";
             };
@@ -254,8 +254,8 @@
             }
         }
 
-        function update_data(steak_infos, today_timestamp, first_date_string) {
-            data.steak_infos = steak_infos;
+        function update_data(streak_infos, today_timestamp, first_date_string) {
+            data.streak_infos = streak_infos;
             today_date = new Date(PPPL_JS.XDate(today_timestamp).date_object_expanded.date_string);
             first_date = new Date(first_date_string);
             update_viewer();

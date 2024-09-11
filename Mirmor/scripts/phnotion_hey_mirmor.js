@@ -199,7 +199,7 @@ class PHNotion_Hey_Mirmor {
                             fetch(`${this.endpoint}/`)
                                 .then(response => response.json())
                                 .then(json => {
-                                    let { steak_infos } =
+                                    let { streak_infos } =
                                         this.Habits_class.data.children.xem_thong_ke
                                             .Extension_class.ExtensionPopup_class
                                             .run_function("update_data", [
@@ -210,7 +210,7 @@ class PHNotion_Hey_Mirmor {
                                     this.Habits_class.data.children.xem_chuoi
                                         .Extension_class.ExtensionPopup_class
                                         .run_function("update_data", [
-                                            steak_infos,
+                                            streak_infos,
                                             this.timestamp,
                                             Object.keys(this.options
                                                 .point_info_extension_parameters.percent_criterions)[0]
