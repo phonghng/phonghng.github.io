@@ -39,9 +39,19 @@ class PHNotion_Hey_Mirmor {
         this.get(
             PPPL_JS.XDate(this.timestamp).date_object_expanded.date_string,
             getted_data => {
-                this.initialization_data = getted_data;
+                this.initialization_data =
+                    JSON.parse(
+                        CryptoJS.enc.Base64.parse(getted_data.date)
+                            .toString(CryptoJS.enc.Utf8)
+                        || "{}"
+                    );
                 this.init_js();
-                this.get_independent_data();
+                this.DataStorage_class.independent_data =
+                    JSON.parse(
+                        CryptoJS.enc.Base64.parse(getted_data.independent_data)
+                            .toString(CryptoJS.enc.Utf8)
+                        || "{}"
+                    );
             }
         );
 
@@ -84,30 +94,11 @@ class PHNotion_Hey_Mirmor {
         this.StatusBar_class.show_status(status_element);
 
         fetch(`${this.endpoint}/${date_string}`)
-            .then(response => response.text())
-            .then(text => callback(
-                JSON.parse(
-                    CryptoJS.enc.Base64.parse(text)
-                        .toString(CryptoJS.enc.Utf8)
-                    || "{}"
-                )
-            ));
+            .then(response => response.json())
+            .then(json => callback(json));
     }
 
-    get_independent_data() {
-        fetch(`${this.endpoint}/independent_data`)
-            .then(response => response.text())
-            .then(text => {
-                this.DataStorage_class.independent_data =
-                    JSON.parse(
-                        CryptoJS.enc.Base64.parse(text)
-                            .toString(CryptoJS.enc.Utf8)
-                        || "{}"
-                    );
-            });
-    }
-
-    set(date_string, data, point, goal_point, data_saved_callback, independent_data_saved_callback) {
+    set(date_string, data, point, goal_point, callback) {
         data =
             CryptoJS.enc.Base64.stringify(
                 CryptoJS.enc.Utf8.parse(data)
@@ -121,27 +112,18 @@ class PHNotion_Hey_Mirmor {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ data, point, goal_point })
-            },
-            callback: data_saved_callback,
-            fetching: false
-        });
-        this.queue.push({
-            url: `${this.endpoint}/independent_data`,
-            options: {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 body: JSON.stringify({
-                    data: CryptoJS.enc.Base64.stringify(
-                        CryptoJS.enc.Utf8.parse(
-                            JSON.stringify(this.DataStorage_class.independent_data)
+                    date: { data, point, goal_point },
+                    independent_data: {
+                        data: CryptoJS.enc.Base64.stringify(
+                            CryptoJS.enc.Utf8.parse(
+                                JSON.stringify(this.DataStorage_class.independent_data)
+                            )
                         )
-                    )
+                    }
                 })
             },
-            callback: independent_data_saved_callback,
+            callback: callback,
             fetching: false
         });
         this.process_queue();
@@ -156,9 +138,9 @@ class PHNotion_Hey_Mirmor {
         this.fetch(
             this.queue[0].url,
             this.queue[0].options,
-            () => {
+            json => {
                 let shifted_item = this.queue.shift();
-                shifted_item.callback();
+                shifted_item.callback(json);
                 this.process_queue();
             }
         );
@@ -167,9 +149,10 @@ class PHNotion_Hey_Mirmor {
     fetch(url, options, callback) {
         window.onbeforeunload = () => true;
         fetch(url, options)
-            .then(() => {
+            .then(response => response.json())
+            .then(json => {
                 window.onbeforeunload = false;
-                callback();
+                callback(json);
             });
     }
 
@@ -189,7 +172,7 @@ class PHNotion_Hey_Mirmor {
                         JSON.stringify(object_data_function()),
                         json_data.point || json_data._point || 0,
                         json_data.goal_point || json_data._goal_point || 0,
-                        () => {
+                        getted_data => {
                             let status_element = document.createElement("span");
                             status_element.style.color = "var(--LIME)";
                             let point = json_data.point || json_data._point || 0;
@@ -197,32 +180,29 @@ class PHNotion_Hey_Mirmor {
                             status_element.innerHTML = `Đã lưu vào Notion! (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
                             this.StatusBar_class.show_status(status_element);
 
-                            fetch(`${this.endpoint}/`)
-                                .then(response => response.json())
-                                .then(json => {
-                                    let { streak_infos } =
-                                        this.Habits_class.data.children.xem_thong_ke
-                                            .Extension_class.ExtensionPopup_class
-                                            .run_function("update_data", [
-                                                json,
-                                                this.options.point_info_extension_parameters.percent_criterions,
-                                                this.options.point_info_extension_parameters.chart_date_range
-                                            ]);
-                                    this.Habits_class.data.children.xem_chuoi
-                                        .Extension_class.ExtensionPopup_class
-                                        .run_function("update_data", [
-                                            streak_infos,
-                                            this.timestamp,
-                                            Object.keys(this.options
-                                                .point_info_extension_parameters.percent_criterions)[0]
-                                        ]);
-                                });
-                        },
-                        () => {
-                            let status_element = document.createElement("span");
-                            status_element.style.color = "var(--LIME)";
-                            status_element.innerHTML = `Đã lưu vào Notion! (Dữ liệu độc lập)`;
-                            this.StatusBar_class.show_status(status_element);
+                            this.DataStorage_class.independent_data =
+                                JSON.parse(
+                                    CryptoJS.enc.Base64.parse(getted_data.independent_data)
+                                        .toString(CryptoJS.enc.Utf8)
+                                    || "{}"
+                                );
+
+                            let { streak_infos } =
+                                this.Habits_class.data.children.xem_thong_ke
+                                    .Extension_class.ExtensionPopup_class
+                                    .run_function("update_data", [
+                                        getted_data.points,
+                                        this.options.point_info_extension_parameters.percent_criterions,
+                                        this.options.point_info_extension_parameters.chart_date_range
+                                    ]);
+                            this.Habits_class.data.children.xem_chuoi
+                                .Extension_class.ExtensionPopup_class
+                                .run_function("update_data", [
+                                    streak_infos,
+                                    this.timestamp,
+                                    Object.keys(this.options
+                                        .point_info_extension_parameters.percent_criterions)[0]
+                                ]);
                         }
                     );
             }
