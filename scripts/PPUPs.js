@@ -125,14 +125,14 @@ function process_item(item, item_list_element) {
                         ]);
 
                     children_ADOM.push([
-                        "div",
+                        "a",
                         {
                             "class": "item" +
                                 (folder_item.important
                                     ? " important_" + folder_item.important_color_type
                                     : ""),
-                            "data-link": folder_item.link,
-                            "title": folder_item.link,
+                            "title": folder_item.title,
+                            "href": folder_item.link
                         },
                         {
                             "onclick": () => location.href = folder_item.link
@@ -185,14 +185,14 @@ function process_item(item, item_list_element) {
                 ]);
 
             ADOMs.push([
-                "div",
+                "a",
                 {
                     "class": "item" +
                         (item.important
                             ? " important_" + item.important_color_type
                             : ""),
-                    "data-link": item.link,
-                    "title": item.link
+                    "title": item.title,
+                    "href": item.link
                 },
                 {
                     "onclick": () => location.href = item.link
