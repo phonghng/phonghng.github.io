@@ -91,8 +91,9 @@ class Data {
                     point: data.completed_time ? data.point : 0,
                     goal_point: is_required ? data.point : 0,
                     data: {
-                        completed_time: data.completed_time,
-                        required_function: data.required.toString()
+                        important: data.important,
+                        required_function: data.required.toString(),
+                        completed_time: data.completed_time
                     }
                 };
             }
@@ -110,10 +111,11 @@ class Data {
                     point: data.value ? (data.point_per_value * data.value) : 0,
                     goal_point: is_required ? (data.point_per_value * data.goal_value) : 0,
                     data: {
+                        important: data.important,
+                        required_function: data.required.toString(),
                         unit: data.unit,
                         value: data.value,
-                        last_changed_time: data.last_changed_time,
-                        required_function: data.required.toString()
+                        last_changed_time: data.last_changed_time
                     }
                 };
             }

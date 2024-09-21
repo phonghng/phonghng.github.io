@@ -9,6 +9,7 @@ const HABITS = {
                 hanh_vi_hanh_phuc: {
                     type: "habit_number",
                     name: "Hành vi gây sự hạnh phúc",
+                    important: false,
                     required: true,
 
                     unit: "hành vi",
@@ -18,6 +19,7 @@ const HABITS = {
                 hanh_vi_bat_hanh: {
                     type: "habit_number",
                     name: "Hành vi gây sự bất hạnh",
+                    important: false,
                     required: false,
 
                     unit: "hành vi",
@@ -27,6 +29,7 @@ const HABITS = {
                 the_hien_cai_toi: {
                     type: "habit_number",
                     name: "Hành vi thể hiện cái tôi quá đáng",
+                    important: false,
                     required: false,
 
                     unit: "hành vi",
@@ -36,6 +39,7 @@ const HABITS = {
                 thoi_gian_ban_than: {
                     type: "habit_check",
                     name: "Dành thời gian tự ngẫm cho bản thân",
+                    important: false,
                     cumulative_period: "week",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -48,6 +52,7 @@ const HABITS = {
                 thoi_gian_gia_dinh: {
                     type: "habit_check",
                     name: "Dành thời gian cho gia đình",
+                    important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -70,18 +75,21 @@ const HABITS = {
                         an_sang: {
                             type: "habit_check",
                             name: "Ăn đủ bữa sáng",
+                            important: true,
                             required: true,
                             point: 15
                         },
                         an_trua: {
                             type: "habit_check",
                             name: "Ăn đủ bữa trưa (bắt buộc có rau, củ)",
+                            important: false,
                             required: true,
                             point: 25
                         },
                         an_trua_them: {
                             type: "habit_check",
                             name: "Ăn bữa trưa có thêm trái cây, hải sản hoặc ngũ cốc",
+                            important: true,
                             cumulative_period: "week",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -94,12 +102,14 @@ const HABITS = {
                         an_toi: {
                             type: "habit_check",
                             name: "Ăn đủ bữa tối (bắt buộc có rau, củ)",
+                            important: false,
                             required: true,
                             point: 25
                         },
                         an_toi_them: {
                             type: "habit_check",
                             name: "Ăn bữa tối có thêm trái cây, hải sản hoặc ngũ cốc",
+                            important: true,
                             cumulative_period: "week",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -112,6 +122,7 @@ const HABITS = {
                         uong_nuoc: {
                             type: "habit_number",
                             name: "Uống nước trắng",
+                            important: false,
                             required: true,
 
                             unit: "ml",
@@ -127,18 +138,21 @@ const HABITS = {
                         ngu_du: {
                             type: "habit_check",
                             name: "Ngủ đủ 7 tiếng",
+                            important: false,
                             required: true,
                             point: 100
                         },
                         day_truoc_7h: {
                             type: "habit_check",
                             name: "Thức dậy trước 7h15",
+                            important: true,
                             required: true,
                             point: 25
                         },
                         ngu_truoc_23h: {
                             type: "habit_check",
                             name: "Bắt đầu ngủ trước 23h",
+                            important: true,
                             required: true,
                             point: 35
                         }
@@ -151,12 +165,14 @@ const HABITS = {
                         the_duc_sang: {
                             type: "habit_check",
                             name: "Tập thể dục buổi sáng (theo <a href='https://www.youtube.com/watch?v=MtZmVz305P0' target='_blank'>video sau</a>)",
+                            important: true,
                             required: true,
                             point: 25
                         },
                         dap_xe: {
                             type: "habit_number",
                             name: "Đạp xe",
+                            important: false,
                             required: true,
 
                             unit: "phút",
@@ -166,6 +182,7 @@ const HABITS = {
                         boi: {
                             type: "habit_number",
                             name: "Bơi",
+                            important: true,
                             cumulative_period: "week",
                             required: (arguments) => {
                                 if (![6, 7, 8].includes(
@@ -184,6 +201,7 @@ const HABITS = {
                         bong_ro: {
                             type: "habit_number",
                             name: "Bóng rổ",
+                            important: true,
                             cumulative_period: "week",
                             required: (arguments) => {
                                 if ([6, 7, 8].includes(
@@ -202,6 +220,7 @@ const HABITS = {
                         khac: {
                             type: "habit_number",
                             name: "Hoạt động khác",
+                            important: false,
                             required: false,
 
                             unit: "phút",
@@ -224,19 +243,31 @@ const HABITS = {
                             type: "habit_check",
                             name: "Chỉ dành thời gian kiểm tra mạng xã hội vào giờ nghỉ trưa, chiều, tối",
                             required: true,
-                            point: 25
+                            important: true,
+                            point: 50
                         },
-                        khong_dopamine: {
+                        an_uong: {
                             type: "habit_check",
-                            name: "Không thoả mãn ngắn hạn (trước mắt là ăn uống vặt, giải trí trên mạng, \"X\", \"KHỐI\")",
+                            name: "Không ăn/uống vặt",
+                            important: true,
                             required: (arguments) => {
                                 return !arguments.XDate_function().is_last_day_of.week;
                             },
-                            point: 150
+                            point: 50
                         },
-                        khong_tieu_vat: {
+                        X: {
+                            type: "habit_check",
+                            name: "Không \"X\"",
+                            important: true,
+                            required: (arguments) => {
+                                return !arguments.XDate_function().is_last_day_of.week;
+                            },
+                            point: 50
+                        },
+                        tieu_vat: {
                             type: "habit_check",
                             name: "Không tiêu tiền phung phí",
+                            important: true,
                             required: true,
                             point: 50
                         }
@@ -249,12 +280,14 @@ const HABITS = {
                         kiem_tra_lich: {
                             type: "habit_check",
                             name: "Kiểm tra lịch hoạt động, mục Mirmor hôm nay",
+                            important: false,
                             required: true,
                             point: 15
                         },
                         dau_viec: {
                             type: "habit_number",
                             name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
+                            important: false,
                             required: true,
 
                             unit: "đầu việc",
@@ -264,6 +297,7 @@ const HABITS = {
                         tap_trung_lam_viec: {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
+                            important: false,
                             required: true,
 
                             unit: "phút",
@@ -273,6 +307,7 @@ const HABITS = {
                         lap_lich_ngay_mai: {
                             type: "habit_check",
                             name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor; tạo khung thời gian ngắn)",
+                            important: false,
                             required: true,
                             point: 15
                         },
@@ -285,42 +320,49 @@ const HABITS = {
                         danh_rang_sang: {
                             type: "habit_check",
                             name: "Đánh răng, rửa mặt buổi sáng",
+                            important: false,
                             required: true,
                             point: 15
                         },
                         danh_rang_toi: {
                             type: "habit_check",
                             name: "Đánh răng, rửa mặt buổi tối",
+                            important: false,
                             required: true,
                             point: 15
                         },
                         rua_mat: {
                             type: "habit_check",
                             name: "Rửa mặt (Garnier Skin Natuarals Bright Complete Anti-Acne Cleansing Foam)",
+                            important: false,
                             required: true,
                             point: 10
                         },
                         tam_goi: {
                             type: "habit_check",
                             name: "Tắm, gội đầu",
+                            important: false,
                             required: true,
                             point: 25
                         },
                         uong_tpcn: {
                             type: "habit_check",
                             name: "Uống 1 viên DHC Multi Vitamins, 3 viên DHC Minerals, 3 viên Omega 3 Pure Alaska Omega 333mg EPA DHA",
+                            important: true,
                             required: true,
                             point: 25
                         },
                         chuan_bi_ra_ngoai: {
                             type: "habit_check",
                             name: "Bôi kem chống nắng (Vichy Capital Soleil Anti Brillance Mattifying SPF50+ UVB+UVA), ăn mặc, để tóc phù hợp khi ra ngoài",
+                            important: false,
                             required: true,
                             point: 35
                         },
                         ve_sinh_dinh_ki: {
                             type: "habit_check",
                             name: "Cắt móng tay, cắt móng chân, cạo râu, rửa khăn mặt",
+                            important: false,
                             cumulative_period: "week",
                             required: (arguments) => {
                                 return (arguments.get_cumulative_info().completed_count == 0
@@ -335,6 +377,7 @@ const HABITS = {
                 hoat_dong_phat_trien: {
                     type: "habit_number",
                     name: "Tham gia hoạt động phát triển kĩ năng",
+                    important: false,
                     cumulative_period: "week",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().total_value < 1
@@ -356,6 +399,7 @@ const HABITS = {
                 kiem_tra_tin_tuc: {
                     type: "habit_check",
                     name: "Kiểm tra các nội dung đăng kí trên YouTube, tin tức",
+                    important: false,
                     cumulative_period: "week",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -368,6 +412,7 @@ const HABITS = {
                 doc_sach: {
                     type: "habit_number",
                     name: "Đọc sách",
+                    important: false,
                     required: true,
 
                     unit: "trang",
@@ -383,6 +428,7 @@ const HABITS = {
                 tong_ket_tuan: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, điều chỉnh, quán triệt thực hiện kế hoạch phát triển kĩ năng và kiến thức",
+                    important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -395,6 +441,7 @@ const HABITS = {
                 tru_cot_phat_trien: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
+                    important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -407,6 +454,7 @@ const HABITS = {
                 ra_soat_Mirmor: {
                     type: "habit_check",
                     name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
+                    important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -419,6 +467,7 @@ const HABITS = {
                 tong_ket_thang: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
+                    important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0
@@ -431,6 +480,7 @@ const HABITS = {
                 tong_ket_quy: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
+                    important: true,
                     cumulative_period: "year_quarter",
                     required: (arguments) => {
                         return (arguments.get_cumulative_info().completed_count == 0

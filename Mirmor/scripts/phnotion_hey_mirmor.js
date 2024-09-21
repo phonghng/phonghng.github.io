@@ -25,13 +25,25 @@ class PHNotion_Hey_Mirmor {
                     "2024-06-05": 0.80,
                     "2024-09-14": 0.85
                 },
-                chart_date_range: ["2024-09-01", "2024-12-31"]
+                chart_date_range: ["2024-09-05", "2024-12-31"]
+            },
+            streak_base_date: "2024-09-05",
+            tersBOT: {
+                quotes: [
+                    "Test1",
+                    "Test2"
+                ],
+                year_quarter_goals: [
+                    "Thử nghiệm 1",
+                    "Đỗ đội tuyển học sinh giỏi quốc gia"
+                ]
             }
         });
         this.StatusBar_class = new StatusBar(this.homepage_top_container);
 
         this.endpoint = this.get_endpoint(encrypted_endpoint);
 
+        this.server_cache = {};
         this.initialization_data;
         this.last_set_point;
         this.queue = [];
@@ -106,6 +118,7 @@ class PHNotion_Hey_Mirmor {
         if (this.last_set_point == point) return;
         this.last_set_point = point;
         this.queue.push({
+            type: "normal",
             url: `${this.endpoint}/${date_string}`,
             options: {
                 method: "POST",
@@ -129,10 +142,123 @@ class PHNotion_Hey_Mirmor {
         this.process_queue();
     }
 
+    process_tersBOT(habits_json_data, streak_infos) {
+        function get_unfinished_important_habits(name, data) {
+            if (data.data && data.data.important && data.point < data.goal_point)
+                unfinished_important_habits.push(name);
+            else if (typeof data == "object")
+                Object.entries(data)
+                    .forEach(item => get_unfinished_important_habits(item[0], item[1]));
+        }
+
+        function get_streaks_info(streak_base_date, timestamp, dates) {
+            const format_date = (date = new Date()) => {
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                if (day <= 9) day = `0${day}`;
+                if (month <= 2) month = `0${month}`;
+                return `${day}/${month}/${date.getFullYear()}`;
+            };
+
+            let streaks = [];
+            let current_streak = [];
+            let lost_count = 0;
+
+            for (let i = 0; i < dates.length; i++) {
+                let current_date = new Date(dates[i]).getTime();
+                let previous_date = i > 0 ? new Date(dates[i - 1]).getTime() : null;
+                if (current_date > streak_base_date
+                    && previous_date
+                    && previous_date + 86400000 !== current_date)
+                    lost_count++;
+                if (i === 0 || previous_date + 86400000 === current_date)
+                    current_streak.push(current_date);
+                else {
+                    streaks.push(current_streak);
+                    current_streak = [current_date];
+                }
+            }
+            if (current_streak.length) streaks.push(current_streak);
+
+            let current_streak_object =
+                streaks.find(streak => streak.includes(timestamp))
+                || { length: 0, 0: timestamp };
+            let longest_streak = streaks.reduce(
+                (maximum_streak, streak) => streak.length > maximum_streak.length ? streak : maximum_streak,
+                []
+            );
+
+            let ongoing_penalty_count = 0;
+            if (current_streak_object.length === 0) {
+                let start_penalty_date = streaks[streaks.length - 1].slice(-1)[0] + 86400000;
+                while (start_penalty_date < timestamp && ongoing_penalty_count < 2 * lost_count + 1) {
+                    ongoing_penalty_count++;
+                    start_penalty_date += 86400000;
+                }
+            }
+
+            let reward_date =
+                new Date(streaks[streaks.length - 1][0]
+                    + 7 * Math.floor(current_streak_object.length / 7) * 86400000);
+
+            return {
+                current_streak_days: current_streak_object.length,
+                current_streak_start_date: format_date(new Date(current_streak_object[0])),
+                longest_streak_days: longest_streak.length,
+                longest_streak_start_date: format_date(new Date(longest_streak[0] || timestamp)),
+                penalty_days: 2 * (lost_count + (current_streak_object.length === 0)) + 1,
+                ongoing_penalty_days:
+                    current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
+                        ? 2 * lost_count + 1 : 0,
+                reward_amount:
+                    current_streak_object.length > 0
+                        ? 5000 * Math.floor(current_streak_object.length / 7) : 0,
+                reward_date:
+                    current_streak_object.length > 0
+                        ? format_date(reward_date) : 0
+            };
+        }
+
+        let unfinished_important_habits = [];
+        Object.entries(habits_json_data)
+            .forEach(item => get_unfinished_important_habits(item[0], item[1]));
+
+        return {
+            unfinished_important_habits: unfinished_important_habits,
+            streak_infos: get_streaks_info(
+                this.options.streak_base_date,
+                this.timestamp,
+                streak_infos.satisfied_dates
+            ),
+            quotes: this.options.tersBOT.quotes,
+            year_quarter_goals: this.options.tersBOT.year_quarter_goals
+        };
+    }
+
+    set_server_cache(callback) {
+        this.queue.push({
+            type: "server_caching",
+            url: `${this.endpoint}/server_cache`,
+            options: {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data: this.server_cache })
+            },
+            callback: callback,
+            fetching: false
+        });
+        this.process_queue();
+    }
+
     process_queue() {
         let ready_for_next_fetch =
             this.queue[0] && this.queue.every(item => !item.fetching);
         if (!ready_for_next_fetch) return;
+
+        if (this.queue[0].type == "server_caching" && this.queue.length > 1) {
+            this.queue.shift();
+            this.process_queue();
+        }
 
         this.queue[0].fetching = true;
         this.fetch(
@@ -203,6 +329,14 @@ class PHNotion_Hey_Mirmor {
                                     Object.keys(this.options
                                         .point_info_extension_parameters.percent_criterions)[0]
                                 ]);
+
+                            this.server_cache.tersBOT = this.process_tersBOT(json_data, streak_infos);
+                            this.set_server_cache(() => {
+                                let status_element = document.createElement("span");
+                                status_element.style.color = "var(--LIME)";
+                                status_element.innerHTML = `Đã lưu vào bộ nhớ đệm máy chú!`;
+                                this.StatusBar_class.show_status(status_element);
+                            });
                         }
                     );
             }
