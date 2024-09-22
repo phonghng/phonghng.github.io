@@ -25,17 +25,19 @@ class PHNotion_Hey_Mirmor {
                     "2024-06-05": 0.80,
                     "2024-09-14": 0.85
                 },
-                chart_date_range: ["2024-09-05", "2024-12-31"]
+                chart_date_range: ["2024-09-23", "2024-12-31"]
             },
-            streak_base_date: "2024-09-05",
+            streak_base_date: "2024-09-23",
             tersBOT: {
                 quotes: [
-                    "Test1",
-                    "Test2"
+                    "Người tích cực sẽ giống như mặt trời vậy, dù ở bất cứ nơi đâu cũng có thể toả sáng. Chỉ khi giữ được một trái tim bình lặng, cậu mới có thể không sợ hãi mà bình thản đối mặt với mọi biến cố. Chỉ khi có được một tâm hồn rộng mở, cậu mới có thể tìm thấy được sức mạnh khiến cậu làm được những gì mà bản thân mong muốn. Hy vọng rằng tất cả chúng ta đều có thể giữ được tâm thái thật tốt, vững vàng không sợ hãi mà tiến về phía trước.",
+                    "Học để làm việc, làm người, làm cán bộ. Học để phụng sự đoàn thể, giai cấp và nhân dân, tổ quốc và nhân loại. Muốn đạt được mục đích thì phải cần, kiệm, liêm, chính, chí công, vô tư.",
+                    "Thời gian sẽ trôi qua mà không để lại bất cứ một dấu vết với những người không biết nhìn về tương lai bằng bộ óc thông minh và sự khổ luyện. Hạnh phúc chắc chắn sẽ dành cho người biết sử dụng thời gian, siêng năng như con kiến chăm chỉ tha mồi về tổ",
                 ],
                 year_quarter_goals: [
-                    "Thử nghiệm 1",
-                    "Đỗ đội tuyển học sinh giỏi quốc gia"
+                    "Theo sát lớp học (2 tiếng/ngày)",
+                    "2⭐ Roadmap (2 tiếng/ngày)",
+                    "7.5 IELTS (1 tiếng/ngày)"
                 ]
             }
         });
