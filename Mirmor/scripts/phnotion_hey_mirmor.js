@@ -146,9 +146,9 @@ class PHNotion_Hey_Mirmor {
 
     process_tersBOT(habits_json_data, streak_infos) {
         function get_unfinished_important_habits(name, data) {
-            if (data.data && data.data.important && data.point < data.goal_point)
+            if (data && data.data && data.data.important && data.point < data.goal_point)
                 unfinished_important_habits.push(name);
-            else if (typeof data == "object")
+            else if (data && typeof data == "object")
                 Object.entries(data)
                     .forEach(item => get_unfinished_important_habits(item[0], item[1]));
         }
