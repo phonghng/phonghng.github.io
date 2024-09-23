@@ -35,9 +35,9 @@ class PHNotion_Hey_Mirmor {
                     "Thời gian sẽ trôi qua mà không để lại bất cứ một dấu vết với những người không biết nhìn về tương lai bằng bộ óc thông minh và sự khổ luyện. Hạnh phúc chắc chắn sẽ dành cho người biết sử dụng thời gian, siêng năng như con kiến chăm chỉ tha mồi về tổ",
                 ],
                 year_quarter_goals: [
-                    "Theo sát lớp học (2 tiếng/ngày)",
-                    "2⭐ Roadmap (2 tiếng/ngày)",
-                    "7.5 IELTS (1 tiếng/ngày)"
+                    "Theo sát lớp (2 tiếng/ngày)",
+                    "2* Roadmap (2 tiếng/ngày)",
+                    "7.5 IELTS (2 tiếng/ngày)"
                 ]
             }
         });
