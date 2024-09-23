@@ -6,7 +6,10 @@ class PHNotion_Hey_Mirmor {
         homepage_top_container = document.body,
         options
     ) {
-        this.timestamp = new Date(new URL(location.href).searchParams.get("date")).getTime() || new Date().getTime();
+        this.timestamp = new Date(
+            new URL(location.href).searchParams.get("date")
+            || PPPL_JS.XDate(new Date()).date_object_expanded.date_string
+        ).getTime();
         this.habit_database = habit_database;
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
@@ -184,6 +187,7 @@ class PHNotion_Hey_Mirmor {
 
             let current_streak_object =
                 streaks.find(streak => streak.includes(timestamp))
+                || streaks.find(streak => streak.includes(timestamp - 86400000))
                 || { length: 0, 0: timestamp };
             let longest_streak = streaks.reduce(
                 (maximum_streak, streak) => streak.length > maximum_streak.length ? streak : maximum_streak,
