@@ -272,7 +272,7 @@ class PHNotion_Hey_Mirmor {
             this.queue[0].options,
             json => {
                 let shifted_item = this.queue.shift();
-                shifted_item.callback(json);
+                shifted_item?.callback(json);
                 this.process_queue();
             }
         );
