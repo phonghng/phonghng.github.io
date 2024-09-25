@@ -220,16 +220,20 @@ class Data {
                     data.completed_time
                         ? (`Hoàn thành lúc ` + data.completed_time)
                         : `Chưa hoàn thành`;
-                        let cumulative_period_text =
-                            data.cumulative_period
-                                ? (` {Tích luỹ theo ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}}`)
-                                : ``;
+                let technical_note = [];
+                if (data.cumulative_period)
+                    technical_note.push(`Tích luỹ theo`
+                        + ` ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}`);
+                if (data.important)
+                    technical_note.push(`Quan trọng`);
+                if (technical_note.length > 0)
+                    technical_note = ` {${technical_note.join(" ; ")}}`;
 
                 strings.push(
                     add_indent(
                         `${data.name}`
                         + ` [${point} / ${goal_point} (${max_point}) điểm]`
-                        + `${cumulative_period_text}`
+                        + `${technical_note}`
                         + ` <${completed_time_string}>`
                     )
                 );
@@ -266,24 +270,28 @@ class Data {
                             get_cumulative_info: () => this.options.get_cumulative_info(data)
                         })
                         : data.required;
-                let point = data.completed_time ? (data.point_per_value * data.goal_value) : 0;
+                let point = data.last_changed_time ? (data.point_per_value * data.goal_value) : 0;
                 let goal_point = is_required ? (data.point_per_value * data.goal_value) : 0;
                 let max_point = data.point_per_value * data.goal_value;
                 let last_changed_time_string =
                     data.last_changed_time
                         ? (`Sửa đổi lần cuối lúc ` + data.last_changed_time)
                         : `Chưa sửa đổi`;
-                let cumulative_period_text =
-                    data.cumulative_period
-                        ? (` {Tích luỹ theo ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}}`)
-                        : ``;
+                let technical_note = [];
+                if (data.cumulative_period)
+                    technical_note.push(`Tích luỹ theo`
+                        + ` ${CUMULATIVE_PERIOD_NAME[data.cumulative_period]}`);
+                if (data.important)
+                    technical_note.push(`Quan trọng`);
+                if (technical_note.length > 0)
+                    technical_note = ` {${technical_note.join(" ; ")}}`;
 
                 strings.push(
                     add_indent(
                         `${data.name}`
                         + ` [${point} / ${goal_point} (${max_point}) điểm`
                         + ` ; ${data.value || 0} / ${data.goal_value} ${data.unit}]`
-                        + `${cumulative_period_text}`
+                        + `${technical_note}`
                         + ` <${last_changed_time_string}>`,
                     )
                 );
