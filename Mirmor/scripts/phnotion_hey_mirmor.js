@@ -38,9 +38,10 @@ class PHNotion_Hey_Mirmor {
                     "Thời gian sẽ trôi qua mà không để lại bất cứ một dấu vết với những người không biết nhìn về tương lai bằng bộ óc thông minh và sự khổ luyện. Hạnh phúc chắc chắn sẽ dành cho người biết sử dụng thời gian, siêng năng như con kiến chăm chỉ tha mồi về tổ",
                 ],
                 year_quarter_goals: [
-                    "Theo sát lớp (2 tiếng/ngày)",
-                    "2* Roadmap (2 tiếng/ngày)",
-                    "7.5 IELTS (2 tiếng/ngày)"
+                    "Dự thi KHKTQG",
+                    "Theo sát lớp",
+                    "Hướng tới 2* Roadmap",
+                    "Hướng tới 7.5 IELTS"
                 ]
             }
         });
@@ -230,7 +231,10 @@ class PHNotion_Hey_Mirmor {
             .forEach(item => get_unfinished_important_habits(item[0], item[1]));
 
         return {
-            unfinished_important_habits: unfinished_important_habits,
+            Mirmor: {
+                timestamp: this.timestamp,
+                unfinished_important_habits: unfinished_important_habits,
+            },
             streak_infos: get_streaks_info(
                 this.options.streak_base_date,
                 this.timestamp,
