@@ -284,12 +284,16 @@ class PHNotion_Hey_Mirmor {
 
     fetch(url, options, callback) {
         window.onbeforeunload = () => true;
-        fetch(url, options)
-            .then(response => response.json())
-            .then(json => {
-                window.onbeforeunload = false;
-                callback(json);
-            });
+        try {
+            fetch(url, options)
+                .then(response => response.json())
+                .then(json => {
+                    window.onbeforeunload = false;
+                    callback(json);
+                });
+        } catch (error) {
+            this.fetch(url, options, callback);
+        }
     }
 
     init_js() {
