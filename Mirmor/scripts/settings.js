@@ -306,7 +306,7 @@ const HABITS = {
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
-                            name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor; tạo khung thời gian ngắn)",
+                            name: "Lập lịch hoạt động ngày mai (có rõ thực hiện các mục Mirmor; tạo khung thời gian ngắn); khởi tạo Mirmor ngày mai",
                             important: false,
                             required: true,
                             point: 15
