@@ -148,7 +148,6 @@ class PHNotion_Hey_Mirmor {
             callback: callback,
             fetching: false
         };
-        console.log(this.queue);
         this.process_queue();
     }
 
@@ -261,7 +260,6 @@ class PHNotion_Hey_Mirmor {
             callback: callback,
             fetching: false
         };
-        console.log(this.queue);
         this.process_queue();
     }
 
