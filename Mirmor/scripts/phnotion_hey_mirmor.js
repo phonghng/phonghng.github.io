@@ -51,7 +51,11 @@ class PHNotion_Hey_Mirmor {
         this.server_cache = {};
         this.initialization_data;
         this.last_set_point;
-        this.queue = [];
+        this.queue = {
+            is_fetching: false,
+            normal: null,
+            server_caching: null
+        };
 
         this.get(
             PPPL_JS.XDate(this.timestamp).date_object_expanded.date_string,
@@ -122,7 +126,7 @@ class PHNotion_Hey_Mirmor {
             );
         if (this.last_set_point == point) return;
         this.last_set_point = point;
-        this.queue.push({
+        this.queue.normal = {
             type: "normal",
             url: `${this.endpoint}/${date_string}`,
             options: {
@@ -143,7 +147,8 @@ class PHNotion_Hey_Mirmor {
             },
             callback: callback,
             fetching: false
-        });
+        };
+        console.log(this.queue);
         this.process_queue();
     }
 
@@ -245,7 +250,7 @@ class PHNotion_Hey_Mirmor {
     }
 
     set_server_cache(callback) {
-        this.queue.push({
+        this.queue.server_caching = {
             type: "server_caching",
             url: `${this.endpoint}/server_cache`,
             options: {
@@ -255,30 +260,34 @@ class PHNotion_Hey_Mirmor {
             },
             callback: callback,
             fetching: false
-        });
+        };
+        console.log(this.queue);
         this.process_queue();
     }
 
     process_queue() {
-        let ready_for_next_fetch =
-            this.queue[0] && this.queue.every(item => !item.fetching);
-        if (!ready_for_next_fetch) return;
-
-        if (this.queue[0].type == "server_caching" && this.queue.length > 1) {
-            this.queue.shift();
-            this.process_queue();
+        const process_queue_type = type => {
+            let callback = this.queue[type].callback;
+            this.queue.is_fetching = true;
+            this.fetch(
+                this.queue[type].url,
+                this.queue[type].options,
+                json => {
+                    this.queue.is_fetching = false;
+                    callback(json);
+                    this.process_queue();
+                }
+            );
+            this.queue[type] = null;
+            console.log(this.queue[type]);
         }
 
-        this.queue[0].fetching = true;
-        this.fetch(
-            this.queue[0].url,
-            this.queue[0].options,
-            json => {
-                let shifted_item = this.queue.shift();
-                shifted_item?.callback(json);
-                this.process_queue();
-            }
-        );
+        if (this.queue.is_fetching)
+            return;
+        if (this.queue.normal)
+            process_queue_type("normal");
+        else if (this.queue.server_caching)
+            process_queue_type("server_caching");
     }
 
     fetch(url, options, callback) {
