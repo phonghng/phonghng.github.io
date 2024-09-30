@@ -61,6 +61,24 @@ const HABITS = {
                                 && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 50
+                },
+                thien: {
+                    type: "habit_check",
+                    name: "Thiền trong ít nhất 5 phút",
+                    important: true,
+                    required: (arguments) => {
+                        return arguments.XDate_function().is_last_day_of.week;
+                    },
+                    point: 50
+                },
+                chuan_bi_Chu_nhat: {
+                    type: "habit_check",
+                    name: "Chuẩn bị cho ngày Chủ nhật ngắt kết nối Internet",
+                    important: true,
+                    required: (arguments) => {
+                        return arguments.XDate_function().date_object_expanded.day == 6;
+                    },
+                    point: 15
                 }
             }
         },
@@ -242,7 +260,9 @@ const HABITS = {
                         mang_xa_hoi: {
                             type: "habit_check",
                             name: "Chỉ dành thời gian kiểm tra mạng xã hội vào giờ nghỉ trưa, chiều, tối",
-                            required: true,
+                            required: (arguments) => {
+                                return !arguments.XDate_function().is_last_day_of.week;
+                            },
                             important: true,
                             point: 50
                         },
@@ -250,9 +270,7 @@ const HABITS = {
                             type: "habit_check",
                             name: "Không ăn/uống vặt",
                             important: true,
-                            required: (arguments) => {
-                                return !arguments.XDate_function().is_last_day_of.week;
-                            },
+                            required: true,
                             point: 50
                         },
                         X: {
@@ -270,6 +288,15 @@ const HABITS = {
                             important: true,
                             required: true,
                             point: 50
+                        },
+                        ngat_ket_noi_Internet: {
+                            type: "habit_check",
+                            name: "Ngắt kết nối Internet, hạn chế sử dụng điện thoại, máy tính",
+                            important: true,
+                            required: (arguments) => {
+                                return arguments.XDate_function().is_last_day_of.week;
+                            },
+                            point: 150
                         }
                     }
                 },
@@ -288,7 +315,9 @@ const HABITS = {
                             type: "habit_number",
                             name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
                             important: false,
-                            required: true,
+                            required: (arguments) => {
+                                return !arguments.XDate_function().is_last_day_of.week;
+                            },
 
                             unit: "đầu việc",
                             point_per_value: 15,
@@ -298,7 +327,9 @@ const HABITS = {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
                             important: false,
-                            required: true,
+                            required: (arguments) => {
+                                return !arguments.XDate_function().is_last_day_of.week;
+                            },
 
                             unit: "phút",
                             point_per_value: 0.5,

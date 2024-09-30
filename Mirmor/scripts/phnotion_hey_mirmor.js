@@ -277,7 +277,6 @@ class PHNotion_Hey_Mirmor {
                 }
             );
             this.queue[type] = null;
-            console.log(this.queue[type]);
         }
 
         if (this.queue.is_fetching)
