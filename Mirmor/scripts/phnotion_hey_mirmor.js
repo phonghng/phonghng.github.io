@@ -38,9 +38,9 @@ class PHNotion_Hey_Mirmor {
                     "Thời gian sẽ trôi qua mà không để lại bất cứ một dấu vết với những người không biết nhìn về tương lai bằng bộ óc thông minh và sự khổ luyện. Hạnh phúc chắc chắn sẽ dành cho người biết sử dụng thời gian, siêng năng như con kiến chăm chỉ tha mồi về tổ",
                 ],
                 year_quarter_goals: [
-                    "Dự thi KHKTQG (3 tiếng/ngày)",
-                    "Hướng tới 2* Roadmap (1,5 tiếng/ngày)",
-                    "Hướng tới 7.5 IELTS (1,5 tiếng/ngày)"
+                    "Dự thi KHKTQG (2h/d)",
+                    "7.5 IELTS (2h/d)",
+                    "Duy trì học lực (2h/d)"
                 ]
             }
         });
