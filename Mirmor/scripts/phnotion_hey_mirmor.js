@@ -220,6 +220,7 @@ class PHNotion_Hey_Mirmor {
                 ongoing_penalty_days:
                     current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
                         ? 2 * lost_count + 1 : 0,
+                reward_count: Math.floor(current_streak_object.length / 7),
                 reward_date:
                     current_streak_object.length > 0
                         ? format_date(reward_date) : 0
