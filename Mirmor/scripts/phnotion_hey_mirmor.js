@@ -177,9 +177,9 @@ class PHNotion_Hey_Mirmor {
             for (let i = 0; i < dates.length; i++) {
                 let current_date = new Date(dates[i]).getTime();
                 let previous_date = i > 0 ? new Date(dates[i - 1]).getTime() : null;
-                if (current_date > streak_base_date
-                    && previous_date
-                    && previous_date + 86400000 !== current_date)
+                if (current_date <= streak_base_date)
+                    continue;
+                if (previous_date && previous_date + 86400000 !== current_date)
                     lost_count++;
                 if (i === 0 || previous_date + 86400000 === current_date)
                     current_streak.push(current_date);
@@ -208,7 +208,7 @@ class PHNotion_Hey_Mirmor {
                 }
             }
 
-            let ongoing_reward_count = Math.floor(current_streak_object.length / 7);
+            let ongoing_reward_count = Math.floor(current_streak_object.length / 30);
 
             return {
                 current_streak_days: current_streak_object.length,
@@ -224,13 +224,13 @@ class PHNotion_Hey_Mirmor {
                 ongoing_reward_date:
                     ongoing_reward_count > 0
                         ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 7 * ongoing_reward_count * 86400000
+                            streaks[streaks.length - 1][0] + 30 * ongoing_reward_count * 86400000
                         ))
                         : 0,
                 upcoming_reward_date:
                     ongoing_reward_count + 1 > 0
                         ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 7 * (ongoing_reward_count + 1) * 86400000
+                            streaks[streaks.length - 1][0] + 30 * (ongoing_reward_count + 1) * 86400000
                         ))
                         : 0,
             };
