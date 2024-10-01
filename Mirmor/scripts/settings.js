@@ -69,7 +69,7 @@ const HABITS = {
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.week;
                     },
-                    point: 50
+                    point: 25
                 },
                 chuan_bi_Chu_nhat: {
                     type: "habit_check",
@@ -311,18 +311,6 @@ const HABITS = {
                             required: true,
                             point: 15
                         },
-                        dau_viec: {
-                            type: "habit_number",
-                            name: "Số đầu việc hoàn thành (tự đánh giá độ khó)",
-                            important: false,
-                            required: (arguments) => {
-                                return !arguments.XDate_function().is_last_day_of.week;
-                            },
-
-                            unit: "đầu việc",
-                            point_per_value: 15,
-                            goal_value: 1,
-                        },
                         tap_trung_lam_viec: {
                             type: "habit_number",
                             name: "Thời gian tập trung hoàn thành công việc",
@@ -404,22 +392,6 @@ const HABITS = {
                             point: 25
                         }
                     }
-                },
-                hoat_dong_phat_trien: {
-                    type: "habit_number",
-                    name: "Tham gia hoạt động phát triển kĩ năng",
-                    important: false,
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().total_value < 1
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().total_value < 1
-                                && arguments.get_cumulative_info().today_value > 0);
-                    },
-
-                    unit: "hoạt động",
-                    point_per_value: 100,
-                    goal_value: 1,
                 }
             }
         },
