@@ -208,9 +208,7 @@ class PHNotion_Hey_Mirmor {
                 }
             }
 
-            let reward_date =
-                new Date(streaks[streaks.length - 1][0]
-                    + 7 * Math.floor(current_streak_object.length / 7) * 86400000);
+            let ongoing_reward_count = Math.floor(current_streak_object.length / 7);
 
             return {
                 current_streak_days: current_streak_object.length,
@@ -220,11 +218,21 @@ class PHNotion_Hey_Mirmor {
                 penalty_days: 2 * (lost_count + (current_streak_object.length === 0)) + 1,
                 ongoing_penalty_days:
                     current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
-                        ? 2 * lost_count + 1 : 0,
-                reward_count: Math.floor(current_streak_object.length / 7),
-                reward_date:
-                    current_streak_object.length > 0
-                        ? format_date(reward_date) : 0
+                        ? 2 * lost_count + 1
+                        : 0,
+                ongoing_reward_count: ongoing_reward_count,
+                ongoing_reward_date:
+                    previous_reward_count > 0
+                        ? format_date(new Date(
+                            streaks[streaks.length - 1][0] + 7 * previous_reward_count * 86400000
+                        ))
+                        : 0,
+                upcoming_reward_date:
+                    previous_reward_count + 1 > 0
+                        ? format_date(new Date(
+                            streaks[streaks.length - 1][0] + 7 * (previous_reward_count + 1) * 86400000
+                        ))
+                        : 0,
             };
         }
 
