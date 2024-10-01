@@ -13,30 +13,7 @@ class PHNotion_Hey_Mirmor {
         this.habit_database = habit_database;
         this.extension_database = extension_database;
         this.homepage_top_container = homepage_top_container;
-        this.options = Object.assign({}, options, {
-            point_info_extension_parameters: {
-                percent_criterions: {
-                    "2024-01-01": 0.85, // changed
-                    "2024-02-23": 0.87,
-                    "2024-02-26": 0.85, // changed
-                    "2024-03-05": 0.87,
-                    "2024-03-31": 0.85,
-                    "2024-04-11": 0.80,
-                    "2024-04-14": 0.75,
-                    "2024-04-25": 0.85,
-                    "2024-05-06": 0.75,
-                    "2024-06-05": 0.80,
-                    "2024-09-14": 0.85,
-                    "2024-10-01": 0.90
-                },
-                chart_date_range: ["2024-09-23", "2024-12-31"]
-            },
-            streak_base_date: "2024-09-23",
-            tersBOT: {
-                quotes: [],
-                year_quarter_goals: []
-            }
-        });
+        this.options = options;
         this.StatusBar_class = new StatusBar(this.homepage_top_container);
 
         this.endpoint = this.get_endpoint(encrypted_endpoint);
@@ -169,7 +146,7 @@ class PHNotion_Hey_Mirmor {
             for (let i = 0; i < dates.length; i++) {
                 let current_date = new Date(dates[i]).getTime();
                 let previous_date = i > 0 ? new Date(dates[i - 1]).getTime() : null;
-                if (current_date <= streak_base_date)
+                if (current_date <= new Date(streak_base_date).getTime())
                     continue;
                 if (previous_date && previous_date + 86400000 !== current_date)
                     lost_count++;

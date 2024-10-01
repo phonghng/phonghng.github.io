@@ -1,4 +1,22 @@
 const DEFAULT_OPTIONS = {
+    point_info_extension_parameters: {
+        percent_criterions: {
+            "2024-01-01": 0.85, // changed
+            "2024-02-23": 0.87,
+            "2024-02-26": 0.85, // changed
+            "2024-03-05": 0.87,
+            "2024-03-31": 0.85,
+            "2024-04-11": 0.80,
+            "2024-04-14": 0.75,
+            "2024-04-25": 0.85,
+            "2024-05-06": 0.75,
+            "2024-06-05": 0.80,
+            "2024-09-14": 0.85,
+            "2024-10-01": 0.90
+        },
+        chart_date_range: ["2024-09-23", "2024-12-31"]
+    },
+    streak_base_date: "2024-09-23",
     tersBOT: {
         quotes: [
             "Người tích cực sẽ giống như mặt trời vậy, dù ở bất cứ nơi đâu cũng có thể toả sáng. Chỉ khi giữ được một trái tim bình lặng, cậu mới có thể không sợ hãi mà bình thản đối mặt với mọi biến cố. Chỉ khi có được một tâm hồn rộng mở, cậu mới có thể tìm thấy được sức mạnh khiến cậu làm được những gì mà bản thân mong muốn. Hy vọng rằng tất cả chúng ta đều có thể giữ được tâm thái thật tốt, vững vàng không sợ hãi mà tiến về phía trước.",
