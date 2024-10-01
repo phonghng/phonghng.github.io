@@ -222,15 +222,15 @@ class PHNotion_Hey_Mirmor {
                         : 0,
                 ongoing_reward_count: ongoing_reward_count,
                 ongoing_reward_date:
-                    previous_reward_count > 0
+                    ongoing_reward_count > 0
                         ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 7 * previous_reward_count * 86400000
+                            streaks[streaks.length - 1][0] + 7 * ongoing_reward_count * 86400000
                         ))
                         : 0,
                 upcoming_reward_date:
-                    previous_reward_count + 1 > 0
+                    ongoing_reward_count + 1 > 0
                         ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 7 * (previous_reward_count + 1) * 86400000
+                            streaks[streaks.length - 1][0] + 7 * (ongoing_reward_count + 1) * 86400000
                         ))
                         : 0,
             };
