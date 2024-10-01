@@ -321,7 +321,7 @@ const HABITS = {
 
                             unit: "phút",
                             point_per_value: 0.5,
-                            goal_value: 15,
+                            goal_value: 60,
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
