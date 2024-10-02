@@ -146,7 +146,7 @@ class PHNotion_Hey_Mirmor {
             for (let i = 0; i < dates.length; i++) {
                 let current_date = new Date(dates[i]).getTime();
                 let previous_date = i > 0 ? new Date(dates[i - 1]).getTime() : null;
-                if (current_date <= new Date(streak_base_date).getTime())
+                if (current_date < new Date(streak_base_date).getTime())
                     continue;
                 if (previous_date && previous_date + 86400000 !== current_date)
                     lost_count++;
