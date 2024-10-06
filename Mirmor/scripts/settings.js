@@ -102,7 +102,7 @@ const HABITS = {
                     name: "Thực hiện ngày \"Chủ nhật hạnh phúc\"",
                     important: true,
                     required: false,
-                    point: 100
+                    point: 200
                 }
             }
         },
@@ -312,15 +312,6 @@ const HABITS = {
                             important: true,
                             required: true,
                             point: 50
-                        },
-                        ngat_ket_noi_Internet: {
-                            type: "habit_check",
-                            name: "Ngắt kết nối Internet, hạn chế sử dụng điện thoại, máy tính",
-                            important: true,
-                            required: (arguments) => {
-                                return arguments.XDate_function().is_last_day_of.week;
-                            },
-                            point: 150
                         }
                     }
                 },
