@@ -97,23 +97,14 @@ const HABITS = {
                     },
                     point: 50
                 },
-                thien: {
+                Chu_nhat_hanh_phuc: {
                     type: "habit_check",
-                    name: "Thiền trong ít nhất 5 phút",
+                    name: "Thực hiện ngày \"Chủ nhật hạnh phúc\"",
                     important: true,
                     required: (arguments) => {
                         return arguments.XDate_function().is_last_day_of.week;
                     },
-                    point: 25
-                },
-                chuan_bi_Chu_nhat: {
-                    type: "habit_check",
-                    name: "Chuẩn bị cho ngày Chủ nhật ngắt kết nối Internet",
-                    important: true,
-                    required: (arguments) => {
-                        return arguments.XDate_function().date_object_expanded.day == 6;
-                    },
-                    point: 15
+                    point: 100
                 }
             }
         },
