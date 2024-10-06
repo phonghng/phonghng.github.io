@@ -101,9 +101,7 @@ const HABITS = {
                     type: "habit_check",
                     name: "Thực hiện ngày \"Chủ nhật hạnh phúc\"",
                     important: true,
-                    required: (arguments) => {
-                        return arguments.XDate_function().is_last_day_of.week;
-                    },
+                    required: false,
                     point: 100
                 }
             }
