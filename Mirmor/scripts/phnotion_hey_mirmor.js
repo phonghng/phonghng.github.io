@@ -121,7 +121,7 @@ class PHNotion_Hey_Mirmor {
         this.process_queue();
     }
 
-    process_tersBOT(habits_json_data, streak_infos) {
+    process_tersBOT(habits_json_data, streak_satisfied_dates) {
         function get_unfinished_important_habits(name, data) {
             if (data && data.data && data.data.important && data.point < data.goal_point)
                 unfinished_important_habits.push(name);
@@ -217,7 +217,7 @@ class PHNotion_Hey_Mirmor {
             streak_infos: get_streaks_info(
                 this.options.streak_base_date,
                 this.timestamp,
-                streak_infos.satisfied_dates
+                streak_satisfied_dates
             ),
             quotes: this.options.tersBOT.quotes,
             year_quarter_goals: this.options.tersBOT.year_quarter_goals
@@ -308,7 +308,7 @@ class PHNotion_Hey_Mirmor {
                                     || "{}"
                                 );
 
-                            let { streak_infos } =
+                            let { streak_satisfied_dates } =
                                 this.Habits_class.data.children.xem_thong_ke
                                     .Extension_class.ExtensionPopup_class
                                     .run_function("update_data", [
@@ -319,13 +319,13 @@ class PHNotion_Hey_Mirmor {
                             this.Habits_class.data.children.xem_chuoi
                                 .Extension_class.ExtensionPopup_class
                                 .run_function("update_data", [
-                                    streak_infos,
+                                    streak_satisfied_dates,
                                     this.timestamp,
                                     Object.keys(this.options
                                         .point_info_extension_parameters.percent_criterions)[0]
                                 ]);
 
-                            this.server_cache.tersBOT = this.process_tersBOT(json_data, streak_infos);
+                            this.server_cache.tersBOT = this.process_tersBOT(json_data, streak_satisfied_dates);
                             this.set_server_cache(() => {
                                 let status_element = document.createElement("span");
                                 status_element.style.color = "var(--LIME)";

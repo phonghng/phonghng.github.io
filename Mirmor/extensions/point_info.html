@@ -28,11 +28,6 @@
     <canvas style="width: 100%; height: 100%;"></canvas>
 
     <script>
-        let data = {
-            /* point_infos: [], */
-            last_updated: undefined
-        };
-
         let ctx = document.querySelector("canvas");
         let chartjs = new Chart(ctx, {
             data: {
@@ -184,10 +179,7 @@
                 month: {},
                 year_quarter: {}
             };
-            let streak_infos = {
-                instruction: "Mipo > 0",
-                satisfied_dates: []
-            };
+            let streak_satisfied_dates = [];
 
             for (let i = 0; i < point_infos.length; i++) {
                 for (let percent_criterion of percent_criterions)
@@ -202,11 +194,9 @@
                     + calculate_reward_points(reward_infos, point_infos[i].date, point_infos[i].pre_Mipo);
                 point_infos[i][Mipo_name(percent_criterion)] = Mipo;
                 if (Mipo > 0)
-                    streak_infos.satisfied_dates.push(point_infos[i].date);
+                    streak_satisfied_dates.push(point_infos[i].date);
             }
 
-            /* data.point_infos = point_infos; */
-            data.last_updated = Date.now();
             info_onchange();
 
             point_infos = point_infos.filter(point_info => is_in_chart_date_range(point_info.date));
@@ -219,7 +209,7 @@
 
             update_chart(mapped_point_infos);
 
-            return { streak_infos };
+            return { streak_satisfied_dates };
         }
 
         function generate_chart_datasets(mapped_point_infos) {
@@ -252,7 +242,7 @@
             let exported_info = {
                 point: 0,
                 goal_point: 0,
-                data: data
+                data: {}
             };
             return exported_info;
         }

@@ -254,8 +254,8 @@
             }
         }
 
-        function update_data(streak_infos, today_timestamp, first_date_string) {
-            data.streak_infos = streak_infos;
+        function update_data(streak_satisfied_dates, today_timestamp, first_date_string) {
+            data.streak_satisfied_dates = streak_satisfied_dates;
             today_date = new Date(PPPL_JS.XDate(today_timestamp).date_object_expanded.date_string);
             first_date = new Date(first_date_string);
             update_viewer();
@@ -270,7 +270,7 @@
             return {
                 point: 0,
                 goal_point: 0,
-                data: data
+                data: {}
             };
         }
     </script>
