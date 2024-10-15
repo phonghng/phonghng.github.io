@@ -87,18 +87,13 @@
 <body>
     <div id="container">
         <div id="decrease_month"><button onclick="decrease_month()">←</button></div>
-        <div id="month_year_display"><button onclick="today_month()">←</button></div>
+        <div id="month_year_display"><button onclick="today_month()">Vui lòng chờ...</button></div>
         <div id="increase_month"><button onclick="increase_month()">→</button></div>
         <table id="calendar_table"></table>
     </div>
 
     <script>
-        let data = {
-            streak_infos: {
-                instruction: "Mipo >= 0",
-                satisfied_dates: []
-            }
-        };
+        let streak_satisfied_dates = [];
 
         let today_date = new Date();
         let first_date = undefined;
@@ -131,7 +126,7 @@
                 return result;
             }
 
-            let streaks = find_consecutive_dates(data.streak_infos.satisfied_dates);
+            let streaks = find_consecutive_dates(streak_satisfied_dates);
             let record_streak = {
                 longest: [0],
                 shortest: [0],
@@ -189,7 +184,7 @@
                 let getting_date_string = PPPL_JS.XDate(getting_date).date_object_expanded.date_string;
                 if (getting_date < first_date || getting_date > today_date)
                     return "var(--GREY_1)";
-                if (data.streak_infos.satisfied_dates.indexOf(getting_date_string) != -1)
+                if (streak_satisfied_dates.indexOf(getting_date_string) != -1)
                     return "var(--LIME)";
                 return "var(--CHERRY)";
             };
@@ -254,8 +249,8 @@
             }
         }
 
-        function update_data(streak_satisfied_dates, today_timestamp, first_date_string) {
-            data.streak_satisfied_dates = streak_satisfied_dates;
+        function update_data(satisfied_dates, today_timestamp, first_date_string) {
+            streak_satisfied_dates = satisfied_dates;
             today_date = new Date(PPPL_JS.XDate(today_timestamp).date_object_expanded.date_string);
             first_date = new Date(first_date_string);
             update_viewer();
