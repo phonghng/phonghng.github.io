@@ -22,13 +22,13 @@
 
         .title {
             text-align: center;
-            font-size: 2.7vmax;
+            font-size: 2.9vmax;
             margin: 0;
             font-weight: bold;
         }
 
         .description {
-            font-size: 1.7vmax;
+            font-size: 1.9vmax;
             margin-bottom: 1.5vmax;
             font-style: italic;
         }
@@ -37,7 +37,7 @@
             flex-grow: 1;
             border-collapse: collapse;
             text-align: center;
-            font-size: 1.7vmax;
+            font-size: 1.9vmax;
             border: 2px solid #18191A;
             border-radius: 10px;
             overflow: hidden;
@@ -46,7 +46,7 @@
 
         td {
             border: 2px solid #18191A;
-            padding: 1vmax;
+            padding: 1vmax 2vmax;
             background-color: #242526;
             width: calc(100% / 7);
         }
@@ -72,7 +72,7 @@
     <div class="description">Thực hiện từ ngày 21 tháng 10 năm 2024</div>
     <table id="timetable">
         <tr>
-            <td></td>
+            <td>Kết thúc</td>
             <td><b>Thứ Hai</b></td>
             <td><b>Thứ Ba</b></td>
             <td><b>Thứ Tư</b></td>
@@ -81,7 +81,7 @@
             <td><b>Thứ Bảy</b></td>
         </tr>
         <tr>
-            <td><b>7h10 - 7h55</b></td>
+            <td><b>7h55</b></td>
             <td></td>
             <td></td>
             <td></td>
@@ -90,7 +90,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><b>8h - 8h45</b></td>
+            <td><b>8h45</b></td>
             <td></td>
             <td></td>
             <td></td>
@@ -99,7 +99,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><b>9h05 - 9h50</b></td>
+            <td><b>9h50</b></td>
             <td></td>
             <td></td>
             <td></td>
@@ -108,7 +108,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><b>9h55 - 10h40</b></td>
+            <td><b>10h40</b></td>
             <td></td>
             <td></td>
             <td></td>
@@ -117,7 +117,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><b>10h45 - 11h30</b></td>
+            <td><b>11h30</b></td>
             <td></td>
             <td></td>
             <td></td>
@@ -157,8 +157,8 @@
             let time_cell = rows[i].cells[0].innerText.split(" - ")[0];
             let [hour, minute] = time_cell.split("h").map(Number);
             let time_in_minutes = hour * 60 + minute;
-            start_time = Math.min(start_time, time_in_minutes);
-            end_time = Math.max(end_time, time_in_minutes + 45);
+            start_time = Math.min(start_time, time_in_minutes - 45);
+            end_time = Math.max(end_time, time_in_minutes);
         }
 
         if (day_of_week > 0) {
