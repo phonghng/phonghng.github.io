@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Thời khoá biểu</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Lora", serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: calc(100vh - 2vmax);
+            width: calc(100vw - 2vmax);
+            margin: 1vmax;
+            background-color: #18191A;
+            color: #FFFFFF;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.7vmax;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .description {
+            font-size: 1.7vmax;
+            margin-bottom: 1.5vmax;
+            font-style: italic;
+        }
+
+        table {
+            flex-grow: 1;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 1.7vmax;
+            border: 2px solid #18191A;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 33vmax;
+        }
+
+        td {
+            border: 2px solid #18191A;
+            padding: 1vmax;
+            background-color: #242526;
+            width: calc(100% / 7);
+        }
+
+        td:first-child {
+            font-weight: bold;
+        }
+
+        td.highlighted {
+            color: #F3425F;
+            font-weight: bold;
+        }
+
+        td.sub_highlighted {
+            color: #1877F2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">THỜI KHÓA BIỂU</div>
+    <div class="description">Thực hiện từ ngày 21 tháng 10 năm 2024</div>
+    <table id="timetable">
+        <tr>
+            <td></td>
+            <td><b>Thứ Hai</b></td>
+            <td><b>Thứ Ba</b></td>
+            <td><b>Thứ Tư</b></td>
+            <td><b>Thứ Năm</b></td>
+            <td><b>Thứ Sáu</b></td>
+            <td><b>Thứ Bảy</b></td>
+        </tr>
+        <tr>
+            <td><b>7h10 - 7h55</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>8h - 8h45</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>9h05 - 9h50</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>9h55 - 10h40</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>10h45 - 11h30</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <script>
+        let timetable_input = [
+            ["Trải", "Văn", "Toán", "Thể", "Thể", "Hoá"],
+            ["Hóa", "Sử", "Sinh", "Toán", "Phương", "Sinh"],
+            ["Anh", "Lí", "Trải", "Quốc", "Toán", "Văn"],
+            ["Anh", "Tin", "Lí", "Anh", "Toán", "Văn"],
+            ["Tin", "", "Lí", "", "", "Trải"]
+        ];
+
+        let table = document.querySelector("#timetable");
+        let rows = table.rows;
+        let current_time = new Date();
+        let current_hour = current_time.getHours();
+        let current_minute = current_time.getMinutes();
+        let day_of_week = current_time.getDay();
+        let current_time_in_minutes = current_hour * 60 + current_minute;
+        let start_time = Infinity;
+        let end_time = -Infinity;
+
+        for (let i = 0; i < timetable_input.length; i++) {
+            let subjects = timetable_input[i];
+            let row = rows[i + 1];
+            for (let j = 0; j < subjects.length; j++)
+                row.cells[j + 1].innerText = subjects[j];
+        }
+
+        for (let i = 1; i < rows.length; i++) {
+            let time_cell = rows[i].cells[0].innerText.split(" - ")[0];
+            let [hour, minute] = time_cell.split("h").map(Number);
+            let time_in_minutes = hour * 60 + minute;
+            start_time = Math.min(start_time, time_in_minutes);
+            end_time = Math.max(end_time, time_in_minutes + 45);
+        }
+
+        if (day_of_week > 0) {
+            if (current_time_in_minutes < start_time || current_time_in_minutes >= end_time)
+                for (let i = 1; i < rows.length; i++)
+                    rows[i].cells[day_of_week].classList.add("highlighted");
+            else {
+                let period_index = Math.floor((current_time_in_minutes - start_time) / 45);
+                if (period_index < rows.length - 1)
+                    rows[period_index + 1].cells[day_of_week].classList.add("highlighted");
+            }
+        }
+
+        if ((day_of_week + 1) % 8 > 0)
+            for (let i = 1; i < rows.length; i++)
+                rows[i].cells[(day_of_week + 1) % 8].classList.add("sub_highlighted");
+    </script>
+</body>
+
+</html>

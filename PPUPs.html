@@ -16,12 +16,7 @@
     <style>
         @media screen and (min-width: 450px) {
             #tkb {
-                --width: 4;
-                --height: 2;
-            }
-
-            #PPUPsyno {
-                --width: 5;
+                --width: 6;
                 --height: 3;
             }
         }
@@ -30,11 +25,6 @@
             #tkb {
                 --width: 2;
                 --height: 1;
-            }
-
-            #PPUPsyno {
-                --width: 2;
-                --height: 3;
             }
         }
     </style>
@@ -45,10 +35,9 @@
 
     <script>
         const ITEMS = [{
-            type: "widget_image",
+            type: "widget_iframe",
             id: "tkb",
-            image_source: "https://i.ibb.co/PtWJVbK/image.png",
-            image_base_color: "#FFFFFF"
+            iframe_url: "./pages/PPUPs_tkb.html"
         }, {
             type: "folder",
             name: "PPUP",
