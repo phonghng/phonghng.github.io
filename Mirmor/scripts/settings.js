@@ -335,7 +335,7 @@ const HABITS = {
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
-                            name: "Lập lịch hoạt động ngày mai (tạo khung thời gian ngắn)",
+                            name: "Lập lịch hoạt động ngày mai (chia thành tối đa 10 hiệp Pomodoro)",
                             important: false,
                             required: true,
                             point: 15
@@ -447,7 +447,7 @@ const HABITS = {
             children: {
                 tong_ket_tuan: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, điều chỉnh, quán triệt thực hiện kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, đánh giá, điều chỉnh, triển khai thực hiện kế hoạch phát triển kĩ năng và kiến thức (viết thành bài)",
                     important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
