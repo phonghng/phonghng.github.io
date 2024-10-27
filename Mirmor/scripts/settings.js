@@ -448,7 +448,7 @@ const HABITS = {
             children: {
                 ki_so_tuan: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, điều chỉnh, triển khai kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Sơ kết, đánh giá, điều chỉnh, triển khai kế hoạch phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
@@ -500,7 +500,7 @@ const HABITS = {
                 },
                 ki_so_thang: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, đánh giá, hoạch định phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
