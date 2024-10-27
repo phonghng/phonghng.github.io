@@ -446,9 +446,9 @@ const HABITS = {
             type: "group",
             name: "Kiểm soát",
             children: {
-                tong_ket_tuan: {
+                ki_so_tuan: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, điều chỉnh, triển khai thực hiện kế hoạch phát triển kĩ năng và kiến thức (viết thành bài)",
+                    name: "Tổng kết, đánh giá, điều chỉnh, triển khai kế hoạch phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
@@ -458,6 +458,19 @@ const HABITS = {
                                 && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 50
+                },
+                viet_bai_ki_so_tuan: {
+                    type: "habit_check",
+                    name: "Viết thành bài Kí-sổ-tuần",
+                    important: true,
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 25
                 },
                 tru_cot_phat_trien: {
                     type: "habit_check",
@@ -485,7 +498,7 @@ const HABITS = {
                     },
                     point: 25
                 },
-                tong_ket_thang: {
+                ki_so_thang: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, lập kế hoạch phát triển kĩ năng và kiến thức",
                     important: true,
@@ -498,7 +511,7 @@ const HABITS = {
                     },
                     point: 50
                 },
-                tong_ket_quy: {
+                ki_so_quy: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
                     important: true,
