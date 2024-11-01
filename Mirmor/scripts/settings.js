@@ -500,7 +500,7 @@ const HABITS = {
                 },
                 ki_so_thang: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, hoạch định phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, đánh giá, hoạch định kế hoạch phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
