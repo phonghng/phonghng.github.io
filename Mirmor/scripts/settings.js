@@ -428,7 +428,7 @@ const HABITS = {
                             || (arguments.get_cumulative_info().completed_count == 1
                                 && arguments.get_cumulative_info().is_today_completed);
                     },
-                    point: 50
+                    point: 25
                 },
                 doc_sach: {
                     type: "habit_number",
