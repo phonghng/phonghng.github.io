@@ -291,7 +291,7 @@ const HABITS = {
                             name: "Không ăn/uống vặt",
                             important: true,
                             required: true,
-                            point: 50
+                            point: 150
                         },
                         X: {
                             type: "habit_check",
