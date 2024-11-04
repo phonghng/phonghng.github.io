@@ -22,9 +22,9 @@ const DEFAULT_OPTIONS = {
     streak_base_date: "2024-09-23",
     tersBOT: {
         year_quarter_goals: [
-            "Dự thi KHKTQG",
-            "6.5 IELTS",
-            "Duy trì học lực"
+            "KHKTQG",
+            "9,0 GPA",
+            "6.5 IELTS"
         ]
     }
 };
