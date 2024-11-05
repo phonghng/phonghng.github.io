@@ -176,7 +176,7 @@ textarea {
     padding: 10px;
     font-size: 15px;
     width: 100%;
-    background-color: var(--background_color);
+    background-color: var(--base_color);
     color: var(--WHITE);
 }
 
@@ -345,11 +345,11 @@ button:disabled:active {
 }
 
 [PPPL-WUIC="tab"] .navigator button.active {
-    background-color: var(--base_background_color);
+    background-color: var(--base_color);
 }
 
 [PPPL-WUIC="tab"] .navigator button:not(:disabled):hover {
-    color: var(--base_background_color);
+    color: var(--base_color);
 }
 
 [PPPL-WUIC="tab"] .navigator button:not(:disabled):active {
@@ -362,7 +362,7 @@ button:disabled:active {
 }
 
 [PPPL-WUIC="tab"] .content {
-    background-color: var(--base_background_color);
+    background-color: var(--base_color);
     padding: 10px;
     -webkit-border-radius: 10px;
        -moz-border-radius: 10px;

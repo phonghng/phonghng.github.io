@@ -38,7 +38,7 @@ button,
 input:not([type="checkbox"]),
 select,
 textarea {
-    --background_color: var(--GREY_1);
+    --base_color: var(--GREY_1);
 }
 
 button {
@@ -51,7 +51,7 @@ button {
 }
 
 [PPPL-WUIC="tab"] {
-    --base_background_color: var(--GREY_1);
+    --base_color: var(--GREY_1);
 }
 ```
 
