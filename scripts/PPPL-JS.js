@@ -291,7 +291,7 @@ const PPPL_JS = {
                         ], document);
                     break;
                 }
-                
+
                 /* item_data = { required, disabled, value, style } */
                 case "textarea": {
                     main_ADOM =
@@ -605,11 +605,11 @@ const PPPL_JS = {
     PPPL_WUIC: {
         popup: {
             open(container_element, title, close_callback) {
-                container_element.querySelector(".container .main .title").innerText = title;
-                container_element.querySelector(".container .main .close_button").onclick = close_callback;
+                container_element.querySelector("[PPPL-WUIC=\"popup\"] .main .title").innerText = title;
+                container_element.querySelector("[PPPL-WUIC=\"popup\"] .main .close_button").onclick = close_callback;
 
                 container_element.style.display = "flex";
-                container_element.querySelector(".container .main")
+                container_element.querySelector("[PPPL-WUIC=\"popup\"] .main")
                     .animate([
                         { transform: "scale(0)" },
                         { transform: "scale(1)" },
@@ -622,7 +622,7 @@ const PPPL_JS = {
             },
 
             close(container_element, closed_callback) {
-                container_element.querySelector(".container .main")
+                container_element.querySelector("[PPPL-WUIC=\"popup\"] .main")
                     .animate([
                         { transform: "scale(1)" },
                         { transform: "scale(0)" },
@@ -636,28 +636,25 @@ const PPPL_JS = {
                 }, 250);
                 return true;
             }
-        }
-    },
+        },
 
-    JSEncrypt: {
-        generate_keys: (private_key) => {
-            let _JSEncrypt = new JSEncrypt();
-            if (private_key)
-                _JSEncrypt.setPrivateKey(private_key);
-            return {
-                public: _JSEncrypt.getPublicKey(),
-                private: _JSEncrypt.getPrivateKey()
-            };
-        },
-        encrypt: (public_key, message) => {
-            let _JSEncrypt = new JSEncrypt();
-            _JSEncrypt.setPublicKey(public_key);
-            return _JSEncrypt.encrypt(message);
-        },
-        decrypt: (private_key, encrypted) => {
-            let _JSEncrypt = new JSEncrypt();
-            _JSEncrypt.setPrivateKey(private_key);
-            return _JSEncrypt.decrypt(encrypted);
+        tab: {
+            init(container_element) {
+                let navagator_buttons = container_element.querySelectorAll("[PPPL-WUIC=\"tab\"] .navigator button");
+                let tab_contents = container_element.querySelectorAll("[PPPL-WUIC=\"tab\"] .content .tab_content");
+                for (let button of navagator_buttons)
+                    button.onclick = (event) => this.open_tab(container_element, navagator_buttons, tab_contents, event);
+            },
+
+            open_tab(container_element, navagator_buttons, tab_contents, event) {
+                for (let button of navagator_buttons) button.classList.remove("active");
+                for (let tab_content of tab_contents) tab_content.classList.remove("active");
+                event.target.classList.add("active");
+                let name = event.target.getAttribute("name");
+                let active_content =
+                    container_element.querySelector(`[PPPL-WUIC=\"tab\"] .content .tab_content[name="${name}"]`);
+                if (active_content) active_content.classList.add("active");
+            }
         }
     }
 }

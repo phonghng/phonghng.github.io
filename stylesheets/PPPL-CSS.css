@@ -149,8 +149,8 @@ table {
 
 * {
     -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
@@ -162,7 +162,7 @@ body {
 
 form {
     -webkit-margin-after: 0;
-            margin-block-end: 0;
+    margin-block-end: 0;
 }
 
 button,
@@ -171,12 +171,12 @@ select,
 textarea {
     border: none;
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
     padding: 10px;
     font-size: 15px;
     width: 100%;
-    background-color: var(--GREY_1);
+    background-color: var(--background_color);
     color: var(--WHITE);
 }
 
@@ -202,10 +202,10 @@ textarea:disabled {
 button {
     background-color: var(--base_color);
     color: var(--WHITE);
-    -webkit-transition: background-color, color 0.25s;
-    -o-transition: background-color, color 0.25s;
-    -moz-transition: background-color, color 0.25s;
-    transition: background-color, color 0.25s;
+    -webkit-transition: background-color 0.25s, color 0.25s;
+    -o-transition: background-color 0.25s, color 0.25s;
+    -moz-transition: background-color 0.25s, color 0.25s;
+    transition: background-color 0.25s, color 0.25s;
     cursor: pointer;
     font-weight: bold;
 }
@@ -241,28 +241,28 @@ button:disabled:active {
     color: var(--WHITE);
 }
 
-[PPPL-WUIC="popup"].container {
+[PPPL-WUIC="popup"] {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     -webkit-backdrop-filter: blur(3px) invert(15%);
-            backdrop-filter: blur(3px) invert(15%);
+    backdrop-filter: blur(3px) invert(15%);
     display: none;
     -webkit-box-pack: center;
     -webkit-justify-content: center;
-       -moz-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
     -webkit-box-align: center;
     -webkit-align-items: center;
-       -moz-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
 }
 
-[PPPL-WUIC="popup"].container .main {
+[PPPL-WUIC="popup"] .main {
     display: -ms-grid;
     display: grid;
     -ms-grid-columns: 1fr 10px -webkit-min-content;
@@ -270,18 +270,18 @@ button:disabled:active {
     grid-template-columns: 1fr -webkit-min-content;
     grid-template-columns: 1fr min-content;
     -ms-grid-rows: -webkit-min-content 10px 1fr;
-    -ms-grid-rows: min-content 10px 1fr;
     grid-template-rows: -webkit-min-content 1fr;
+    -ms-grid-rows: min-content 10px 1fr;
     grid-template-rows: min-content 1fr;
     gap: 10px 10px;
     grid-auto-flow: row;
         grid-template-areas:
         "title close_button"
         "content content";
-    background-color: var(--GREY_4);
+    background-color: var(--outside_background_color);
     -webkit-border-radius: 10px;
-       -moz-border-radius: 10px;
-            border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
     padding: 10px;
     width: 75vw;
     height: -webkit-fit-content;
@@ -291,14 +291,14 @@ button:disabled:active {
     max-height: 75vh;
 }
 
-[PPPL-WUIC="popup"].container .main .title {
+[PPPL-WUIC="popup"] .main .title {
     -ms-grid-row: 1;
     -ms-grid-column: 1;
     grid-area: title;
-    background-color: var(--GREY_3);
+    background-color: var(--inside_background_color);
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
     padding: 10px;
     font-weight: bold;
     text-align: center;
@@ -306,19 +306,70 @@ button:disabled:active {
     overflow: auto;
 }
 
-[PPPL-WUIC="popup"].container .main .close_button {
+[PPPL-WUIC="popup"] .main .close_button {
     --base_color: var(--CHERRY);
 }
 
-[PPPL-WUIC="popup"].container .main .content {
+[PPPL-WUIC="popup"] .main .content {
     -ms-grid-row: 3;
     -ms-grid-column: 1;
     -ms-grid-column-span: 3;
     grid-area: content;
-    background-color: var(--GREY_3);
+    background-color: var(--inside_background_color);
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
     overflow: auto;
     padding: 10px;
+}
+
+[PPPL-WUIC="tab"] .navigator {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: auto;
+    gap: 10px;
+}
+
+[PPPL-WUIC="tab"] .navigator button {
+    background-color: transparent;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
+    -webkit-transition: background-color 0.25s, color 0.25s;
+    -o-transition: background-color 0.25s, color 0.25s;
+    -moz-transition: background-color 0.25s, color 0.25s;
+    transition: background-color 0.25s, color 0.25s;
+}
+
+[PPPL-WUIC="tab"] .navigator button.active {
+    background-color: var(--base_background_color);
+}
+
+[PPPL-WUIC="tab"] .navigator button:not(:disabled):hover {
+    color: var(--base_background_color);
+}
+
+[PPPL-WUIC="tab"] .navigator button:not(:disabled):active {
+    color: var(--WHITE);
+}
+
+[PPPL-WUIC="tab"] .navigator button.active:not(:disabled):hover,
+[PPPL-WUIC="tab"] .navigator button.active:not(:disabled):active {
+    color: var(--WHITE);
+}
+
+[PPPL-WUIC="tab"] .content {
+    background-color: var(--base_background_color);
+    padding: 10px;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
+    margin: 10px 0 0 0;
+}
+
+[PPPL-WUIC="tab"] .content .tab_content:not(.active) {
+    display: none;
 }
