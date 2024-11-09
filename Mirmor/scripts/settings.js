@@ -410,6 +410,19 @@ const HABITS = {
                             point: 25
                         }
                     }
+                },
+                do_rac_KTX: {
+                    type: "habit_check",
+                    name: "Đổ rác kí túc xá",
+                    important: true,
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.week)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 25
                 }
             }
         },
