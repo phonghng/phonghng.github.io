@@ -22,8 +22,7 @@ const DEFAULT_OPTIONS = {
     streak_base_date: "2024-09-23",
     tersBOT: {
         year_quarter_goals: [
-            "KHKTQG",
-            "9,0 GPA",
+            "8,5 HK Toán - Lí - Hoá",
             "6.5 IELTS"
         ]
     }
