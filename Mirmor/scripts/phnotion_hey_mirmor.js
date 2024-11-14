@@ -177,7 +177,7 @@ class PHNotion_Hey_Mirmor {
                 }
             }
 
-            let ongoing_reward_count = Math.floor(current_streak_object.length / 30);
+            let upcoming_reward_count = Math.floor(current_streak_object.length / 30);
 
             return {
                 current_streak_days: current_streak_object.length,
@@ -189,17 +189,13 @@ class PHNotion_Hey_Mirmor {
                     current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
                         ? 2 * lost_count + 1
                         : 0,
-                ongoing_reward_count: ongoing_reward_count,
-                ongoing_reward_date:
-                    ongoing_reward_count > 0
-                        ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 30 * ongoing_reward_count * 86400000
-                        ))
-                        : 0,
+                upcoming_reward_count: upcoming_reward_count,
                 upcoming_reward_date:
-                    current_streak_object.length !== 0 && ongoing_reward_count + 1 > 0
+                    current_streak_object.length !== 0
+                        && current_streak_object.length == longest_streak.length
+                        && upcoming_reward_count > 0
                         ? format_date(new Date(
-                            streaks[streaks.length - 1][0] + 30 * (ongoing_reward_count + 1) * 86400000
+                            streaks[streaks.length - 1][0] + 30 * upcoming_reward_count * 86400000
                         ))
                         : 0,
             };
