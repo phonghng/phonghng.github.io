@@ -189,9 +189,11 @@ class PHNotion_Hey_Mirmor {
                     current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
                         ? 2 * lost_count + 1
                         : 0,
-                upcoming_reward_count: longest_streak.length !== 0 ? upcoming_reward_count : 0,
+                upcoming_reward_count:
+                    current_streak_object.length != 0 && longest_streak.length !== 0
+                        ? upcoming_reward_count : 0,
                 upcoming_reward_date:
-                    longest_streak.length !== 0
+                current_streak_object.length != 0 && longest_streak.length !== 0
                         ? format_date(new Date(
                             streaks[streaks.length - 1][0] + 30 * upcoming_reward_count * 86400000
                         ))
