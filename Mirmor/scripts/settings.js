@@ -22,7 +22,7 @@ const DEFAULT_OPTIONS = {
     streak_base_date: "2024-09-23",
     tersBOT: {
         year_quarter_goals: [
-            "8,5 HK Toán - Lí - Hoá",
+            "8,5 HK A00",
             "6.5 IELTS"
         ]
     }
