@@ -184,20 +184,21 @@ class PHNotion_Hey_Mirmor {
                 current_streak_start_date: format_date(new Date(current_streak_object[0])),
                 longest_streak_days: longest_streak.length,
                 longest_streak_start_date: format_date(new Date(longest_streak[0] || timestamp)),
-                penalty_days: 2 * (lost_count + (current_streak_object.length === 0)) + 1,
-                ongoing_penalty_days:
+                ongoing_penalty:
                     current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
-                        ? 2 * lost_count + 1
-                        : 0,
-                upcoming_reward_count:
+                        ? "Xoá TikTok " + (2 * lost_count + 1) + " ngày"
+                        : null,
+                upcoming_penalty:
+                    "Xoá TikTok " + (2 * (lost_count + (current_streak_object.length === 0)) + 1) + " ngày",
+                upcoming_reward:
                     current_streak_object.length != 0 && longest_streak.length !== 0
-                        ? upcoming_reward_count : 0,
+                        ? "Pomism " + upcoming_reward_count + " (tặng huy chương)" : null,
                 upcoming_reward_date:
-                current_streak_object.length != 0 && longest_streak.length !== 0
-                        ? format_date(new Date(
+                    current_streak_object.length != 0 && longest_streak.length !== 0
+                        ? "Hiệu lực từ ngày " + format_date(new Date(
                             streaks[streaks.length - 1][0] + 30 * upcoming_reward_count * 86400000
                         ))
-                        : 0,
+                        : null,
             };
         }
 
