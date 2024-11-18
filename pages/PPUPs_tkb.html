@@ -27,12 +27,6 @@
             font-weight: bold;
         }
 
-        .description {
-            font-size: 1.9vmax;
-            margin-bottom: 1.5vmax;
-            font-style: italic;
-        }
-
         table {
             flex-grow: 1;
             border-collapse: collapse;
@@ -69,7 +63,6 @@
 
 <body>
     <div class="title">THỜI KHÓA BIỂU</div>
-    <div class="description">Thực hiện từ ngày 21 tháng 10 năm 2024</div>
     <table id="timetable">
         <tr>
             <td>Kết thúc</td>
@@ -130,10 +123,10 @@
     <script>
         let timetable_input = [
             ["Trải", "Lí", "Hoá", "Thể", "Thể", "Hoá"],
-            ["Toán", "Văn", "Sinh", "Toán", "Phương", "Lí"],
-            ["Trải", "Tin", "Anh", "Sinh", "Toán", "Văn"],
-            ["Anh", "Tin", "Quốc", "Lí", "Toán", "Văn"],
-            ["Anh", "", "Sử", "", "", "Trải"]
+            ["Lí", "Sinh", "Tin", "Văn", "Phương", "Sinh"],
+            ["Trải", "Văn", "Toán", "Quốc", "Sử", "Toán"],
+            ["Toán", "Tin", "Văn", "Anh", "Anh", "Toán"],
+            ["Anh", "", "Lí", "", "", "Trải"]
         ];
 
         let table = document.querySelector("#timetable");
