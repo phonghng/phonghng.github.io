@@ -335,7 +335,7 @@ const HABITS = {
                         },
                         lap_lich_ngay_mai: {
                             type: "habit_check",
-                            name: "Lập lịch hoạt động ngày mai (chia thành tối đa 10 hiệp Pomodoro)",
+                            name: "Lập lịch hoạt động ngày mai bám sát kế hoạch phát triển kĩ năng và kiến thức (chia thành tối đa 10 hiệp Pomodoro)",
                             important: false,
                             required: true,
                             point: 15
