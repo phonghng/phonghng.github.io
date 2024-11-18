@@ -131,6 +131,18 @@ class PHNotion_Hey_Mirmor {
         }
 
         function get_streaks_info(streak_base_date, timestamp, dates) {
+            function decimal_to_roman(num) {
+                let roman_numerals = [
+                    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"],
+                    [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"],
+                    [5, "V"], [4, "IV"], [1, "I"]
+                ];
+                let result = "";
+                for (let [value, numeral] of roman_numerals)
+                    while (num >= value) result += numeral, num -= value;
+                return result;
+            }
+
             const format_date = (date = new Date()) => {
                 let day = date.getDate();
                 let month = date.getMonth() + 1;
@@ -192,7 +204,7 @@ class PHNotion_Hey_Mirmor {
                     "Xoá TikTok " + (2 * (lost_count + (current_streak_object.length === 0)) + 1) + " ngày",
                 upcoming_reward:
                     current_streak_object.length != 0 && longest_streak.length !== 0
-                        ? "Pomism " + upcoming_reward_count + " (tặng huy chương)" : null,
+                        ? "Công nhận pomism " + decimal_to_roman(upcoming_reward_count) : null,
                 upcoming_reward_date:
                     current_streak_object.length != 0 && longest_streak.length !== 0
                         ? "Hiệu lực từ ngày " + format_date(new Date(
