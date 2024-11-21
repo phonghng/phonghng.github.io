@@ -208,7 +208,7 @@ class PHNotion_Hey_Mirmor {
                 upcoming_reward_date:
                     current_streak_object.length != 0 && longest_streak.length !== 0
                         ? "Hiệu lực từ ngày " + format_date(new Date(
-                            streaks[streaks.length - 1][0] + 30 * upcoming_reward_count * 86400000
+                            streaks[streaks.length - 1][0] + 7 * upcoming_reward_count * 86400000
                         ))
                         : null,
             };
