@@ -189,7 +189,7 @@ class PHNotion_Hey_Mirmor {
                 }
             }
 
-            let upcoming_reward_count = Math.floor(longest_streak.length / 30) + 1;
+            let upcoming_reward_count = Math.floor(longest_streak.length / 7) + 1;
 
             return {
                 current_streak_days: current_streak_object.length,
