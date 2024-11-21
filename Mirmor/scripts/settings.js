@@ -451,6 +451,48 @@ const HABITS = {
                     unit: "trang",
                     point_per_value: 15,
                     goal_value: 3,
+                },
+                doi_nhan_xu_the_lanh_dao: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về đối nhân xử thế, lãnh đạo",
+                    important: false,
+                    required: false,
+                    point: 25
+                },
+                chuyen_mon_phap_luat: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về chuyên môn, pháp luật",
+                    important: false,
+                    required: true,
+                    point: 25
+                },
+                tiep_thi_ban_hang: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về tiếp thị, bán hàng",
+                    important: false,
+                    required: false,
+                    point: 25
+                },
+                tai_chinh_doanh_nghiep: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về tài chính doanh nghiệp",
+                    important: false,
+                    required: false,
+                    point: 25
+                },
+                kinh_te_dau_tu_tai_chinh: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về kinh tế, đầu tư tài chính",
+                    important: false,
+                    required: false,
+                    point: 25
+                },
+                triet_hoc: {
+                    type: "habit_check",
+                    name: "Lĩnh hội kiến thức về triết học",
+                    important: false,
+                    required: false,
+                    point: 25
                 }
             }
         },
