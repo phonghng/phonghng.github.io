@@ -526,32 +526,6 @@ const HABITS = {
                     },
                     point: 25
                 },
-                tru_cot_phat_trien: {
-                    type: "habit_check",
-                    name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
-                    important: true,
-                    cumulative_period: "month",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.month)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 50
-                },
-                ra_soat_Mirmor: {
-                    type: "habit_check",
-                    name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
-                    important: true,
-                    cumulative_period: "month",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.month)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 25
-                },
                 ki_so_thang: {
                     type: "habit_check",
                     name: "Tổng kết, đánh giá, hoạch định kế hoạch phát triển kĩ năng và kiến thức",
@@ -564,6 +538,32 @@ const HABITS = {
                                 && arguments.get_cumulative_info().is_today_completed);
                     },
                     point: 50
+                },
+                tru_cot_phat_trien: {
+                    type: "habit_check",
+                    name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
+                    important: true,
+                    cumulative_period: "year_quarter",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.year_quarter)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 50
+                },
+                ra_soat_Mirmor: {
+                    type: "habit_check",
+                    name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
+                    important: true,
+                    cumulative_period: "year_quarter",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && arguments.XDate_function().is_last_day_of.year_quarter)
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 25
                 },
                 ki_so_quy: {
                     type: "habit_check",
