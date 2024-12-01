@@ -19,15 +19,7 @@ const DEFAULT_OPTIONS = {
         },
         chart_date_range: ["2024-09-23", "2024-12-31"]
     },
-    streak_base_date: "2024-09-23",
-    tersBOT: {
-        year_quarter_goals: [
-            "8,0 HK Toán",
-            "8,0 HK Lí",
-            "8,0 HK Hoá",
-            "Học 6.5 IELTS"
-        ]
-    }
+    streak_base_date: "2024-09-23"
 };
 
 const HABITS = {
@@ -491,7 +483,7 @@ const HABITS = {
             children: {
                 ki_so_tuan: {
                     type: "habit_check",
-                    name: "Sơ kết, đánh giá, điều chỉnh, triển khai kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết và hoạch nhiệm vụ phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
@@ -502,22 +494,9 @@ const HABITS = {
                     },
                     point: 50
                 },
-                viet_bai_ki_so_tuan: {
-                    type: "habit_check",
-                    name: "Viết thành bài Kí-sổ-tuần",
-                    important: true,
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 25
-                },
                 ki_so_thang: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, hoạch định kế hoạch phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết và hoạch định chỉ tiêu phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
@@ -526,37 +505,11 @@ const HABITS = {
                             || (arguments.get_cumulative_info().completed_count == 1
                                 && arguments.get_cumulative_info().is_today_completed);
                     },
-                    point: 50
-                },
-                tru_cot_phat_trien: {
-                    type: "habit_check",
-                    name: "Tổng kết, đánh giá, hoạch định, điều chỉnh các trụ cột phát triển",
-                    important: true,
-                    cumulative_period: "year_quarter",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.year_quarter)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 50
-                },
-                ra_soat_Mirmor: {
-                    type: "habit_check",
-                    name: "Rà soát, đánh giá, điều chỉnh các mục Mirmor",
-                    important: true,
-                    cumulative_period: "year_quarter",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.year_quarter)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 25
+                    point: 75
                 },
                 ki_so_quy: {
                     type: "habit_check",
-                    name: "Tổng kết, đánh giá, hoạch định mục tiêu phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết và hoạch mục tiêu phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "year_quarter",
                     required: (arguments) => {

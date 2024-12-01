@@ -207,8 +207,7 @@ class PHNotion_Hey_Mirmor {
                 this.options.streak_base_date,
                 this.timestamp,
                 streak_satisfied_dates
-            ),
-            year_quarter_goals: this.options.tersBOT.year_quarter_goals
+            )
         };
     }
 
