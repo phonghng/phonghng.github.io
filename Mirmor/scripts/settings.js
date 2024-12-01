@@ -579,36 +579,8 @@ const HABITS = {
                     point: 100
                 }
             }
-        },
-        xem_chuoi: {
-            type: "habit_ext",
-            name: "Xem thống kê chuỗi Mipo dương",
-            extension_id: "streak_viewer"
-        },
-        xem_thong_ke: {
-            type: "habit_ext",
-            name: "Xem thống kê Mipo",
-            extension_id: "point_info"
-        },
-        xem_du_lieu: {
-            type: "habit_ext",
-            name: "Xem dữ liệu Mirmor hôm nay",
-            extension_id: "view_data"
         }
     }
 };
 
-const EXTENSIONS = {
-    point_info: {
-        name: "Thống kê Mipo",
-        filename: "point_info.html"
-    },
-    streak_viewer: {
-        name: "Thống kê chuỗi Mipo dương",
-        filename: "streak_viewer.html"
-    },
-    view_data: {
-        name: "Dữ liệu Mirmor hôm nay",
-        filename: "view_data.html"
-    }
-};
+const EXTENSIONS = {};

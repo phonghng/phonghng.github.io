@@ -121,7 +121,16 @@ class PHNotion_Hey_Mirmor {
         this.process_queue();
     }
 
-    process_tersBOT(habits_json_data, streak_satisfied_dates) {
+    process_tersBOT(habits_json_data, point_infos) {
+        function get_percent_criterion(percent_criterions, date) {
+            let timestamp = new Date(date).getTime();
+            let i;
+            for (i = 0; i < percent_criterions.length - 1; i++)
+                if (timestamp < percent_criterions[i + 1][0])
+                    break;
+            return percent_criterions[i][1];
+        }
+
         function get_unfinished_important_habits(name, data) {
             if (data && data.data && data.data.important && data.point < data.goal_point)
                 unfinished_important_habits.push(name);
@@ -131,18 +140,6 @@ class PHNotion_Hey_Mirmor {
         }
 
         function get_streaks_info(streak_base_date, timestamp, dates) {
-            function decimal_to_roman(num) {
-                let roman_numerals = [
-                    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"],
-                    [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"],
-                    [5, "V"], [4, "IV"], [1, "I"]
-                ];
-                let result = "";
-                for (let [value, numeral] of roman_numerals)
-                    while (num >= value) result += numeral, num -= value;
-                return result;
-            }
-
             const format_date = (date = new Date()) => {
                 let day = date.getDate();
                 let month = date.getMonth() + 1;
@@ -189,8 +186,6 @@ class PHNotion_Hey_Mirmor {
                 }
             }
 
-            let upcoming_reward_count = Math.floor(longest_streak.length / 7) + 1;
-
             return {
                 current_streak_days: current_streak_object.length,
                 current_streak_start_date: format_date(new Date(current_streak_object[0])),
@@ -201,22 +196,22 @@ class PHNotion_Hey_Mirmor {
                         ? "Xoá TikTok " + (2 * lost_count + 1) + " ngày"
                         : null,
                 upcoming_penalty:
-                    "Xoá TikTok " + (2 * (lost_count + (current_streak_object.length === 0)) + 1) + " ngày",
-                upcoming_reward:
-                    current_streak_object.length != 0 && longest_streak.length !== 0
-                        ? "Công nhận pomism " + decimal_to_roman(upcoming_reward_count) : null,
-                upcoming_reward_date:
-                    current_streak_object.length != 0 && longest_streak.length !== 0
-                        ? "Hiệu lực từ ngày " + format_date(new Date(
-                            streaks[streaks.length - 1][0] + 7 * upcoming_reward_count * 86400000
-                        ))
-                        : null,
+                    "Xoá TikTok " + (2 * (lost_count + (current_streak_object.length === 0)) + 1) + " ngày"
             };
         }
 
+        let percent_criterions =
+            Object.entries(this.options.point_info_extension_parameters.percent_criterions)
+                .map(percent_criterion => [new Date(percent_criterion[0]).getTime(), percent_criterion[1]]);
+        let streak_satisfied_dates = [];
         let unfinished_important_habits = [];
-        Object.entries(habits_json_data)
-            .forEach(item => get_unfinished_important_habits(item[0], item[1]));
+        for (let i = 0; i < point_infos.length; i++) {
+            let percent_criterion = get_percent_criterion(percent_criterions, point_infos[i].date);
+            let point_ratio = point_infos[i].point / point_infos[i].goal_point;
+            if (parseInt((Math.floor(point_ratio * 100) / 100 - percent_criterion) * 100) > 0)
+                streak_satisfied_dates.push(point_infos[i].date);
+        }
+        Object.entries(habits_json_data).forEach(item => get_unfinished_important_habits(item[0], item[1]));
 
         return {
             Mirmor: {
@@ -289,59 +284,37 @@ class PHNotion_Hey_Mirmor {
         this.DataStorage_class = new DataStorage(
             this.initialization_data,
             (options, object_data_function, json_data_function, string_data_function, date_string) => {
-                if (!options?.is_from_view_data_extension)
-                    this.Habits_class.data.children.xem_du_lieu
-                        .Extension_class.ExtensionPopup_class
-                        .run_function("update_textarea", [string_data_function()]);
                 let json_data = json_data_function();
                 this.StatusBar_class.show_status(json_data);
-                if (Object.entries(json_data["Xem dữ liệu Mirmor hôm nay"].data).length)
-                    this.set(
-                        date_string,
-                        JSON.stringify(object_data_function()),
-                        json_data.point || json_data._point || 0,
-                        json_data.goal_point || json_data._goal_point || 0,
-                        getted_data => {
+                this.set(
+                    date_string,
+                    JSON.stringify(object_data_function()),
+                    json_data.point || json_data._point || 0,
+                    json_data.goal_point || json_data._goal_point || 0,
+                    getted_data => {
+                        let status_element = document.createElement("span");
+                        status_element.style.color = "var(--LIME)";
+                        let point = json_data.point || json_data._point || 0;
+                        let goal_point = json_data.goal_point || json_data._goal_point || 0;
+                        status_element.innerHTML = `Đã lưu vào Notion! (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
+                        this.StatusBar_class.show_status(status_element);
+
+                        this.DataStorage_class.independent_data =
+                            JSON.parse(
+                                CryptoJS.enc.Base64.parse(getted_data.independent_data)
+                                    .toString(CryptoJS.enc.Utf8)
+                                || "{}"
+                            );
+
+                        this.server_cache.tersBOT = this.process_tersBOT(json_data, getted_data.points);
+                        this.set_server_cache(() => {
                             let status_element = document.createElement("span");
                             status_element.style.color = "var(--LIME)";
-                            let point = json_data.point || json_data._point || 0;
-                            let goal_point = json_data.goal_point || json_data._goal_point || 0;
-                            status_element.innerHTML = `Đã lưu vào Notion! (${point} / ${goal_point} ≈ ${Math.floor(point / goal_point * 100)}%)`;
+                            status_element.innerHTML = `Đã lưu vào bộ nhớ đệm máy chú!`;
                             this.StatusBar_class.show_status(status_element);
-
-                            this.DataStorage_class.independent_data =
-                                JSON.parse(
-                                    CryptoJS.enc.Base64.parse(getted_data.independent_data)
-                                        .toString(CryptoJS.enc.Utf8)
-                                    || "{}"
-                                );
-
-                            let { streak_satisfied_dates } =
-                                this.Habits_class.data.children.xem_thong_ke
-                                    .Extension_class.ExtensionPopup_class
-                                    .run_function("update_data", [
-                                        getted_data.points,
-                                        this.options.point_info_extension_parameters.percent_criterions,
-                                        this.options.point_info_extension_parameters.chart_date_range
-                                    ]);
-                            this.Habits_class.data.children.xem_chuoi
-                                .Extension_class.ExtensionPopup_class
-                                .run_function("update_data", [
-                                    streak_satisfied_dates,
-                                    this.timestamp,
-                                    Object.keys(this.options
-                                        .point_info_extension_parameters.percent_criterions)[0]
-                                ]);
-
-                            this.server_cache.tersBOT = this.process_tersBOT(json_data, streak_satisfied_dates);
-                            this.set_server_cache(() => {
-                                let status_element = document.createElement("span");
-                                status_element.style.color = "var(--LIME)";
-                                status_element.innerHTML = `Đã lưu vào bộ nhớ đệm máy chú!`;
-                                this.StatusBar_class.show_status(status_element);
-                            });
-                        }
-                    );
+                        });
+                    }
+                );
             }
         );
 
