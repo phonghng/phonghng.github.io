@@ -177,26 +177,11 @@ class PHNotion_Hey_Mirmor {
                 []
             );
 
-            let ongoing_penalty_count = 0;
-            if (current_streak_object.length === 0) {
-                let start_penalty_date = streaks[streaks.length - 1].slice(-1)[0] + 86400000;
-                while (start_penalty_date < timestamp && ongoing_penalty_count < 2 * lost_count + 1) {
-                    ongoing_penalty_count++;
-                    start_penalty_date += 86400000;
-                }
-            }
-
             return {
                 current_streak_days: current_streak_object.length,
                 current_streak_start_date: format_date(new Date(current_streak_object[0])),
                 longest_streak_days: longest_streak.length,
-                longest_streak_start_date: format_date(new Date(longest_streak[0] || timestamp)),
-                ongoing_penalty:
-                    current_streak_object.length === 0 && ongoing_penalty_count < 2 * lost_count + 1
-                        ? "Xoá TikTok " + (2 * lost_count + 1) + " ngày"
-                        : null,
-                upcoming_penalty:
-                    "Xoá TikTok " + (2 * (lost_count + (current_streak_object.length === 0)) + 1) + " ngày"
+                longest_streak_start_date: format_date(new Date(longest_streak[0] || timestamp))
             };
         }
 

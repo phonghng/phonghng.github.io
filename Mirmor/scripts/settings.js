@@ -431,19 +431,6 @@ const HABITS = {
             type: "group",
             name: "Phát triển kiến thức",
             children: {
-                kiem_tra_tin_tuc: {
-                    type: "habit_check",
-                    name: "Kiểm tra các nội dung đăng kí trên YouTube, tin tức",
-                    important: false,
-                    cumulative_period: "week",
-                    required: (arguments) => {
-                        return (arguments.get_cumulative_info().completed_count == 0
-                            && arguments.XDate_function().is_last_day_of.week)
-                            || (arguments.get_cumulative_info().completed_count == 1
-                                && arguments.get_cumulative_info().is_today_completed);
-                    },
-                    point: 25
-                },
                 doc_sach: {
                     type: "habit_number",
                     name: "Đọc sách",
