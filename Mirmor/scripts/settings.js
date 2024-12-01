@@ -481,9 +481,24 @@ const HABITS = {
             type: "group",
             name: "Kiểm soát",
             children: {
+                kiem_soat_chung: {
+                    type: "habit_check",
+                    name: "Tổng kết, hoạch định, điều chỉnh mục tiêu, chỉ tiêu, nhiệm vụ phát triển kĩ năng và kiến thức",
+                    important: true,
+                    cumulative_period: "week",
+                    required: (arguments) => {
+                        return (arguments.get_cumulative_info().completed_count == 0
+                            && (arguments.XDate_function().is_last_day_of.week
+                                || arguments.XDate_function().is_last_day_of.month
+                                || arguments.XDate_function().is_last_day_of.year_quarter))
+                            || (arguments.get_cumulative_info().completed_count == 1
+                                && arguments.get_cumulative_info().is_today_completed);
+                    },
+                    point: 25
+                },
                 ki_so_tuan: {
                     type: "habit_check",
-                    name: "Tổng kết và hoạch nhiệm vụ phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, hoạch định nhiệm vụ phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "week",
                     required: (arguments) => {
@@ -496,7 +511,7 @@ const HABITS = {
                 },
                 ki_so_thang: {
                     type: "habit_check",
-                    name: "Tổng kết và hoạch định chỉ tiêu phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, hoạch định chỉ tiêu phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "month",
                     required: (arguments) => {
@@ -509,7 +524,7 @@ const HABITS = {
                 },
                 ki_so_quy: {
                     type: "habit_check",
-                    name: "Tổng kết và hoạch mục tiêu phát triển kĩ năng và kiến thức",
+                    name: "Tổng kết, hoạch mục tiêu phát triển kĩ năng và kiến thức",
                     important: true,
                     cumulative_period: "year_quarter",
                     required: (arguments) => {
