@@ -6,16 +6,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
-    <link href="../stylesheets/font-awesome-6-pro/css/all.css" rel="stylesheet">
+    <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css" rel="stylesheet">
+    <script src="https://phonghng.github.io/scripts/PPPL-JS.js"></script>
     <style>
         body {
+            background-color: #18191A;
+            color: #FFFFFF;
             font-family: "Lora", serif;
             display: flex;
             height: calc(100vh - 2vmax);
             width: calc(100vw - 2vmax);
             margin: 1vmax;
-            background-color: #18191A;
-            color: #FFFFFF;
             flex-wrap: wrap;
             align-content: center;
             justify-content: center;
@@ -29,33 +30,91 @@
         }
 
         a i {
-            width: 27px;
             text-align: center;
+        }
+
+        textarea {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: calc(100% - 50px);
+            height: calc(100% - 50px);
+            border: none;
+            background-color: #18191A;
+            color: #FFFFFF;
+            font-family: monospace;
+            font-size: 16px;
+            resize: none;
+            padding: 25px;
+            display: none;
+            text-wrap-mode: nowrap;
+        }
+
+        button {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            width: 45px;
+            height: 45px;
+            border-radius: 100%;
+            border: none;
+            cursor: pointer;
+            background: #212121;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+            transition: background 0.15s, color 0.15s;
+            color: var(--base_color);
+        }
+
+        button:hover {
+            background: var(--base_color);
+            color: #FFFFFF;
+        }
+
+        button:active {
+            background: #212121;
+            color: var(--base_color);
+        }
+
+        button i {
+            font-size: 17px;
+            line-height: 0;
+        }
+
+        button i::before {
+            line-height: normal !important;
         }
     </style>
 </head>
 
 <body>
-    <a href="https://drive.google.com/drive/u/2/folders/1bEQcofk2NPmEZ-r0loQYQm-L-1vumUyi" target="_top">
-        <i class="fa-solid fa-folders" style="color: #F3425F;"></i>
-        <span>Đoàn trường</span>
-    </a>
-    <a href="https://docs.google.com/spreadsheets/d/1B2VvuA3xbB_JvcYbZ1YGsfNneIV6XJprOJ_IYtYR4s8/edit" target="_top">
-        <i class="fa-solid fa-file-excel" style="color: #45BD62;"></i>
-        <span>Theo dõi trực tuyến Đoàn trường</span>
-    </a>
-    <a href="https://docs.google.com/spreadsheets/u/2/d/1eDhVsGp8SOGPxjbzK3GRChip6tpnEhUSFdV4OrJYeG0/edit" target="_top">
-        <i class="fa-solid fa-file-excel" style="color: #45BD62;"></i>
-        <span>Theo dõi đoàn viên Chi đoàn</span>
-    </a>
-    <a href="https://docs.google.com/document/d/19pairFdTGfIe6zGuLCQizrMQiFQOJOA4V56YXbkjoeY/edit?tab=t.0" target="_top">
-        <i class="fa-solid fa-file-word" style="color: #1877F2;"></i>
-        <span>Phân công nhiệm vụ cán bộ lớp</span>
-    </a>
-    <a href="https://docs.google.com/spreadsheets/d/1kjDfULsguHL5EYmgo2fsP7YtDLOHV-6cdirI7zgAjTw/edit" target="_top">
-        <i class="fa-solid fa-file-excel" style="color: #45BD62;"></i>
-        <span>Sheet tổng TCHC</span>
-    </a>
+    <textarea></textarea>
+    <button style="--base_color: #F7B928;"><i class="fi fi-br-magic-wand"></i></button>
+    <script>
+        if (localStorage.getItem("PPUPs_tcn"))
+            for (let item of localStorage.getItem("PPUPs_tcn").split("\n")) {
+                let [text, icon_name, icon_color, url] = item.split("|");
+                document.body.appendChild(PPPL_JS.ADOM([
+                    "a",
+                    { "href": url, "target": "_top" },
+                    null,
+                    [
+                        ["i", { "class": "fi fi-br-" + icon_name, "style": "color: " + icon_color + ";" },],
+                        ["span", null, { "innerHTML": " " + text }]
+                    ]
+                ], document));
+            }
+
+        document.querySelector("button").onclick = () => {
+            document.querySelector("button i").className = "fi fi-br-hexagon-check";
+            document.querySelector("button").style = "--base_color: #45BD62;";
+            document.querySelector("textarea").style.display = "block";
+            document.querySelector("textarea").value = localStorage.getItem("PPUPs_tcn");
+            document.querySelector("button").onclick = () => {
+                localStorage.setItem("PPUPs_tcn", document.querySelector("textarea").value);
+                location.reload();
+            };
+        };
+    </script>
 </body>
 
 </html>
