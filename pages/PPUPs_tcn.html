@@ -33,7 +33,7 @@
             text-align: center;
         }
 
-        textarea {
+        div {
             position: fixed;
             top: 0;
             left: 0;
@@ -45,9 +45,16 @@
             font-family: monospace;
             font-size: 16px;
             resize: none;
-            padding: 25px;
+            padding: 20px 25px;
             display: none;
-            text-wrap-mode: nowrap;
+            text-indent: 0;
+            word-break: break-all;
+            overflow: auto;
+        }
+
+        div p {
+            margin-block-start: 5px;
+            margin-block-end: 5px;
         }
 
         button {
@@ -87,12 +94,13 @@
 </head>
 
 <body>
-    <textarea></textarea>
+    <div contenteditable="true"></div>
     <button style="--base_color: #F7B928;"><i class="fi fi-br-magic-wand"></i></button>
     <script>
         if (localStorage.getItem("PPUPs_tcn"))
             for (let item of localStorage.getItem("PPUPs_tcn").split("\n")) {
                 let [text, icon_name, icon_color, url] = item.split("|");
+                if (!url) continue;
                 document.body.appendChild(PPPL_JS.ADOM([
                     "a",
                     { "href": url, "target": "_top" },
@@ -107,10 +115,11 @@
         document.querySelector("button").onclick = () => {
             document.querySelector("button i").className = "fi fi-br-hexagon-check";
             document.querySelector("button").style = "--base_color: #45BD62;";
-            document.querySelector("textarea").style.display = "block";
-            document.querySelector("textarea").value = localStorage.getItem("PPUPs_tcn");
+            document.querySelector("div").style.display = "block";
+            document.querySelector("div").innerHTML =
+                localStorage.getItem("PPUPs_tcn").split("\n\n").map(item => `<p>${item}</p>`).join("");
             document.querySelector("button").onclick = () => {
-                localStorage.setItem("PPUPs_tcn", document.querySelector("textarea").value);
+                localStorage.setItem("PPUPs_tcn", document.querySelector("div").innerText);
                 location.reload();
             };
         };
