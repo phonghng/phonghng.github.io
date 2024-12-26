@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css" rel="stylesheet">
-    <script src="https://phonghng.github.io/scripts/PPPL-JS.js"></script>
     <style>
         body {
             background-color: #18191A;
@@ -101,17 +100,19 @@
     <script>
         if (localStorage.getItem("PhongHNg_tcn"))
             for (let item of localStorage.getItem("PhongHNg_tcn").split("\n")) {
-                let [text, icon_name, icon_color, url] = item.split("|");
+                let [text, icon_name, icon_color, url] = item_element.split("|");
                 if (!url) continue;
-                document.body.appendChild(PPPL_JS.ADOM([
-                    "a",
-                    { "href": url, "target": "_top" },
-                    null,
-                    [
-                        ["i", { "class": "fi fi-br-" + icon_name, "style": "color: " + icon_color + ";" },],
-                        ["span", null, { "innerHTML": " " + text }]
-                    ]
-                ], document));
+                let item_element = document.createElement("a");
+                item_element.href = url;
+                item_element.target = "_top";
+                let icon_element = document.createElement("i");
+                icon_element.className = "fi fi-br-" + icon_name;
+                icon_element.style.color = icon_color;
+                item_element.appendChild(icon_element);
+                let text_element = document.createElement("span");
+                text_element.innerText = " " + text;
+                item_element.appendChild(text_element);
+                document.body.appendChild(item_element);
             }
 
         document.querySelector("button").onclick = () => {
