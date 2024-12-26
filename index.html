@@ -136,10 +136,12 @@
             {
                 type: "widget",
                 id: "tkb",
+                title: "Thời khoá biểu",
                 link: "./tkb.html"
             }, {
                 type: "widget",
                 id: "tcn",
+                title: "Truy cập nhanh",
                 link: "./tcn.html"
             }, {
                 type: "item",
@@ -228,7 +230,7 @@
                 let item_element = document.createElement("div");
                 item_element.id = item.id;
                 item_element.className = "item widget";
-                item_element.title = item.link;
+                item_element.title = item.title;
                 item_element.onclick = () => location.href = item.link;
                 let iframe_element = document.createElement("iframe");
                 iframe_element.src = item.link;
@@ -238,7 +240,7 @@
                 let item_element = document.createElement("a");
                 item_element.className = "item";
                 item_element.href = item.link;
-                item_element.title = item.link;
+                item_element.title = item.title;
                 let icon_element = document.createElement("img");
                 icon_element.src = item.icon;
                 item_element.appendChild(icon_element);
