@@ -2,15 +2,261 @@
 <html>
 
 <head>
+    <title>PhongHNg</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PhongHNg</title>
-    <link rel="shortcut icon" href="./images/PhongHNg.png" type="image/x-icon">
+    <link rel="shortcut icon" href="https://i.ibb.co/R99W4q2/PhongHNg.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+    <style>
+        * {
+            box-sizing: unset;
+            -webkit-box-sizing: unset;
+        }
+
+        :root {
+            --BLUE: #1877F2;
+            --CHERRY: #F3425F;
+            --GRAPE: #9360F7;
+            --LEMON: #F7B928;
+            --LIME: #45BD62;
+            --PINK: #FF66BF;
+            --SEAFOAM: #54C7EC;
+            --TEAL: #2ABBA7;
+            --TOMATO: #FB724B;
+        }
+
+        html {
+            height: fit-content;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        body {
+            background-color: #18191A;
+            font-family: Arial, Helvetica, sans-serif;
+            width: 100%;
+            padding: 20px;
+        }
+
+        #item_list {
+            height: 100%;
+            margin: 0 auto;
+            transition: all 0.25s;
+        }
+
+        .item {
+            width: 75px;
+            background-color: #212121;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.25s;
+            user-select: none;
+            display: flex;
+            align-items: flex-end;
+            aspect-ratio: 1 / 1;
+            margin-bottom: 20px;
+        }
+
+        .item:hover {
+            background-color: #3A3B3C;
+        }
+
+        .item:active {
+            background-color: #212121;
+        }
+
+        .item>img:nth-child(1) {
+            border-radius: 100%;
+            background-color: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            width: calc(100% - 4px);
+            height: calc(100% - 4px);
+            transition: all 0.25s;
+        }
+
+        .item>img:nth-child(2) {
+            border-radius: 100%;
+            background-color: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            width: calc(35% - 4px);
+            box-shadow: 3px 3px 15px 3px #18191A;
+            margin-left: calc(-35%);
+            transition: all 0.25s;
+        }
+
+        .item.widget {
+            width: calc(105px * var(--width) + 20px * (var(--width) - 1) - 30px);
+            height: calc(105px * var(--height) + 20px * (var(--height) - 1) - 30px);
+            aspect-ratio: unset;
+        }
+
+        .item.widget iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            border: none;
+        }
+
+        @media screen and (min-width: 450px) {
+            #tkb {
+                --width: 6;
+                --height: 3;
+            }
+
+            #tcn {
+                --width: 4;
+                --height: 3;
+            }
+        }
+
+        @media screen and (max-width: 450px) {
+            #tkb {
+                --width: 2;
+                --height: 1;
+            }
+
+            #tcn {
+                --width: 2;
+                --height: 1;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="item_list"></div>
 
+    <script>
+        [
+            {
+                type: "widget",
+                id: "tkb",
+                link: "./tkb.html"
+            }, {
+                type: "widget",
+                id: "tcn",
+                link: "./tcn.html"
+            }, {
+                type: "item",
+                title: "Google Drive – phonghng8420@gmail.com",
+                link: "https://drive.google.com/drive/u/1/",
+                icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsU10M2QVV-_Ys5LithcENZwRBBJzs3rS_Q&s",
+                subicon: "https://i.ibb.co/R99W4q2/PhongHNg.png"
+            }, {
+                type: "item",
+                title: "Định hướng",
+                link: "https://docs.google.com/document/d/1C5l5_im3k8Ams2awaaavnhqpiLCTBy48f0Cd52vHHgg/edit",
+                icon: "https://static.vecteezy.com/system/resources/previews/027/179/381/non_2x/google-docs-icon-logo-symbol-free-png.png",
+                subicon: "https://i.ibb.co/NxwN41g/mountain.png"
+            }, {
+                type: "item",
+                title: "Notion Calendar",
+                link: "https://calendar.notion.so/",
+                icon: "https://play-lh.googleusercontent.com/ZpieHVHj503tx4YoFlsHOtjQ3edA9FE_yLocxpEecO0TQq0VcKbcsZ4fvjA9LzcRdmg=w240-h480-rw"
+            }, {
+                type: "item",
+                title: "Kết quả học tập (cấp ba)",
+                link: "https://docs.google.com/spreadsheets/d/1xO_BU7omIyCwUsq57KnWhPVAYRsxmxqq5HI9T7jkCkU/edit",
+                icon: "https://img.freepik.com/premium-vector/google-sheets-logo_578229-309.jpg",
+                subicon: "https://i.ibb.co/W3rwfqs/book.png"
+            }, {
+                type: "item",
+                title: "Nhật kí",
+                link: "https://docs.google.com/document/d/1Z8xlB0yr0z7kBNT6asPM4ZTWDtNyIFjPcqWzsvL-V7M/edit",
+                icon: "https://static.vecteezy.com/system/resources/previews/027/179/381/non_2x/google-docs-icon-logo-symbol-free-png.png",
+                subicon: "https://i.ibb.co/pPNj4FC/pen.png"
+            }, {
+                type: "item",
+                title: "Notion",
+                link: "https://notion.so/",
+                icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW1JdqGvw4e2SZxFuFpb853z9Wq2XR1IbNQnnpU3jZrQ&s"
+            }, {
+                type: "item",
+                title: "Google Drive – vietnamprosoft@gmail.com",
+                link: "https://drive.google.com/drive/u/2/",
+                icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsU10M2QVV-_Ys5LithcENZwRBBJzs3rS_Q&s",
+                subicon: "https://i.ibb.co/VSjYXvV/unnamed.png"
+            }, {
+                type: "item",
+                title: "Zalo",
+                link: "https://chat.zalo.me/",
+                icon: "https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Zalo-Arc.png"
+            }, {
+                type: "item",
+                title: "Messenger",
+                link: "https://www.messenger.com/",
+                icon: "https://i.ibb.co/3C9bG9g/messenger-icon-2048x2048-x46zpl9t.png"
+            }, {
+                type: "item",
+                title: "Gmail – phonghng8420@gmail.com",
+                link: "https://drive.google.com/drive/u/1/",
+                icon: "https://cdn.iconscout.com/icon/free/png-256/free-gmail-logo-icon-download-in-svg-png-gif-file-formats--mail-email-logos-icons-2416660.png?f=webp",
+                subicon: "https://i.ibb.co/R99W4q2/PhongHNg.png"
+            }, {
+                type: "item",
+                title: "Facebook",
+                link: "https://facebook.com/",
+                icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/480px-Facebook_Logo_%282019%29.png"
+            }, {
+                type: "item",
+                title: "YouTube",
+                link: "https://www.youtube.com/",
+                icon: "https://cdn-icons-png.freepik.com/256/15707/15707874.png?semt=ais_hybrid"
+            }, {
+                type: "item",
+                title: "GitHub",
+                link: "https://github.com/",
+                icon: "https://cdn-icons-png.flaticon.com/512/25/25231.png"
+            }, {
+                type: "item",
+                title: "Canva",
+                link: "https://www.canva.com/",
+                icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQURXSVJcJLHRlQApPQ2jJBniDiuSsdos84MA&s"
+            }, {
+                type: "item",
+                title: "Geogebra",
+                link: "https://www.geogebra.org/calculator",
+                icon: "https://thumbor-api.gynzy.com/fws3mYgO1ZX6IvjSxDTNwDmE2hA=/fit-in/320x288/https://media.gynzy.com/content-thumbnail%252Ftool%252F101_da_766.png"
+            }
+        ].forEach(item => {
+            if (item.type == "widget") {
+                let item_element = document.createElement("div");
+                item_element.id = item.id;
+                item_element.className = "item widget";
+                item_element.title = item.link;
+                item_element.onclick = () => location.href = item.link;
+                let iframe_element = document.createElement("iframe");
+                iframe_element.src = item.link;
+                item_element.appendChild(iframe_element);
+                document.querySelector("#item_list").appendChild(item_element);
+            } else if (item.type == "item") {
+                let item_element = document.createElement("a");
+                item_element.className = "item";
+                item_element.href = item.link;
+                item_element.title = item.link;
+                let icon_element = document.createElement("img");
+                icon_element.src = item.icon;
+                item_element.appendChild(icon_element);
+                if (item.subicon) {
+                    let subicon_element = document.createElement("img");
+                    subicon_element.src = item.subicon;
+                    item_element.appendChild(subicon_element);
+                }
+                document.querySelector("#item_list").appendChild(item_element);
+            }
+        });
+        new Masonry("#item_list", {
+            itemSelector: ".item",
+            columnWidth: 105,
+            gutter: 20,
+            fitWidth: true
+        });
+    </script>
 </body>
 
 </html>

@@ -5,6 +5,7 @@
     <title>Truy cập nhanh</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css" rel="stylesheet">
     <script src="https://phonghng.github.io/scripts/PPPL-JS.js"></script>
@@ -98,8 +99,8 @@
     <div contenteditable="true"></div>
     <button style="--base_color: #F7B928;"><i class="fi fi-br-magic-wand"></i></button>
     <script>
-        if (localStorage.getItem("PPUPs_tcn"))
-            for (let item of localStorage.getItem("PPUPs_tcn").split("\n")) {
+        if (localStorage.getItem("PhongHNg_tcn"))
+            for (let item of localStorage.getItem("PhongHNg_tcn").split("\n")) {
                 let [text, icon_name, icon_color, url] = item.split("|");
                 if (!url) continue;
                 document.body.appendChild(PPPL_JS.ADOM([
@@ -118,9 +119,9 @@
             document.querySelector("button").style = "--base_color: #45BD62;";
             document.querySelector("div").style.display = "block";
             document.querySelector("div").innerHTML =
-                localStorage.getItem("PPUPs_tcn").split("\n\n").map(item => `<p>${item}</p>`).join("");
+                localStorage.getItem("PhongHNg_tcn").split("\n\n").map(item => `<p>${item}</p>`).join("");
             document.querySelector("button").onclick = () => {
-                localStorage.setItem("PPUPs_tcn", document.querySelector("div").innerText);
+                localStorage.setItem("PhongHNg_tcn", document.querySelector("div").innerText);
                 location.reload();
             };
         };
