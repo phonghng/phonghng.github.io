@@ -100,7 +100,7 @@
     <script>
         if (localStorage.getItem("PhongHNg_tcn"))
             for (let item of localStorage.getItem("PhongHNg_tcn").split("\n")) {
-                let [text, icon_name, icon_color, url] = item_element.split("|");
+                let [text, icon_name, icon_color, url] = item.split("|");
                 if (!url) continue;
                 let item_element = document.createElement("a");
                 item_element.href = url;
