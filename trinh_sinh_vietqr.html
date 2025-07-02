@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://i.ibb.co/4wc951dF/Tr-ng-N-N-D-EN.png" type="image/x-icon">
+    <title>PhongHNg | Trình sinh VietQR</title>
+    <style>
+        :root {
+            --color-blue: #2563eb;
+            --color-blue-dark: #003e8d;
+            --color-blue-light: #e7f2fe;
+            --color-blue-border: #d1e7fd;
+            --color-gray: #e5e7eb;
+            --color-gray-dark: #334155;
+            --color-gray-label: #42507b;
+            --color-red-danger: #e11d48;
+            --color-green-money: #22c55e;
+            --color-shadow-main: 0 4px 24px 0 rgba(0, 0, 0, 0.09);
+            --color-shadow-result: 0 2px 8px 0 rgba(37, 99, 235, 0.08);
+
+            --radius-large: 16px;
+            --radius-medium: 12px;
+            --radius-small: 7px;
+        }
+
+        body {
+            background: #f3f4f6;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #main_card {
+            background: #fff;
+            border-radius: var(--radius-large);
+            box-shadow: var(--color-shadow-main);
+            max-width: 500px;
+            width: 100%;
+            padding: 32px 22px 24px 22px;
+            margin: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+        }
+
+        #main_title {
+            text-align: center;
+            margin: 0 0 8px 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-gray-dark);
+            letter-spacing: -0.5px;
+        }
+
+        #dropdown_container {
+            margin-bottom: 12px;
+        }
+
+        #dropdown_container .dropdown_wrapper:not(:first-child) {
+            margin-top: 12px;
+        }
+
+        #dropdown_container .dropdown_wrapper label {
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+            display: inline-block;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+        }
+
+        #dropdown_container .dropdown_wrapper select {
+            display: block;
+            width: 100%;
+            border-radius: 10px;
+            border: 1.5px solid var(--color-gray);
+            padding: 13px 40px 13px 15px;
+            font-size: 1.08rem;
+            color: #1e293b;
+            background: #f9fafb url('data:image/svg+xml;utf8,<svg fill="gray" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 14px center/18px 18px;
+            appearance: none;
+            outline: none;
+            transition: border .2s;
+            margin-top: 2px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        #dropdown_container .dropdown_wrapper select:focus {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.10);
+        }
+
+        #dropdown_container .dropdown_wrapper option[disabled] {
+            color: #a3a3a3;
+        }
+
+        #vietqr_container {
+            margin: 0 auto 0 auto;
+            background: #f1f5f9;
+            border-radius: 14px;
+            border: 1.5px solid #e0e7ef;
+            box-shadow: 0 2px 8px 0 rgba(0, 62, 141, 0.07);
+            width: max-content;
+            padding: 19px 26px 15px 26px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #vietqr_label {
+            font-size: 1.04em;
+            font-weight: 600;
+            color: var(--color-blue-dark);
+            text-align: center;
+            margin-top: 13px;
+            margin-bottom: 0;
+            letter-spacing: 0.01em;
+        }
+
+        #attention {
+            display: none;
+            align-items: flex-start;
+            gap: 7px;
+            background: #fdf2f8;
+            color: var(--color-red-danger);
+            border: 1.5px solid #fecdd3;
+            border-radius: 8px;
+            margin: 15px 0 10px 0;
+            padding: 10px 12px 10px 12px;
+            font-size: .99em;
+            text-align: justify;
+        }
+
+        #attention #attention_icon {
+            margin-top: 1.5px;
+            flex-shrink: 0;
+            width: 1.3em;
+            height: 1.3em;
+            display: inline-block;
+        }
+
+        #result {
+            background: var(--color-blue-light);
+            border: 1.5px solid var(--color-blue-border);
+            border-radius: var(--radius-medium);
+            box-shadow: var(--color-shadow-result);
+            padding: 18px 18px 11px 18px;
+            min-width: 260px;
+            max-width: 99vw;
+            margin-top: 8px;
+            font-size: 1.08rem;
+            color: #263146;
+            display: none;
+            flex-direction: column;
+            transition: box-shadow .2s;
+        }
+
+        #result .result_row {
+            margin-bottom: 13px;
+            display: flex;
+        }
+
+        #result .result_row .result_label,
+        #result .result_row .result_row_label {
+            min-width: 120px;
+            color: var(--color-gray-label);
+            font-weight: 600;
+            margin-right: 8px;
+            font-size: 1em;
+            letter-spacing: .01em;
+        }
+
+        #result .result_row .result_row_content {
+            word-break: break-all;
+            font-size: 1em;
+        }
+
+        #result_transaction_bank_logo {
+            width: 26px;
+            height: 26px;
+            margin-right: 8px;
+            margin-left: 0;
+            vertical-align: middle;
+            object-fit: contain;
+            border-radius: 50%;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        #result_transaction_bank_name {
+            color: #2a4377;
+            font-weight: bold;
+        }
+
+        #result_transaction_amount {
+            color: var(--color-green-money);
+            font-weight: bold;
+            margin-left: 2px;
+        }
+
+        #result_transaction_description {
+            color: var(--color-blue);
+            background: #fff;
+            border-radius: var(--radius-small);
+            padding: 5px 12px;
+            margin-left: 0;
+            margin-top: 2px;
+            width: fit-content;
+            display: inline-block;
+            box-shadow: 0 1px 6px 0 rgba(37, 99, 235, 0.04);
+            border: 1px solid var(--color-blue-border);
+        }
+
+        #reset {
+            border: none;
+            border-radius: var(--radius-medium);
+            font-size: 1rem;
+            padding: 11px 28px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 17px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+            background: var(--color-blue);
+            color: #fff;
+            transition: background .18s;
+            display: none;
+        }
+
+        #reset:hover,
+        #reset:focus {
+            background: var(--color-blue-dark);
+        }
+
+        @media (max-width: 600px) {
+            #main_card {
+                padding: 15px 4vw 16px 4vw;
+            }
+
+            #dropdown_container .dropdown_wrapper select {
+                font-size: 1rem;
+            }
+
+            #result {
+                padding: 13px 3vw 10px 3vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main_card">
+        <h2 id="main_title">PhongHNg | Trình sinh VietQR</h2>
+        <div id="dropdown_container"></div>
+        <div id="vietqr_container">
+            <div id="vietqr_inner"></div>
+            <div id="vietqr_label">Mã VietQR chuyển khoản</div>
+        </div>
+        <div id="attention">
+            <span id="attention_icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="12" fill="#fee2e2" />
+                    <path d="M12 7v4.5M12 16h.01" stroke="#e11d48" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </span>
+            <span>Mã QR đã bao gồm toàn bộ thông tin giao dịch, chỉ cần dùng ứng dụng hỗ trợ VietQR để quét và thanh
+                toán. Nếu không quét được, vui lòng chuyển khoản theo thông tin bên dưới và nhập <b>chính xác</b> nội
+                dung (kể cả chữ hoa/thường) để hệ thống đối soát tự động. Mọi sai sót có thể khiến giao dịch không được
+                ghi nhận.</span>
+        </div>
+        <div id="result">
+            <div class="result_row">
+                <span class="result_label">Ngân hàng:</span>
+                <img src="https://i.ibb.co/JLTKcb8/Icon-BIDV.webp" alt="BIDV" id="result_transaction_bank_logo">
+                <span class="result_row_content" id="result_transaction_bank_name">BIDV</span>
+            </div>
+            <div class="result_row">
+                <span class="result_row_label">Số tài khoản:</span>
+                <span class="result_row_content" id="result_transaction_account_number">PHONGHNG</span>
+            </div>
+            <div class="result_row">
+                <span class="result_row_label">Chủ tài khoản:</span>
+                <span class="result_row_content" id="result_transaction_account_name">NGUYEN HAI PHONG</span>
+            </div>
+            <div class="result_row">
+                <span class="result_row_label">Số tiền:</span>
+                <span class="result_row_content" id="result_transaction_amount">0₫</span>
+            </div>
+            <div class="result_row">
+                <span class="result_row_label">Nội dung:</span>
+                <span class="result_row_content" id="result_transaction_description"></span>
+            </div>
+        </div>
+        <button id="reset">Chọn lại</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        // ==== CẤU HÌNH DỮ LIỆU ====
+
+        const list_config = {
+            value: "PHONGHNG", // 8 kí tự
+            text: "",
+            child_dropdown_name: "Hoạt động",
+            child_dropdown_choices: [{
+                value: "TEST", // 4 kí tự
+                text: "Kiểm thử chức năng",
+                child_dropdown_name: "Đợt",
+                child_dropdown_choices: [
+                    { value: "250602A", text: "Đợt 01 ngày 02 tháng 6 năm 2025", amount: 10000 }
+                ]
+            }, {
+                value: "TNNANG10", // 8 kí tự
+                text: "Góp quỹ tình nguyện Câu lạc bộ Nắng năm học 2024 - 2025",
+                child_dropdown_name: "Ban",
+                child_dropdown_choices: [{
+                    value: "CV", // 2 kí tự
+                    text: "Cố vấn",
+                    child_dropdown_name: "Họ tên",
+                    child_dropdown_choices: [
+                        { value: "01HANG", text: "Nguyễn Hà Thanh Hằng", amount: 50000 },
+                        { value: "02HA", text: "Đỗ Khánh Hà", amount: 50000 },
+                        { value: "03TRA", text: "Nguyễn Hương Trà", amount: 50000 },
+                        { value: "04ANH", text: "Lương Ngọc Ánh", amount: 50000 },
+                        { value: "05HUY", text: "Tô Đức Huy", amount: 50000 },
+                        { value: "06ANH", text: "Nông Minh Hoàng Anh", amount: 50000 },
+                        { value: "08HA", text: "Nguyễn Nguyên Hà", amount: 50000 },
+                        { value: "09VY", text: "Uông Thiên Yến Vy", amount: 50000 },
+                        { value: "10TRANG", text: "Nguyễn Quỳnh Trang", amount: 50000 },
+                        { value: "11DANG", text: "Nguyễn Hải Đăng", amount: 50000 },
+                        { value: "12LINH", text: "Đoàn Phương Linh", amount: 50000 }
+                    ]
+                }, {
+                    value: "CT", // 2 kí tự
+                    text: "Coreteam",
+                    child_dropdown_name: "Họ tên",
+                    child_dropdown_choices: [
+                        { value: "13KHANH", text: "Bùi Ngọc Khánh", amount: 50000 },
+                        { value: "14QUYEN", text: "Vũ Phạm Thục Quyên", amount: 50000 },
+                        { value: "15MINH", text: "Dương Ngọc Minh", amount: 50000 },
+                        { value: "17QUANG", text: "Lê Minh Quang", amount: 50000 },
+                        { value: "18THIEN", text: "Đỗ Hoàng Gia Thiện", amount: 50000 },
+                        { value: "19YEN", text: "Ngô Hải Yến", amount: 50000 },
+                        { value: "20MINH", text: "Nguyễn Gia Minh", amount: 50000 },
+                        { value: "21LINH", text: "Nguyễn Tú Linh", amount: 50000 },
+                        { value: "22NGOC", text: "Nguyễn Thị Vân Ngọc", amount: 50000 },
+                        { value: "23NHAT", text: "Nguyễn Minh Nhật", amount: 50000 },
+                        { value: "24PHONG", text: "Nguyễn Hải Phong", amount: 50000 },
+                        { value: "25NGUYE", text: "Lê Thảo Nguyên", amount: 50000 }
+                    ]
+                }]
+            }]
+        };
+
+        // ==== KIỂM TRA LỖI CẤU HÌNH ====
+
+        function check_duplicate_choices(current_node, path = []) {
+            if (!current_node.child_dropdown_choices) return;
+            const set_text = new Set();
+            const set_value = new Set();
+            for (const option_node of current_node.child_dropdown_choices) {
+                if (set_text.has(option_node.text)) {
+                    console.error(
+                        `Trùng tên đối tượng tại ${[...path, current_node.child_dropdown_name].join(" > ")}: "${option_node.text}"`
+                    );
+                }
+                if (set_value.has(option_node.value)) {
+                    console.error(
+                        `Trùng kí hiệu đối tượng tại ${[...path, current_node.child_dropdown_name].join(" > ")}: "${option_node.value}"`
+                    );
+                }
+                set_text.add(option_node.text);
+                set_value.add(option_node.value);
+                check_duplicate_choices(option_node, [...path, current_node.child_dropdown_name]);
+            }
+        }
+
+        function check_value_length_at_leaf(current_node, path = [], accumulated_value = "") {
+            const new_accumulated_value = accumulated_value + current_node.value;
+            if (current_node.child_dropdown_choices) {
+                for (const option_node of current_node.child_dropdown_choices) {
+                    check_value_length_at_leaf(
+                        option_node,
+                        [...path, current_node.text || current_node.value],
+                        new_accumulated_value
+                    );
+                }
+            } else if (current_node.amount !== undefined) {
+                if (new_accumulated_value.length > 25) {
+                    console.error(
+                        `Nội dung chuyển khoản VietQR vượt quá giới hạn (25 kí tự): "${new_accumulated_value}" (${new_accumulated_value.length} ký tự) tại ${[...path, current_node.text || current_node.value].join(" > ")}`
+                    );
+                }
+            }
+        }
+
+        check_duplicate_choices(list_config);
+        check_value_length_at_leaf(list_config, [], "");
+
+        // ==== LẤY & CẬP NHẬT URL PARAMS ====
+
+        function get_choices_from_url() {
+            const current_url = new URL(window.location);
+            const choices_param_string = current_url.searchParams.get("choices");
+            if (!choices_param_string) return [];
+            return choices_param_string.split("|").filter(Boolean).map(choice_value => ({ value: choice_value }));
+        }
+
+        function set_choices_to_url(user_choices_array) {
+            const choices_param_string = user_choices_array.map(choice_object => choice_object.value).join("|");
+            const current_url = new URL(window.location);
+            if (choices_param_string) current_url.searchParams.set("choices", choices_param_string);
+            else current_url.searchParams.delete("choices");
+            window.history.replaceState({}, "", current_url);
+        }
+
+        // ==== QUẢN LÝ DROPDOWN ====
+
+        const dropdown_container_element = document.querySelector("#dropdown_container");
+        let user_choices = [];
+
+        function create_dropdown_element(current_node, dropdown_level, selected_value) {
+            const dropdown_wrapper_div = document.createElement("div");
+            dropdown_wrapper_div.className = "dropdown_wrapper";
+            const dropdown_label = document.createElement("label");
+            dropdown_label.textContent = current_node.child_dropdown_name;
+            dropdown_wrapper_div.appendChild(dropdown_label);
+
+            const dropdown_select = document.createElement("select");
+            dropdown_select.required = true;
+            dropdown_select.setAttribute("data-level", dropdown_level);
+
+            const option_placeholder = document.createElement("option");
+            option_placeholder.disabled = true;
+            option_placeholder.selected = true;
+            option_placeholder.textContent = "Vui lòng chọn...";
+            dropdown_select.appendChild(option_placeholder);
+
+            (current_node.child_dropdown_choices || []).forEach(option_node => {
+                const dropdown_option = document.createElement("option");
+                dropdown_option.value = option_node.value;
+                dropdown_option.textContent = option_node.text;
+                dropdown_select.appendChild(dropdown_option);
+            });
+
+            if (typeof selected_value === "string") dropdown_select.value = selected_value;
+            dropdown_wrapper_div.appendChild(dropdown_select);
+            return dropdown_wrapper_div;
+        }
+
+        function render_dropdowns(current_root_node, selected_choices_array = []) {
+            dropdown_container_element.innerHTML = "";
+            let traversing_node = current_root_node;
+            let dropdown_level = 0;
+            while (traversing_node.child_dropdown_choices) {
+                const current_selected_value = selected_choices_array[dropdown_level]?.value;
+                const dropdown_element = create_dropdown_element(traversing_node, dropdown_level, current_selected_value);
+                dropdown_container_element.appendChild(dropdown_element);
+
+                if (!current_selected_value) break;
+                const next_node = traversing_node.child_dropdown_choices.find(option_node => option_node.value === current_selected_value);
+                if (!next_node) break;
+                traversing_node = next_node;
+                dropdown_level++;
+                if (!traversing_node.child_dropdown_choices) break;
+            }
+            attach_dropdown_events();
+        }
+
+        function attach_dropdown_events() {
+            const all_dropdown_elements = dropdown_container_element.querySelectorAll("select");
+            all_dropdown_elements.forEach((dropdown_select_element, dropdown_index) => {
+                dropdown_select_element.onchange = function () {
+                    user_choices = user_choices.slice(0, dropdown_index);
+                    const parent_node = dropdown_index === 0 ? list_config : find_node_by_choices(list_config, user_choices);
+                    const selected_option_node = parent_node.child_dropdown_choices.find(option_node => option_node.value === dropdown_select_element.value);
+                    user_choices.push({ value: selected_option_node.value, text: selected_option_node.text, amount: selected_option_node.amount });
+                    set_choices_to_url(user_choices);
+                    render_dropdowns(list_config, user_choices);
+                    if (selected_option_node.amount !== undefined) {
+                        show_result_block();
+                    } else {
+                        hide_result_block();
+                    }
+                };
+            });
+        }
+
+        function find_node_by_choices(root_node, user_choices_array) {
+            let traversing_node = root_node;
+            for (const choice_object of user_choices_array) {
+                traversing_node = traversing_node.child_dropdown_choices?.find(option_node => option_node.value === choice_object.value);
+                if (!traversing_node) break;
+            }
+            return traversing_node;
+        }
+
+        // ==== HIỆN/ẨN KẾT QUẢ & QR ====
+
+        function calculate_crc_ccitt(input_string) {
+            let crc_value = 0xFFFF;
+            for (let string_index = 0; string_index < input_string.length; string_index++) {
+                crc_value ^= (input_string.charCodeAt(string_index) << 8);
+                for (let bit_index = 0; bit_index < 8; bit_index++) {
+                    if ((crc_value & 0x8000) !== 0) {
+                        crc_value = ((crc_value << 1) ^ 0x1021) & 0xFFFF;
+                    } else {
+                        crc_value = (crc_value << 1) & 0xFFFF;
+                    }
+                }
+            }
+            return crc_value.toString(16).toUpperCase().padStart(4, "0");
+        }
+
+        function show_result_block() {
+            const root_value = list_config.value;
+            const transaction_description = [root_value, ...user_choices.map(choice_object => choice_object.value)].join("");
+            const transaction_amount = user_choices[user_choices.length - 1].amount;
+
+            document.querySelector("#result_transaction_amount").textContent = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(transaction_amount);
+            document.querySelector("#result_transaction_description").textContent = `${transaction_description}`;
+
+            document.querySelector("#result").style.display = "flex";
+            document.querySelector("#attention").style.display = "flex";
+            document.querySelector("#vietqr_container").style.display = "flex";
+            document.querySelector("#reset").style.display = "inline-block";
+
+            document.querySelector("#vietqr_inner").innerHTML = "";
+            let vietqr_content = ""
+                + /**/ "000201"
+                + /**/ "010212"
+                + /**/ "3852"
+                + /*-----*/ "0010A000000727"
+                + /*-----*/ "0122"
+                + /*----------*/ "0006970418"
+                + /*----------*/ "0108PHONGHNG"
+                + /*-----*/ "0208QRIBFTTA"
+                + /**/ "5303704"
+                + /**/ "54" + String(transaction_amount.toString().length).padStart(2, "0") + transaction_amount
+                + /**/ "5802VN"
+                + /**/ "62" + String(4 + transaction_description.length).padStart(2, "0")
+                + /*-----*/ "08" + String(transaction_description.length).padStart(2, "0") + transaction_description
+                + /**/ "6304";
+            vietqr_content = vietqr_content + calculate_crc_ccitt(vietqr_content);
+            new QRCode(document.querySelector("#vietqr_inner"), {
+                text: `${vietqr_content}`,
+                width: 180,
+                height: 180,
+                colorLight: "rgba(0,0,0,0)"
+            });
+        }
+
+        function hide_result_block() {
+            document.querySelector("#result").style.display = "none";
+            document.querySelector("#attention").style.display = "none";
+            document.querySelector("#vietqr_container").style.display = "none";
+            document.querySelector("#reset").style.display = "none";
+            document.querySelector("#vietqr_inner").innerHTML = "";
+        }
+
+        document.querySelector("#reset").onclick = function () {
+            user_choices = [];
+            set_choices_to_url([]);
+            hide_result_block();
+            render_dropdowns(list_config, []);
+        };
+
+        // ==== KHỞI TẠO TRANG ====
+
+        window.addEventListener("DOMContentLoaded", function () {
+            const initial_choices_from_url = get_choices_from_url();
+            let traversing_node = list_config;
+            let filled_choices = [];
+            for (const choice_object of initial_choices_from_url) {
+                const next_node = traversing_node.child_dropdown_choices?.find(option_node => option_node.value === choice_object.value);
+                if (!next_node) break;
+                filled_choices.push({ value: next_node.value, text: next_node.text, amount: next_node.amount });
+                traversing_node = next_node;
+            }
+            user_choices = filled_choices;
+            render_dropdowns(list_config, user_choices);
+            if (user_choices.length && user_choices[user_choices.length - 1]?.amount !== undefined) {
+                show_result_block();
+            } else {
+                hide_result_block();
+            }
+        });
+    </script>
+</body>
+
+</html>
