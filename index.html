@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chữ ký số</title>
+    <meta name="description"
+        content="Ký và xác thực chữ ký số trên tệp PDF một cách an toàn ngay trên trình duyệt của bạn.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00ff00;
+            --background-color: #000000;
+            --surface-color: #111111;
+            --text-color: #ffffff;
+            --text-muted-color: #888888;
+            --border-color: #333333;
+            --success-color: #00ff00;
+            --error-color: #ff0055;
+            --warning-color: #ffff00;
+            --font-family: "IBM Plex Mono", monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+        }
+
+        html {
+            font-size: 100%;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .main_container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .tab_navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab_button {
+            flex-grow: 1;
+            padding: 1rem;
+            cursor: pointer;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            background-color: transparent;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-muted-color);
+            transition: background-color 0.2s, color 0.2s;
+            position: relative;
+            font-family: var(--font-family);
+        }
+
+        .tab_button:last-child {
+            border-right: none;
+        }
+
+        .tab_button.active {
+            color: var(--background-color);
+            background-color: var(--primary-color);
+        }
+
+        .tab_content {
+            display: none;
+            padding: 2.5rem;
+            animation: fade_in 0.5s;
+        }
+
+        @keyframes fade_in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .tab_content.active {
+            display: block;
+        }
+
+        .form_group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input_field,
+        .textarea_field,
+        .select_field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input_field::placeholder,
+        .textarea_field::placeholder {
+            color: var(--text-muted-color);
+        }
+
+        .file_input_label {
+            width: 100%;
+            padding: 1.25rem;
+            border: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-align: center;
+            background-color: var(--background-color);
+            color: var(--text-muted-color);
+            transition: background-color 0.2s, border-color 0.2s;
+            min-height: 90px;
+        }
+
+        .file_input_label:hover,
+        .file_input_label:focus {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            outline: none;
+        }
+
+        .file_input_icon {
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .file_input_text_wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file_name_display {
+            color: var(--text-color);
+            font-weight: 400;
+        }
+
+        .file_status_display {
+            font-weight: 400;
+            font-size: 0.875rem;
+            color: var(--success-color);
+        }
+
+        .textarea_field {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input_field:focus,
+        .textarea_field:focus,
+        .select_field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .password_wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password_wrapper .input_field {
+            padding-right: 3rem;
+        }
+
+        .password_toggle_button {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            bottom: 1px;
+            border: none;
+            background: var(--background-color);
+            color: var(--text-muted-color);
+            cursor: pointer;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password_toggle_button:hover {
+            color: var(--primary-color);
+        }
+
+        .button {
+            display: inline-block;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s, color 0.2s;
+            margin-top: 1rem;
+            font-family: var(--font-family);
+        }
+
+        .button:hover:not(:disabled) {
+            background-color: transparent;
+            color: var(--primary-color);
+        }
+
+        .button:disabled {
+            background-color: var(--border-color);
+            border-color: var(--border-color);
+            cursor: not-allowed;
+            color: var(--text-muted-color);
+        }
+
+        .button_group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .button.secondary {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-muted-color);
+        }
+
+        .button.secondary:hover:not(:disabled) {
+            border-color: var(--text-muted-color);
+            color: var(--text-color);
+            background-color: var(--border-color);
+        }
+
+        .result_box {
+            margin-top: 0.5rem;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            word-break: break-all;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .result_box pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .loader_spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .signer_block {
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+            padding: 1.25rem;
+        }
+
+        .signer_header {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .signer_header.valid {
+            color: var(--success-color);
+        }
+
+        .signer_header.invalid {
+            color: var(--error-color);
+        }
+
+        .signer_header.untrusted {
+            color: var(--warning-color);
+        }
+
+        .signer_header .icon {
+            margin-right: 0.75rem;
+        }
+
+        .signer_info_table {
+            width: 100%;
+            font-size: 0.9rem;
+            word-break: break-all;
+            border-collapse: collapse;
+        }
+
+        .signer_info_table td {
+            padding: 0.25rem 0;
+        }
+
+        .signer_info_table td:first-child {
+            font-weight: 400;
+            padding-right: 1rem;
+            width: 1%;
+            white-space: nowrap;
+            color: var(--text-muted-color);
+        }
+
+        .status_message,
+        .message_display {
+            padding: 0.75rem 1rem;
+            font-weight: 400;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            display: none;
+            font-size: 0.875rem;
+        }
+
+        .message_display.success {
+            color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .message_display.error {
+            color: var(--error-color);
+            border-color: var(--error-color);
+        }
+
+        #password_strength_indicator {
+            display: flex;
+            gap: 0.25rem;
+            height: 4px;
+            margin-top: 0.5rem;
+        }
+
+        #password_strength_indicator span {
+            flex-grow: 1;
+            background-color: var(--border-color);
+            transition: background-color 0.3s;
+        }
+
+        .label_with_action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .label_text,
+        .form_label {
+            font-weight: 600;
+            color: var(--text-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .label_with_action .label_text span {
+            font-size: 0.875rem;
+            color: var(--text-muted-color);
+            font-weight: 400;
+        }
+
+        .button_icon {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted-color);
+            cursor: pointer;
+            padding: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .button_icon:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .main_container {
+                margin: 0;
+                border: none;
+            }
+
+            .tab_content {
+                padding: 1.5rem;
+            }
+
+            .tab_button {
+                font-size: 0.875rem;
+                padding: 0.8rem 0.5rem;
+            }
+
+            .button_group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main_container">
+        <nav class="tab_navigation" role="tablist">
+            <button id="tab_button_verify" role="tab" aria-selected="true" aria-controls="tab_content_verify"
+                class="tab_button active">Xác thực</button>
+            <button id="tab_button_sign" role="tab" aria-selected="false" aria-controls="tab_content_sign"
+                class="tab_button">Ký</button>
+            <button id="tab_button_key" role="tab" aria-selected="false" aria-controls="tab_content_key"
+                class="tab_button">Tạo bút ký</button>
+        </nav>
+
+        <section id="tab_content_verify" role="tabpanel" aria-labelledby="tab_button_verify" class="tab_content active">
+            <div class="form_group">
+                <label for="verify_file_input" class="file_input_label" tabindex="0">
+                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <div class="file_input_text_wrapper">
+                        <span>Chạm hoặc kéo tệp PDF vào đây để xác thực</span>
+                        <span id="verify_file_name_display" class="file_name_display">Chưa có tệp nào được chọn</span>
+                    </div>
+                </label>
+                <input type="file" id="verify_file_input" accept=".pdf">
+            </div>
+            <div id="verify_loader" class="loader">
+                <div class="loader_spinner"></div>
+                <p>Đang đọc và xác thực tệp...</p>
+            </div>
+            <div id="verify_result_section"></div>
+        </section>
+
+        <section id="tab_content_sign" role="tabpanel" aria-labelledby="tab_button_sign" class="tab_content">
+            <div class="form_group">
+                <select id="sign_key_select" class="select_field"></select>
+                <div id="sign_key_select_message" class="message_display" role="alert"></div>
+            </div>
+            <div class="form_group">
+                <div class="password_wrapper">
+                    <input type="password" id="sign_password_input" class="input_field" placeholder="Mật khẩu bút ký">
+                    <button type="button" class="password_toggle_button" title="Hiển thị/Ẩn mật khẩu">
+                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <path
+                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                            </path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="sign_password_message" class="message_display" role="alert"></div>
+            </div>
+            <div class="form_group">
+                <label for="sign_pdf_file_input" class="file_input_label" tabindex="0">
+                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <div class="file_input_text_wrapper">
+                        <span>Tệp PDF cần ký</span>
+                        <span id="sign_pdf_file_name_display" class="file_name_display">Chưa có tệp PDF nào được
+                            chọn</span>
+                        <span id="sign_pdf_file_status_display" class="file_status_display"></span>
+                    </div>
+                </label>
+                <input type="file" id="sign_pdf_file_input" accept=".pdf">
+                <div id="sign_pdf_file_message" class="message_display" role="alert"></div>
+            </div>
+            <div class="form_group">
+                <textarea id="sign_note_input" class="textarea_field"
+                    placeholder="Ghi chú cho chữ ký (tùy chọn)"></textarea>
+            </div>
+            <div id="sign_general_message" class="message_display" role="alert"></div>
+            <button id="sign_file_button" class="button">Ký và tải xuống</button>
+            <div id="sign_loader" class="loader">
+                <div class="loader_spinner"></div>
+                <p id="sign_loader_message">Đang xử lý...</p>
+            </div>
+        </section>
+
+        <section id="tab_content_key" role="tabpanel" aria-labelledby="tab_button_key" class="tab_content">
+            <div class="form_group">
+                <input type="text" id="key_name_input" class="input_field"
+                    placeholder="Tên bút ký (ví dụ: Nguyễn Văn A)">
+                <div id="key_name_message" class="message_display" role="alert"></div>
+            </div>
+            <div class="form_group">
+                <div class="password_wrapper">
+                    <input type="password" id="key_password_input" class="input_field" placeholder="Mật khẩu bảo vệ">
+                    <button type="button" class="password_toggle_button" title="Hiển thị/Ẩn mật khẩu">
+                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <path
+                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                            </path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="password_strength_indicator">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div id="key_password_message" class="message_display" role="alert"></div>
+            </div>
+            <div class="button_group">
+                <button id="generate_key_button" class="button">Tạo bút ký</button>
+                <button id="reset_key_button" class="button secondary">Đặt lại</button>
+            </div>
+            <div id="key_loader" class="loader">
+                <div class="loader_spinner"></div>
+                <p>Đang tạo cặp khóa, quá trình này có thể mất một lúc...</p>
+            </div>
+            <div id="key_result_section" style="display: none;">
+                <div id="key_generation_success_message" class="message_display success" role="alert"
+                    style="margin-bottom: 1.5rem;"></div>
+                <div class="form_group">
+                    <div class="label_with_action">
+                        <div class="label_text">
+                            <strong>Đối tượng bút ký</strong> <span>(sao chép và thêm vào KEY_REGISTRY)</span>
+                        </div>
+                        <button id="copy_key_object_button" class="button_icon" title="Sao chép đối tượng bút ký">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="copy_key_object_message" class="message_display" role="alert"
+                        style="margin-bottom: 0.5rem;"></div>
+                    <div id="key_object_output" class="result_box">
+                        <pre><code></code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const KEY_REGISTRY = {
+            "a3db47ed-7a43-4753-b308-9cb7e76d6719": {
+                "secret": {
+                    "key_name": "Nguyễn Hải Phong",
+                    "encrypted_private_key_base64": "nvxVxsTcRoJFngXqXw7UR5RTUTbms6d99Wicbeb7AVfFC+ose5j2p0jQdnovsn0Doy7DKJdqn+HZrAJK2Xl/hAQ9apfPFbfom0NA7kaSJOc1YOhw8KabZsH5MX64THEHcUMknHyKfU5MqBQprbvZKHRCFHXknaSd8CcSiQooVgwu1fpEyAm1xA13c3ait6zNVwct9V8poI4RVkFKYHb4EqGL3TUbkMMtP5PSZnUzu8CTasjBuYLRkrRGsofljSL5Ul0c6lg8blpgJuv7XHoxtAPXGF+LYZGCbksnVFIX4iVp26KR5SwA6NZR5hbjRXm5+NhRTnFrsvYsykNlOrltcVZKzcZJEJMD7l6/5BMn39aiaC3/qBfp+myyFBpd",
+                    "salt_base64": "iOOgLPCPwOM2XdDrAb8JsIBOTq0wG9EdcV6aw3ZJzow=",
+                    "iv_base64": "NjAnjlXU3fUH31fo",
+                    "created_at": "2025-09-18T17:20:06.098Z"
+                },
+                "public": {
+                    "crv": "P-384",
+                    "ext": true,
+                    "key_ops": [
+                        "verify"
+                    ],
+                    "kty": "EC",
+                    "x": "TbUeHUzVq5wc6OkbKDP9RMU2yY6SC0HLcqZ7cnrK1NnLZBCd_i9EiCOYr1bPQnfg",
+                    "y": "FqoH3F8PVU7iNaBzbZRqe_0OFuiJqfhwveQ8AIe0NnR0VrGNkdK1CLS00rIny_-d"
+                }
+            }
+        };
+
+        class CryptoService {
+            constructor(config) {
+                this.config = config;
+                this.text_encoder = new TextEncoder();
+                this.text_decoder = new TextDecoder();
+            }
+
+            _array_buffer_to_base64(buffer) {
+                let binary = "";
+                const bytes = new Uint8Array(buffer);
+                bytes.forEach((byte) => binary += String.fromCharCode(byte));
+                return window.btoa(binary);
+            }
+
+            _base64_to_array_buffer(base64) {
+                const binary_string = window.atob(base64);
+                const len = binary_string.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binary_string.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+
+            async _derive_key_from_password(password, salt) {
+                const key_material = await window.crypto.subtle.importKey("raw", this.text_encoder.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+                return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: this.config.pbkdf2_iterations, hash: this.config.pbkdf2_hash }, key_material, { name: this.config.aes_algorithm, length: 256 }, true, ["encrypt", "decrypt"]);
+            }
+
+            async _encrypt_data(key, data_buffer) {
+                const iv = window.crypto.getRandomValues(new Uint8Array(this.config.aes_iv_length_bytes));
+                const encrypted_data = await window.crypto.subtle.encrypt({ name: this.config.aes_algorithm, iv: iv }, key, data_buffer);
+                return { encrypted_data, iv };
+            }
+
+            async _decrypt_data(key, encrypted_data_buffer, iv) {
+                return window.crypto.subtle.decrypt({ name: this.config.aes_algorithm, iv: iv }, key, encrypted_data_buffer);
+            }
+
+            async generate_signature_key(password, key_name) {
+                const salt = window.crypto.getRandomValues(new Uint8Array(this.config.pbkdf2_salt_length_bytes));
+                const encryption_key = await this._derive_key_from_password(password, salt);
+                const key_pair = await window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: this.config.ecdsa_curve }, true, ["sign", "verify"]);
+                const private_key_jwk = await window.crypto.subtle.exportKey("jwk", key_pair.privateKey);
+                const public_key_jwk = await window.crypto.subtle.exportKey("jwk", key_pair.publicKey);
+                const private_key_buffer = this.text_encoder.encode(JSON.stringify(private_key_jwk));
+                const { encrypted_data, iv } = await this._encrypt_data(encryption_key, private_key_buffer);
+
+                return {
+                    secret: {
+                        key_name: key_name,
+                        encrypted_private_key_base64: this._array_buffer_to_base64(encrypted_data),
+                        salt_base64: this._array_buffer_to_base64(salt),
+                        iv_base64: this._array_buffer_to_base64(iv),
+                        created_at: new Date().toISOString()
+                    },
+                    public: public_key_jwk
+                };
+            }
+
+            async sign_hash(private_key, hash_buffer) {
+                return window.crypto.subtle.sign({ name: "ECDSA", hash: { name: this.config.hash_algorithm_for_signing } }, private_key, hash_buffer);
+            }
+
+            async verify_signature(public_key_jwk_object, signature_base64, data_buffer) {
+                const public_key = await window.crypto.subtle.importKey("jwk", public_key_jwk_object, { name: "ECDSA", namedCurve: this.config.ecdsa_curve }, true, ["verify"]);
+                const signature_buffer = this._base64_to_array_buffer(signature_base64);
+                const hash_buffer = await this.calculate_sha384(data_buffer);
+                return window.crypto.subtle.verify({ name: "ECDSA", hash: { name: this.config.hash_algorithm_for_signing } }, public_key, signature_buffer, hash_buffer);
+            }
+
+            async calculate_sha384(buffer) {
+                return window.crypto.subtle.digest(this.config.hash_algorithm_for_signing, buffer);
+            }
+
+            array_buffer_to_hex(buffer) {
+                return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+            }
+        }
+
+        class UIManager {
+            constructor(crypto_service, key_registry) {
+                this.crypto_service = crypto_service;
+                this.key_registry = key_registry;
+                this.magic_number_bytes = new TextEncoder().encode("PDFSIGJSONPKG");
+                this.is_subsequent_signer = false;
+                this._select_dom_elements();
+                this._bind_event_listeners();
+                this._populate_key_selector();
+            }
+
+            _select_dom_elements() {
+                this.elements = {
+                    tab_buttons: document.querySelectorAll(".tab_button"),
+                    tab_contents: document.querySelectorAll(".tab_content"),
+                    key: {
+                        name_input: document.getElementById("key_name_input"),
+                        password_input: document.getElementById("key_password_input"),
+                        password_strength_indicator: document.getElementById("password_strength_indicator"),
+                        generate_button: document.getElementById("generate_key_button"),
+                        reset_button: document.getElementById("reset_key_button"),
+                        loader: document.getElementById("key_loader"),
+                        result_section: document.getElementById("key_result_section"),
+                        key_object_output_code: document.querySelector("#key_object_output code"),
+                        copy_key_object_button: document.getElementById("copy_key_object_button"),
+                        name_message: document.getElementById("key_name_message"),
+                        password_message: document.getElementById("key_password_message"),
+                        generation_success_message: document.getElementById("key_generation_success_message"),
+                        copy_key_object_message: document.getElementById("copy_key_object_message"),
+                    },
+                    sign: {
+                        key_select: document.getElementById("sign_key_select"),
+                        pdf_file_input: document.getElementById("sign_pdf_file_input"),
+                        pdf_file_name_display: document.getElementById("sign_pdf_file_name_display"),
+                        pdf_file_status_display: document.getElementById("sign_pdf_file_status_display"),
+                        note_input: document.getElementById("sign_note_input"),
+                        password_input: document.getElementById("sign_password_input"),
+                        sign_button: document.getElementById("sign_file_button"),
+                        loader: document.getElementById("sign_loader"),
+                        loader_message: document.getElementById("sign_loader_message"),
+                        key_select_message: document.getElementById("sign_key_select_message"),
+                        password_message: document.getElementById("sign_password_message"),
+                        pdf_file_message: document.getElementById("sign_pdf_file_message"),
+                        general_message: document.getElementById("sign_general_message"),
+                    },
+                    verify: {
+                        file_input: document.getElementById("verify_file_input"),
+                        file_name_display: document.getElementById("verify_file_name_display"),
+                        loader: document.getElementById("verify_loader"),
+                        result_section: document.getElementById("verify_result_section"),
+                    }
+                };
+            }
+
+            _bind_event_listeners() {
+                this.elements.tab_buttons.forEach(button => button.addEventListener("click", () => this._switch_tab(button.getAttribute("aria-controls"))));
+
+                this.elements.key.generate_button.addEventListener("click", () => this._handle_generate_key_click());
+                this.elements.key.reset_button.addEventListener("click", () => this._reset_key_form());
+                this.elements.key.password_input.addEventListener("input", () => this._update_password_strength_indicator());
+                this.elements.key.copy_key_object_button.addEventListener("click", () => this._handle_copy_key_object_click());
+
+                this.elements.sign.pdf_file_input.addEventListener("change", () => this._handle_sign_pdf_file_change());
+                this.elements.sign.sign_button.addEventListener("click", () => this._handle_sign_file_click());
+
+                this.elements.verify.file_input.addEventListener("change", () => this._handle_verify_file_change());
+
+                this._setup_file_input_display(this.elements.verify.file_input, this.elements.verify.file_name_display, "Chưa có tệp nào được chọn");
+                this._setup_file_input_display(this.elements.sign.pdf_file_input, this.elements.sign.pdf_file_name_display, "Chưa có tệp PDF nào được chọn");
+
+                document.querySelectorAll(".file_input_label").forEach(label => {
+                    label.addEventListener("keydown", (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            document.getElementById(label.getAttribute("for")).click();
+                        }
+                    });
+                });
+
+                document.querySelectorAll(".password_toggle_button").forEach(button => {
+                    button.addEventListener("click", () => this._toggle_password_visibility(button));
+                });
+            }
+
+            _populate_key_selector() {
+                const select_element = this.elements.sign.key_select;
+                select_element.innerHTML = "";
+
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = "-- Chọn bút ký của bạn --";
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                select_element.appendChild(placeholder);
+
+                for (const key_id in this.key_registry) {
+                    const option = document.createElement("option");
+                    option.value = key_id;
+                    option.textContent = this.key_registry[key_id].secret.key_name;
+                    select_element.appendChild(option);
+                }
+            }
+
+            _switch_tab(target_tab_id) {
+                this.elements.tab_contents.forEach(content => content.classList.remove("active"));
+                this.elements.tab_buttons.forEach(button => {
+                    button.classList.remove("active");
+                    button.setAttribute("aria-selected", "false");
+                });
+                document.getElementById(target_tab_id).classList.add("active");
+                const active_button = document.querySelector(`[aria-controls="${target_tab_id}"]`);
+                active_button.classList.add("active");
+                active_button.setAttribute("aria-selected", "true");
+            }
+
+            _display_message(element, message, is_success = true) {
+                if (!element) return;
+                element.textContent = message;
+                element.className = `message_display ${is_success ? "success" : "error"}`;
+                element.style.display = message ? "block" : "none";
+            }
+
+            _toggle_loader(loader_element, show, message = "") {
+                if (!loader_element) return;
+                loader_element.style.display = show ? "block" : "none";
+                if (show && message && loader_element.querySelector("p")) {
+                    loader_element.querySelector("p").textContent = message;
+                }
+            }
+
+            _toggle_password_visibility(button) {
+                const wrapper = button.parentElement;
+                const input = wrapper.querySelector("input[type='password'], input[type='text']");
+                const icon_eye = wrapper.querySelector(".icon_eye");
+                const icon_eye_off = wrapper.querySelector(".icon_eye_off");
+
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon_eye.style.display = "none";
+                    icon_eye_off.style.display = "inline-block";
+                } else {
+                    input.type = "password";
+                    icon_eye.style.display = "inline-block";
+                    icon_eye_off.style.display = "none";
+                }
+            }
+
+            _read_file(file, type) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(reader.error);
+                    if (type === "buffer") reader.readAsArrayBuffer(file);
+                    else reader.readAsText(file);
+                });
+            }
+
+            _setup_file_input_display(input_element, display_element, default_text) {
+                input_element.addEventListener("change", () => {
+                    display_element.textContent = input_element.files.length > 0 ? input_element.files[0].name : default_text;
+                });
+            }
+
+            _validate_password(password) {
+                const validations = [
+                    { regex: /.{10,}/, score: 1 }, { regex: /[a-z]/, score: 1 },
+                    { regex: /[A-Z]/, score: 1 }, { regex: /[0-9]/, score: 1 },
+                    { regex: /[^A-Za-z0-9]/, score: 1 }
+                ];
+                let score = validations.reduce((acc, v) => acc + (v.regex.test(password) ? v.score : 0), 0);
+                const message = score < 5 ? "Mật khẩu phải chứa ít nhất 10 ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt." : "Mật khẩu hợp lệ.";
+                return { score: score, is_valid: score >= 5, message: message };
+            }
+
+            _update_password_strength_indicator() {
+                const password = this.elements.key.password_input.value;
+                const { score } = this._validate_password(password);
+                const bars = this.elements.key.password_strength_indicator.querySelectorAll("span");
+                const colors = ["#333", "#ff0055", "#ff0055", "#ffff00", "#ffff00", "#00ff00"];
+                bars.forEach((bar, index) => {
+                    bar.style.backgroundColor = index < score ? colors[score] : "var(--border-color)";
+                });
+            }
+
+            async _handle_generate_key_click() {
+                const { name_input, password_input, loader, result_section, key_object_output_code, name_message, password_message, generation_success_message } = this.elements.key;
+                this._display_message(name_message, "");
+                this._display_message(password_message, "");
+                this._display_message(generation_success_message, "");
+                result_section.style.display = "none";
+
+                const key_name = name_input.value.trim();
+                const password = password_input.value;
+
+                if (!key_name) {
+                    this._display_message(name_message, "Vui lòng nhập tên bút ký.", false); return;
+                }
+                const name_exists = Object.values(this.key_registry).some(key => key.secret.key_name === key_name);
+                if (name_exists) {
+                    this._display_message(name_message, `Tên bút ký "${key_name}" đã tồn tại.`, false); return;
+                }
+
+                const password_validation = this._validate_password(password);
+                if (!password_validation.is_valid) {
+                    this._display_message(password_message, password_validation.message, false); return;
+                }
+
+                this._toggle_loader(loader, true, "Đang tạo cặp khóa, quá trình này có thể mất một lúc...");
+                try {
+                    const key_object = await this.crypto_service.generate_signature_key(password, key_name);
+                    const new_key_id = crypto.randomUUID();
+                    key_object_output_code.textContent = `"${new_key_id}": ${JSON.stringify(key_object, null, 2)}`;
+                    result_section.style.display = "block";
+                    this._display_message(generation_success_message, "Bút ký đã được tạo thành công!");
+                } catch (error) {
+                    this._display_message(name_message, `Lỗi khi tạo bút ký: ${error.message}`, false);
+                } finally {
+                    this._toggle_loader(loader, false);
+                }
+            }
+
+            _reset_key_form() {
+                const { name_input, password_input, result_section, loader, name_message, password_message, generation_success_message } = this.elements.key;
+                name_input.value = "";
+                password_input.value = "";
+                result_section.style.display = "none";
+                loader.style.display = "none";
+                this._update_password_strength_indicator();
+                this._display_message(name_message, "");
+                this._display_message(password_message, "");
+                this._display_message(generation_success_message, "");
+            }
+
+            _handle_copy_key_object_click() {
+                const text_to_copy = this.elements.key.key_object_output_code.textContent;
+                const message_element = this.elements.key.copy_key_object_message;
+                this._display_message(message_element, "");
+                if (!text_to_copy) return;
+
+                const temp_textarea = document.createElement("textarea");
+                temp_textarea.value = text_to_copy;
+                document.body.appendChild(temp_textarea);
+                temp_textarea.select();
+                temp_textarea.setSelectionRange(0, 99999);
+
+                try {
+                    const successful = document.execCommand("copy");
+                    this._display_message(message_element, successful ? "Đã sao chép vào bộ nhớ đệm." : "Sao chép thất bại.", successful);
+                } catch (err) {
+                    this._display_message(message_element, "Sao chép thất bại.", false);
+                }
+
+                document.body.removeChild(temp_textarea);
+            }
+
+            async _handle_sign_pdf_file_change() {
+                const { pdf_file_input, pdf_file_status_display } = this.elements.sign;
+                pdf_file_status_display.textContent = "";
+                this.is_subsequent_signer = false;
+                const file = pdf_file_input.files[0];
+                if (!file) return;
+
+                try {
+                    const file_bytes = new Uint8Array(await this._read_file(file, "buffer"));
+                    this._extract_data_from_pdf(file_bytes);
+                    this.is_subsequent_signer = true;
+                    pdf_file_status_display.textContent = "Tệp đã có chữ ký. Bạn sẽ ký tiếp theo.";
+                } catch (error) {
+                    this.is_subsequent_signer = false;
+                    pdf_file_status_display.textContent = "Đây là tệp mới. Bạn sẽ là người ký khởi tạo.";
+                }
+            }
+            
+            _get_data_to_verify_buffer(file_hash, entry) {
+                const data_to_verify_string = `${file_hash}|${entry.key_id}|${entry.signed_at}|${entry.note}`;
+                return this.crypto_service.text_encoder.encode(data_to_verify_string);
+            }
+
+            async _handle_sign_file_click() {
+                const { pdf_file_input, key_select, password_input, note_input, loader, loader_message, key_select_message, password_message, pdf_file_message, general_message } = this.elements.sign;
+                this._display_message(key_select_message, "");
+                this._display_message(password_message, "");
+                this._display_message(pdf_file_message, "");
+                this._display_message(general_message, "");
+
+                const pdf_file = pdf_file_input.files[0];
+                const selected_key_id = key_select.value;
+                const password = password_input.value;
+
+                let is_valid = true;
+                if (!selected_key_id) { this._display_message(key_select_message, "Vui lòng chọn một bút ký.", false); is_valid = false; }
+                if (!password) { this._display_message(password_message, "Vui lòng nhập mật khẩu bút ký.", false); is_valid = false; }
+                if (!pdf_file) { this._display_message(pdf_file_message, "Vui lòng chọn tệp PDF để ký.", false); is_valid = false; }
+                if (!is_valid) return;
+
+                this._toggle_loader(loader, true);
+                try {
+                    const key_data = this.key_registry[selected_key_id].secret;
+
+                    if ((Date.now() - new Date(key_data.created_at).getTime()) > (365 * 24 * 60 * 60 * 1000)) { throw new Error("Bút ký đã quá 1 năm. Vui lòng tạo một bút ký mới."); }
+
+                    let original_pdf_bytes, signature_package;
+                    const pdf_file_bytes = new Uint8Array(await this._read_file(pdf_file, "buffer"));
+                    
+                    loader_message.textContent = "Đang phân tích tệp PDF...";
+                    if (this.is_subsequent_signer) {
+                        const extracted = this._extract_data_from_pdf(pdf_file_bytes);
+                        original_pdf_bytes = extracted.original_pdf_bytes;
+                        signature_package = extracted.signature_package;
+                        
+                        loader_message.textContent = "Đang xác thực các chữ ký trước đó...";
+                        const file_hash_hex = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+                        if (file_hash_hex !== signature_package.file_hash_sha384) throw new Error("Toàn vẹn tệp thất bại. Nội dung gốc đã bị thay đổi.");
+                       
+                        for (const [i, entry] of signature_package.signature_chain.entries()) {
+                            const public_key_object = this.key_registry[entry.key_id]?.public;
+                            const data_to_verify_buffer = this._get_data_to_verify_buffer(signature_package.file_hash_sha384, entry);
+                            if (!public_key_object || !await this.crypto_service.verify_signature(public_key_object, entry.signature, data_to_verify_buffer)) {
+                                throw new Error(`Chữ ký của "${entry.key_name}" (người thứ ${i + 1}) không hợp lệ.`);
+                            }
+                        }
+                    } else {
+                        original_pdf_bytes = pdf_file_bytes;
+                        const hash = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+                        signature_package = { file_hash_sha384: hash, signature_chain: [] };
+                    }
+
+                    loader_message.textContent = "Đang giải mã bút ký...";
+                    const salt = this.crypto_service._base64_to_array_buffer(key_data.salt_base64);
+                    const iv = this.crypto_service._base64_to_array_buffer(key_data.iv_base64);
+                    const encryption_key = await this.crypto_service._derive_key_from_password(password, salt);
+                    const encrypted_private_key = this.crypto_service._base64_to_array_buffer(key_data.encrypted_private_key_base64);
+                    const decrypted_private_key = await this.crypto_service._decrypt_data(encryption_key, encrypted_private_key, iv);
+                    const private_key_jwk = JSON.parse(this.crypto_service.text_decoder.decode(decrypted_private_key));
+                    const private_key = await window.crypto.subtle.importKey("jwk", private_key_jwk, { name: "ECDSA", namedCurve: this.crypto_service.config.ecdsa_curve }, true, ["sign"]);
+
+                    loader_message.textContent = "Đang tạo chữ ký số...";
+                    const new_entry_metadata = {
+                        key_id: selected_key_id,
+                        key_name: key_data.key_name,
+                        signed_at: new Date().toISOString(),
+                        note: note_input.value
+                    };
+                    
+                    const data_to_sign_buffer = this._get_data_to_verify_buffer(signature_package.file_hash_sha384, new_entry_metadata);
+                    const hash_to_sign_buffer = await this.crypto_service.calculate_sha384(data_to_sign_buffer);
+                    const signature_buffer = await this.crypto_service.sign_hash(private_key, hash_to_sign_buffer);
+                    
+                    const final_new_entry = {
+                        ...new_entry_metadata,
+                        signature: this.crypto_service._array_buffer_to_base64(signature_buffer)
+                    };
+
+                    signature_package.signature_chain.push(final_new_entry);
+                    const final_bytes = this._append_data_to_pdf(original_pdf_bytes, JSON.stringify(signature_package));
+                    const original_file_name = pdf_file.name.replace(/\.pdf$/i, "");
+                    this._create_and_download_file(`${original_file_name} (đã ký).pdf`, final_bytes, "application/pdf");
+                    this._display_message(general_message, "Ký thành công! Tệp đã được tải xuống.");
+                } catch (error) {
+                    this._display_message(general_message, `Lỗi khi ký: ${error.message}`, false);
+                } finally {
+                    this._toggle_loader(loader, false);
+                    password_input.value = "";
+                }
+            }
+
+            async _handle_verify_file_change() {
+                const { file_input, loader, result_section } = this.elements.verify;
+                const file = file_input.files[0];
+                if (!file) return;
+
+                this._toggle_loader(loader, true, "Đang đọc và xác thực tệp...");
+                result_section.innerHTML = "";
+
+                try {
+                    const file_bytes = new Uint8Array(await this._read_file(file, "buffer"));
+                    const { original_pdf_bytes, signature_package } = this._extract_data_from_pdf(file_bytes);
+                    let result_html = "";
+                    const recomputed_hash = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+
+                    if (recomputed_hash === signature_package.file_hash_sha384) {
+                        result_html += `<div class="status_message" style="display: block; color: var(--success-color); border-color: var(--success-color);">✓ Toàn vẹn tệp: Nội dung gốc không bị thay đổi.</div>`;
+                    } else {
+                        result_html += `<div class="status_message" style="display: block; color: var(--error-color); border-color: var(--error-color);">✗ CẢNH BÁO: Nội dung tệp gốc đã bị thay đổi!</div>`;
+                        result_section.innerHTML = result_html; this._toggle_loader(loader, false); return;
+                    }
+
+                    result_html += `<div style="margin-top: 2rem; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted-color);">Chuỗi chữ ký (${signature_package.signature_chain.length} chữ ký)</div>`;
+                    for (const [index, entry] of signature_package.signature_chain.entries()) {
+                        const public_key_object = this.key_registry[entry.key_id]?.public;
+                        let status = "untrusted";
+                        if (public_key_object) {
+                            const data_to_verify_buffer = this._get_data_to_verify_buffer(signature_package.file_hash_sha384, entry);
+                            const is_valid = await this.crypto_service.verify_signature(public_key_object, entry.signature, data_to_verify_buffer);
+                            status = is_valid ? "valid" : "invalid";
+                        }
+                        result_html += this._create_signer_block_html(index, entry, status);
+                    }
+                    result_section.innerHTML = result_html;
+                } catch (error) {
+                    const message = error.message.includes("Không tìm thấy khối dữ liệu") ? "Tệp này không chứa chữ ký số." : `Lỗi: ${error.message}`;
+                    result_section.innerHTML = `<div class="status_message" style="display: block; color: var(--warning-color); border-color: var(--warning-color);">${message}</div>`;
+                } finally {
+                    this._toggle_loader(loader, false);
+                }
+            }
+
+            _create_signer_block_html(index, entry, status) {
+                const icons = {
+                    valid: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+                    invalid: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
+                    untrusted: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`
+                };
+                const status_text = { "valid": "Hợp lệ", "invalid": "Không hợp lệ", "untrusted": "Không đáng tin cậy (Chưa đăng ký)" }[status];
+
+                return `
+                   <div class="signer_block">
+                       <div class="signer_header ${status}">
+                           ${icons[status]}
+                           <span>Chữ ký ${index + 1}: ${status_text}</span>
+                       </div>
+                       <table class="signer_info_table">
+                           <tr><td>Tên bút ký:</td><td>${entry.key_name || "(Không có)"}</td></tr>
+                           <tr><td>Thời gian ký:</td><td>${new Date(entry.signed_at).toLocaleString("vi-VN")}</td></tr>
+                           <tr><td>Ghi chú:</td><td>${entry.note || "(Không có)"}</td></tr>
+                       </table>
+                   </div>
+                `;
+            }
+
+            _append_data_to_pdf(pdf_bytes, data_json_string) {
+                const data_bytes = this.crypto_service.text_encoder.encode(data_json_string);
+                const final_bytes = new Uint8Array(pdf_bytes.length + data_bytes.length + 4 + this.magic_number_bytes.length);
+                final_bytes.set(pdf_bytes, 0);
+                let offset = pdf_bytes.length;
+                final_bytes.set(data_bytes, offset);
+                offset += data_bytes.length;
+                const length_view = new DataView(new ArrayBuffer(4));
+                length_view.setUint32(0, data_bytes.length, false);
+                final_bytes.set(new Uint8Array(length_view.buffer), offset);
+                offset += 4;
+                final_bytes.set(this.magic_number_bytes, offset);
+                return final_bytes;
+            }
+
+            _extract_data_from_pdf(file_bytes) {
+                const magic_start_index = file_bytes.length - this.magic_number_bytes.length;
+                const potential_magic_bytes = file_bytes.slice(magic_start_index);
+                if (potential_magic_bytes.length !== this.magic_number_bytes.length || !potential_magic_bytes.every((v, i) => v === this.magic_number_bytes[i])) {
+                    throw new Error("Không tìm thấy khối dữ liệu chữ ký hợp lệ trong tệp.");
+                }
+                const length_view = new DataView(file_bytes.buffer, magic_start_index - 4, 4);
+                const data_length = length_view.getUint32(0, false);
+                const data_start_index = magic_start_index - 4 - data_length;
+                if (data_start_index < 0) {
+                    throw new Error("Định dạng dữ liệu chữ ký không hợp lệ (độ dài không chính xác).");
+                }
+                const data_bytes = file_bytes.slice(data_start_index, data_start_index + data_length);
+                const original_pdf_bytes = file_bytes.slice(0, data_start_index);
+                const signature_package = JSON.parse(this.crypto_service.text_decoder.decode(data_bytes));
+                return { original_pdf_bytes, signature_package };
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const CRYPTO_CONFIG = {
+                pbkdf2_iterations: 600000,
+                pbkdf2_salt_length_bytes: 32,
+                aes_iv_length_bytes: 12,
+                ecdsa_curve: "P-384",
+                hash_algorithm_for_signing: "SHA-384",
+                pbkdf2_hash: "SHA-256",
+                aes_algorithm: "AES-GCM"
+            };
+            const crypto_service = new CryptoService(CRYPTO_CONFIG);
+            new UIManager(crypto_service, KEY_REGISTRY);
+        });
+    </script>
+</body>
+
+</html>
+
