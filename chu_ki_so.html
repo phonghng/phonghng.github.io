@@ -879,6 +879,15 @@
                 });
             }
 
+            _create_and_download_file(file_name, content, mime_type) {
+                const blob = new Blob([content], { type: mime_type });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = file_name;
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+            }
+
             _setup_file_input_display(input_element, display_element, default_text) {
                 input_element.addEventListener("change", () => {
                     display_element.textContent = input_element.files.length > 0 ? input_element.files[0].name : default_text;
@@ -1203,4 +1212,5 @@
 </body>
 
 </html>
+
 
