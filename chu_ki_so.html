@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chữ ký số</title>
-    <meta name="description"
-        content="Ký và xác thực chữ ký số trên tệp PDF một cách an toàn ngay trên trình duyệt của bạn.">
+    <meta name="description" content="Ký và xác thực chữ ký số trên tệp PDF một cách an toàn ngay trên trình duyệt của bạn.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -16,7 +15,7 @@
             --background-color: #000000;
             --surface-color: #111111;
             --text-color: #ffffff;
-            --text-muted-color: #888888;
+            --text-muted-color: #aaaaaa;
             --border-color: #333333;
             --success-color: #00ff00;
             --error-color: #ff0055;
@@ -87,6 +86,12 @@
             position: relative;
             font-family: var(--font-family);
         }
+        
+        .tab_button:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -2px;
+            z-index: 1;
+        }
 
         .tab_button:last-child {
             border-right: none;
@@ -155,7 +160,7 @@
         }
 
         .file_input_label:hover,
-        .file_input_label:focus {
+        .file_input_label:focus-within {
             border-color: var(--primary-color);
             color: var(--primary-color);
             outline: none;
@@ -224,6 +229,11 @@
             align-items: center;
             justify-content: center;
         }
+        
+        .password_toggle_button:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -2px;
+        }
 
         .password_toggle_button:hover {
             color: var(--primary-color);
@@ -243,6 +253,11 @@
             transition: background-color 0.2s, color 0.2s;
             margin-top: 1rem;
             font-family: var(--font-family);
+        }
+
+        .button:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
         .button:hover:not(:disabled) {
@@ -430,6 +445,11 @@
             justify-content: center;
             transition: color 0.2s, border-color 0.2s;
         }
+        
+        .button_icon:focus-visible {
+             outline: 2px solid var(--primary-color);
+             outline-offset: 2px;
+        }
 
         .button_icon:hover {
             color: var(--primary-color);
@@ -465,21 +485,16 @@
 <body>
 
     <main class="main_container">
-        <nav class="tab_navigation" role="tablist">
-            <button id="tab_button_verify" role="tab" aria-selected="true" aria-controls="tab_content_verify"
-                class="tab_button active">Xác thực</button>
-            <button id="tab_button_sign" role="tab" aria-selected="false" aria-controls="tab_content_sign"
-                class="tab_button">Ký</button>
-            <button id="tab_button_key" role="tab" aria-selected="false" aria-controls="tab_content_key"
-                class="tab_button">Tạo bút ký</button>
+        <nav class="tab_navigation" role="tablist" aria-label="Điều hướng chính">
+            <button id="tab_button_verify" role="tab" aria-selected="true" aria-controls="tab_content_verify" class="tab_button active">Xác thực</button>
+            <button id="tab_button_sign" role="tab" aria-selected="false" aria-controls="tab_content_sign" class="tab_button">Ký</button>
+            <button id="tab_button_key" role="tab" aria-selected="false" aria-controls="tab_content_key" class="tab_button">Tạo bút ký</button>
         </nav>
 
         <section id="tab_content_verify" role="tabpanel" aria-labelledby="tab_button_verify" class="tab_content active">
             <div class="form_group">
                 <label for="verify_file_input" class="file_input_label" tabindex="0">
-                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round">
+                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                     <div class="file_input_text_wrapper">
@@ -493,29 +508,26 @@
                 <div class="loader_spinner"></div>
                 <p>Đang đọc và xác thực tệp...</p>
             </div>
-            <div id="verify_result_section"></div>
+            <div id="verify_result_section" aria-live="polite"></div>
         </section>
 
         <section id="tab_content_sign" role="tabpanel" aria-labelledby="tab_button_sign" class="tab_content">
             <div class="form_group">
+                <label for="sign_key_select" class="form_label">Chọn bút ký</label>
                 <select id="sign_key_select" class="select_field"></select>
                 <div id="sign_key_select_message" class="message_display" role="alert"></div>
             </div>
             <div class="form_group">
+                <label for="sign_password_input" class="form_label">Mật khẩu bút ký</label>
                 <div class="password_wrapper">
-                    <input type="password" id="sign_password_input" class="input_field" placeholder="Mật khẩu bút ký">
-                    <button type="button" class="password_toggle_button" title="Hiển thị/Ẩn mật khẩu">
-                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
+                    <input type="password" id="sign_password_input" class="input_field" placeholder="Nhập mật khẩu của bạn">
+                    <button type="button" class="password_toggle_button" aria-label="Hiển thị/ẩn mật khẩu" aria-pressed="false">
+                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
-                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                            <path
-                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
                             </path>
                             <line x1="1" y1="1" x2="23" y2="23"></line>
                         </svg>
@@ -525,16 +537,13 @@
             </div>
             <div class="form_group">
                 <label for="sign_pdf_file_input" class="file_input_label" tabindex="0">
-                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round">
+                    <svg class="file_input_icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
                     <div class="file_input_text_wrapper">
                         <span>Tệp PDF cần ký</span>
-                        <span id="sign_pdf_file_name_display" class="file_name_display">Chưa có tệp PDF nào được
-                            chọn</span>
+                        <span id="sign_pdf_file_name_display" class="file_name_display">Chưa có tệp PDF nào được chọn</span>
                         <span id="sign_pdf_file_status_display" class="file_status_display"></span>
                     </div>
                 </label>
@@ -542,8 +551,8 @@
                 <div id="sign_pdf_file_message" class="message_display" role="alert"></div>
             </div>
             <div class="form_group">
-                <textarea id="sign_note_input" class="textarea_field"
-                    placeholder="Ghi chú cho chữ ký (tùy chọn)"></textarea>
+                <label for="sign_note_input" class="form_label">Ghi chú (tùy chọn)</label>
+                <textarea id="sign_note_input" class="textarea_field" placeholder="Ghi chú cho chữ ký của bạn"></textarea>
             </div>
             <div id="sign_general_message" class="message_display" role="alert"></div>
             <button id="sign_file_button" class="button">Ký và tải xuống</button>
@@ -555,31 +564,27 @@
 
         <section id="tab_content_key" role="tabpanel" aria-labelledby="tab_button_key" class="tab_content">
             <div class="form_group">
-                <input type="text" id="key_name_input" class="input_field"
-                    placeholder="Tên bút ký (ví dụ: Nguyễn Văn A)">
+                <label for="key_name_input" class="form_label">Tên bút ký</label>
+                <input type="text" id="key_name_input" class="input_field" placeholder="Ví dụ: Nguyễn Văn A">
                 <div id="key_name_message" class="message_display" role="alert"></div>
             </div>
             <div class="form_group">
+                <label for="key_password_input" class="form_label">Mật khẩu bảo vệ</label>
                 <div class="password_wrapper">
-                    <input type="password" id="key_password_input" class="input_field" placeholder="Mật khẩu bảo vệ">
-                    <button type="button" class="password_toggle_button" title="Hiển thị/Ẩn mật khẩu">
-                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
+                    <input type="password" id="key_password_input" class="input_field" placeholder="Tạo mật khẩu mạnh">
+                    <button type="button" class="password_toggle_button" aria-label="Hiển thị/ẩn mật khẩu" aria-pressed="false">
+                        <svg class="icon_eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
-                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                            <path
-                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        <svg class="icon_eye_off" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
                             </path>
                             <line x1="1" y1="1" x2="23" y2="23"></line>
                         </svg>
                     </button>
                 </div>
-                <div id="password_strength_indicator">
+                <div id="password_strength_indicator" aria-hidden="true">
                     <span></span><span></span><span></span><span></span><span></span>
                 </div>
                 <div id="key_password_message" class="message_display" role="alert"></div>
@@ -592,25 +597,21 @@
                 <div class="loader_spinner"></div>
                 <p>Đang tạo cặp khóa, quá trình này có thể mất một lúc...</p>
             </div>
-            <div id="key_result_section" style="display: none;">
-                <div id="key_generation_success_message" class="message_display success" role="alert"
-                    style="margin-bottom: 1.5rem;"></div>
+            <div id="key_result_section" style="display: none;" aria-live="polite">
+                <div id="key_generation_success_message" class="message_display success" role="alert" style="margin-bottom: 1.5rem;"></div>
                 <div class="form_group">
                     <div class="label_with_action">
                         <div class="label_text">
-                            <strong>Đối tượng bút ký</strong> <span>(sao chép và thêm vào KEY_REGISTRY)</span>
+                            <strong>Đối tượng bút ký</strong> <span>(sao chép và thêm vào SIGNATURE_KEY_REGISTRY)</span>
                         </div>
-                        <button id="copy_key_object_button" class="button_icon" title="Sao chép đối tượng bút ký">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
+                        <button id="copy_key_object_button" class="button_icon" aria-label="Sao chép đối tượng bút ký">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                             </svg>
                         </button>
                     </div>
-                    <div id="copy_key_object_message" class="message_display" role="alert"
-                        style="margin-bottom: 0.5rem;"></div>
+                    <div id="copy_key_object_message" class="message_display" role="alert" style="margin-bottom: 0.5rem;"></div>
                     <div id="key_object_output" class="result_box">
                         <pre><code></code></pre>
                     </div>
@@ -620,7 +621,7 @@
     </main>
 
     <script>
-        const KEY_REGISTRY = {
+        const SIGNATURE_KEY_REGISTRY = {
             "a3db47ed-7a43-4753-b308-9cb7e76d6719": {
                 "secret": {
                     "key_name": "Nguyễn Hải Phong",
@@ -632,9 +633,7 @@
                 "public": {
                     "crv": "P-384",
                     "ext": true,
-                    "key_ops": [
-                        "verify"
-                    ],
+                    "key_ops": ["verify"],
                     "kty": "EC",
                     "x": "TbUeHUzVq5wc6OkbKDP9RMU2yY6SC0HLcqZ7cnrK1NnLZBCd_i9EiCOYr1bPQnfg",
                     "y": "FqoH3F8PVU7iNaBzbZRqe_0OFuiJqfhwveQ8AIe0NnR0VrGNkdK1CLS00rIny_-d"
@@ -643,20 +642,20 @@
         };
 
         class CryptoService {
-            constructor(config) {
-                this.config = config;
+            constructor(configuration) {
+                this.configuration = configuration;
                 this.text_encoder = new TextEncoder();
                 this.text_decoder = new TextDecoder();
             }
 
-            _array_buffer_to_base64(buffer) {
+            _convert_array_buffer_to_base64(buffer) {
                 let binary = "";
                 const bytes = new Uint8Array(buffer);
                 bytes.forEach((byte) => binary += String.fromCharCode(byte));
                 return window.btoa(binary);
             }
 
-            _base64_to_array_buffer(base64) {
+            _convert_base64_to_array_buffer(base64) {
                 const binary_string = window.atob(base64);
                 const len = binary_string.length;
                 const bytes = new Uint8Array(len);
@@ -668,23 +667,26 @@
 
             async _derive_key_from_password(password, salt) {
                 const key_material = await window.crypto.subtle.importKey("raw", this.text_encoder.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
-                return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: this.config.pbkdf2_iterations, hash: this.config.pbkdf2_hash }, key_material, { name: this.config.aes_algorithm, length: 256 }, true, ["encrypt", "decrypt"]);
+                const { pbkdf2_iterations, pbkdf2_hash, aes_algorithm } = this.configuration;
+                return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: pbkdf2_iterations, hash: pbkdf2_hash }, key_material, { name: aes_algorithm, length: 256 }, true, ["encrypt", "decrypt"]);
             }
 
             async _encrypt_data(key, data_buffer) {
-                const iv = window.crypto.getRandomValues(new Uint8Array(this.config.aes_iv_length_bytes));
-                const encrypted_data = await window.crypto.subtle.encrypt({ name: this.config.aes_algorithm, iv: iv }, key, data_buffer);
+                const { aes_iv_length_bytes, aes_algorithm } = this.configuration;
+                const iv = window.crypto.getRandomValues(new Uint8Array(aes_iv_length_bytes));
+                const encrypted_data = await window.crypto.subtle.encrypt({ name: aes_algorithm, iv: iv }, key, data_buffer);
                 return { encrypted_data, iv };
             }
 
             async _decrypt_data(key, encrypted_data_buffer, iv) {
-                return window.crypto.subtle.decrypt({ name: this.config.aes_algorithm, iv: iv }, key, encrypted_data_buffer);
+                return window.crypto.subtle.decrypt({ name: this.configuration.aes_algorithm, iv: iv }, key, encrypted_data_buffer);
             }
 
             async generate_signature_key(password, key_name) {
-                const salt = window.crypto.getRandomValues(new Uint8Array(this.config.pbkdf2_salt_length_bytes));
+                const { pbkdf2_salt_length_bytes, ecdsa_curve } = this.configuration;
+                const salt = window.crypto.getRandomValues(new Uint8Array(pbkdf2_salt_length_bytes));
                 const encryption_key = await this._derive_key_from_password(password, salt);
-                const key_pair = await window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: this.config.ecdsa_curve }, true, ["sign", "verify"]);
+                const key_pair = await window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: ecdsa_curve }, true, ["sign", "verify"]);
                 const private_key_jwk = await window.crypto.subtle.exportKey("jwk", key_pair.privateKey);
                 const public_key_jwk = await window.crypto.subtle.exportKey("jwk", key_pair.publicKey);
                 const private_key_buffer = this.text_encoder.encode(JSON.stringify(private_key_jwk));
@@ -693,9 +695,9 @@
                 return {
                     secret: {
                         key_name: key_name,
-                        encrypted_private_key_base64: this._array_buffer_to_base64(encrypted_data),
-                        salt_base64: this._array_buffer_to_base64(salt),
-                        iv_base64: this._array_buffer_to_base64(iv),
+                        encrypted_private_key_base64: this._convert_array_buffer_to_base64(encrypted_data),
+                        salt_base64: this._convert_array_buffer_to_base64(salt),
+                        iv_base64: this._convert_array_buffer_to_base64(iv),
                         created_at: new Date().toISOString()
                     },
                     public: public_key_jwk
@@ -703,22 +705,23 @@
             }
 
             async sign_hash(private_key, hash_buffer) {
-                return window.crypto.subtle.sign({ name: "ECDSA", hash: { name: this.config.hash_algorithm_for_signing } }, private_key, hash_buffer);
+                return window.crypto.subtle.sign({ name: "ECDSA", hash: { name: this.configuration.hash_algorithm_for_signing } }, private_key, hash_buffer);
             }
 
             async verify_signature(public_key_jwk_object, signature_base64, data_buffer) {
-                const public_key = await window.crypto.subtle.importKey("jwk", public_key_jwk_object, { name: "ECDSA", namedCurve: this.config.ecdsa_curve }, true, ["verify"]);
-                const signature_buffer = this._base64_to_array_buffer(signature_base64);
+                const { ecdsa_curve, hash_algorithm_for_signing } = this.configuration;
+                const public_key = await window.crypto.subtle.importKey("jwk", public_key_jwk_object, { name: "ECDSA", namedCurve: ecdsa_curve }, true, ["verify"]);
+                const signature_buffer = this._convert_base64_to_array_buffer(signature_base64);
                 const hash_buffer = await this.calculate_sha384(data_buffer);
-                return window.crypto.subtle.verify({ name: "ECDSA", hash: { name: this.config.hash_algorithm_for_signing } }, public_key, signature_buffer, hash_buffer);
+                return window.crypto.subtle.verify({ name: "ECDSA", hash: { name: hash_algorithm_for_signing } }, public_key, signature_buffer, hash_buffer);
             }
 
             async calculate_sha384(buffer) {
-                return window.crypto.subtle.digest(this.config.hash_algorithm_for_signing, buffer);
+                return window.crypto.subtle.digest(this.configuration.hash_algorithm_for_signing, buffer);
             }
 
-            array_buffer_to_hex(buffer) {
-                return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+            convert_array_buffer_to_hex(buffer) {
+                return Array.from(new Uint8Array(buffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
             }
         }
 
@@ -735,6 +738,7 @@
 
             _select_dom_elements() {
                 this.elements = {
+                    tab_navigation: document.querySelector(".tab_navigation"),
                     tab_buttons: document.querySelectorAll(".tab_button"),
                     tab_contents: document.querySelectorAll(".tab_content"),
                     key: {
@@ -778,6 +782,7 @@
 
             _bind_event_listeners() {
                 this.elements.tab_buttons.forEach(button => button.addEventListener("click", () => this._switch_tab(button.getAttribute("aria-controls"))));
+                this.elements.tab_navigation.addEventListener("keydown", (event) => this._handle_tab_keyboard_navigation(event));
 
                 this.elements.key.generate_button.addEventListener("click", () => this._handle_generate_key_click());
                 this.elements.key.reset_button.addEventListener("click", () => this._reset_key_form());
@@ -836,6 +841,33 @@
                 active_button.classList.add("active");
                 active_button.setAttribute("aria-selected", "true");
             }
+            
+            _handle_tab_keyboard_navigation(event) {
+                const is_arrow_right = event.key === "ArrowRight";
+                const is_arrow_left = event.key === "ArrowLeft";
+
+                if (!is_arrow_right && !is_arrow_left) {
+                    return;
+                }
+                
+                const buttons = Array.from(this.elements.tab_buttons);
+                const current_index = buttons.findIndex(button => button === document.activeElement);
+                
+                if (current_index === -1) {
+                    return;
+                }
+
+                event.preventDefault();
+                let next_index;
+                if (is_arrow_right) {
+                    next_index = (current_index + 1) % buttons.length;
+                } else {
+                    next_index = (current_index - 1 + buttons.length) % buttons.length;
+                }
+
+                buttons[next_index].focus();
+                this._switch_tab(buttons[next_index].getAttribute("aria-controls"));
+            }
 
             _display_message(element, message, is_success = true) {
                 if (!element) return;
@@ -862,30 +894,34 @@
                     input.type = "text";
                     icon_eye.style.display = "none";
                     icon_eye_off.style.display = "inline-block";
+                    button.setAttribute("aria-pressed", "true");
                 } else {
                     input.type = "password";
                     icon_eye.style.display = "inline-block";
                     icon_eye_off.style.display = "none";
+                    button.setAttribute("aria-pressed", "false");
                 }
             }
 
-            _read_file(file, type) {
+            _read_file(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result);
                     reader.onerror = () => reject(reader.error);
-                    if (type === "buffer") reader.readAsArrayBuffer(file);
-                    else reader.readAsText(file);
+                    reader.readAsArrayBuffer(file);
                 });
             }
 
             _create_and_download_file(file_name, content, mime_type) {
                 const blob = new Blob([content], { type: mime_type });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url; a.download = file_name;
-                document.body.appendChild(a); a.click();
-                document.body.removeChild(a); URL.revokeObjectURL(url);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = file_name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
 
             _setup_file_input_display(input_element, display_element, default_text) {
@@ -900,7 +936,7 @@
                     { regex: /[A-Z]/, score: 1 }, { regex: /[0-9]/, score: 1 },
                     { regex: /[^A-Za-z0-9]/, score: 1 }
                 ];
-                let score = validations.reduce((acc, v) => acc + (v.regex.test(password) ? v.score : 0), 0);
+                let score = validations.reduce((accumulator, validation) => accumulator + (validation.regex.test(password) ? validation.score : 0), 0);
                 const message = score < 5 ? "Mật khẩu phải chứa ít nhất 10 ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt." : "Mật khẩu hợp lệ.";
                 return { score: score, is_valid: score >= 5, message: message };
             }
@@ -926,16 +962,19 @@
                 const password = password_input.value;
 
                 if (!key_name) {
-                    this._display_message(name_message, "Vui lòng nhập tên bút ký.", false); return;
+                    this._display_message(name_message, "Vui lòng nhập tên bút ký.", false);
+                    return;
                 }
                 const name_exists = Object.values(this.key_registry).some(key => key.secret.key_name === key_name);
                 if (name_exists) {
-                    this._display_message(name_message, `Tên bút ký "${key_name}" đã tồn tại.`, false); return;
+                    this._display_message(name_message, `Tên bút ký "${key_name}" đã tồn tại.`, false);
+                    return;
                 }
 
                 const password_validation = this._validate_password(password);
                 if (!password_validation.is_valid) {
-                    this._display_message(password_message, password_validation.message, false); return;
+                    this._display_message(password_message, password_validation.message, false);
+                    return;
                 }
 
                 this._toggle_loader(loader, true, "Đang tạo cặp khóa, quá trình này có thể mất một lúc...");
@@ -970,11 +1009,11 @@
                 this._display_message(message_element, "");
                 if (!text_to_copy) return;
 
-                const temp_textarea = document.createElement("textarea");
-                temp_textarea.value = text_to_copy;
-                document.body.appendChild(temp_textarea);
-                temp_textarea.select();
-                temp_textarea.setSelectionRange(0, 99999);
+                const temporary_textarea = document.createElement("textarea");
+                temporary_textarea.value = text_to_copy;
+                document.body.appendChild(temporary_textarea);
+                temporary_textarea.select();
+                temporary_textarea.setSelectionRange(0, 99999);
 
                 try {
                     const successful = document.execCommand("copy");
@@ -983,7 +1022,7 @@
                     this._display_message(message_element, "Sao chép thất bại.", false);
                 }
 
-                document.body.removeChild(temp_textarea);
+                document.body.removeChild(temporary_textarea);
             }
 
             async _handle_sign_pdf_file_change() {
@@ -994,7 +1033,7 @@
                 if (!file) return;
 
                 try {
-                    const file_bytes = new Uint8Array(await this._read_file(file, "buffer"));
+                    const file_bytes = new Uint8Array(await this._read_file(file));
                     this._extract_data_from_pdf(file_bytes);
                     this.is_subsequent_signer = true;
                     pdf_file_status_display.textContent = "Tệp đã có chữ ký. Bạn sẽ ký tiếp theo.";
@@ -1003,7 +1042,7 @@
                     pdf_file_status_display.textContent = "Đây là tệp mới. Bạn sẽ là người ký khởi tạo.";
                 }
             }
-            
+
             _get_data_to_verify_buffer(file_hash, entry) {
                 const data_to_verify_string = `${file_hash}|${entry.key_id}|${entry.signed_at}|${entry.note}`;
                 return this.crypto_service.text_encoder.encode(data_to_verify_string);
@@ -1030,42 +1069,47 @@
                 try {
                     const key_data = this.key_registry[selected_key_id].secret;
 
-                    if ((Date.now() - new Date(key_data.created_at).getTime()) > (365 * 24 * 60 * 60 * 1000)) { throw new Error("Bút ký đã quá 1 năm. Vui lòng tạo một bút ký mới."); }
+                    const one_year_in_milliseconds = 365 * 24 * 60 * 60 * 1000;
+                    if ((Date.now() - new Date(key_data.created_at).getTime()) > one_year_in_milliseconds) {
+                        throw new Error("Bút ký đã quá 1 năm. Vui lòng tạo một bút ký mới.");
+                    }
 
                     let original_pdf_bytes, signature_package;
-                    const pdf_file_bytes = new Uint8Array(await this._read_file(pdf_file, "buffer"));
-                    
+                    const pdf_file_bytes = new Uint8Array(await this._read_file(pdf_file));
+
                     loader_message.textContent = "Đang phân tích tệp PDF...";
                     if (this.is_subsequent_signer) {
                         const extracted = this._extract_data_from_pdf(pdf_file_bytes);
                         original_pdf_bytes = extracted.original_pdf_bytes;
                         signature_package = extracted.signature_package;
-                        
+
                         loader_message.textContent = "Đang xác thực các chữ ký trước đó...";
-                        const file_hash_hex = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
-                        if (file_hash_hex !== signature_package.file_hash_sha384) throw new Error("Toàn vẹn tệp thất bại. Nội dung gốc đã bị thay đổi.");
-                       
-                        for (const [i, entry] of signature_package.signature_chain.entries()) {
+                        const file_hash_hex = this.crypto_service.convert_array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+                        if (file_hash_hex !== signature_package.file_hash_sha384) {
+                            throw new Error("Toàn vẹn tệp thất bại. Nội dung gốc đã bị thay đổi.");
+                        }
+
+                        for (const [index, entry] of signature_package.signature_chain.entries()) {
                             const public_key_object = this.key_registry[entry.key_id]?.public;
                             const data_to_verify_buffer = this._get_data_to_verify_buffer(signature_package.file_hash_sha384, entry);
                             if (!public_key_object || !await this.crypto_service.verify_signature(public_key_object, entry.signature, data_to_verify_buffer)) {
-                                throw new Error(`Chữ ký của "${entry.key_name}" (người thứ ${i + 1}) không hợp lệ.`);
+                                throw new Error(`Chữ ký của "${entry.key_name}" (người thứ ${index + 1}) không hợp lệ.`);
                             }
                         }
                     } else {
                         original_pdf_bytes = pdf_file_bytes;
-                        const hash = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+                        const hash = this.crypto_service.convert_array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
                         signature_package = { file_hash_sha384: hash, signature_chain: [] };
                     }
 
                     loader_message.textContent = "Đang giải mã bút ký...";
-                    const salt = this.crypto_service._base64_to_array_buffer(key_data.salt_base64);
-                    const iv = this.crypto_service._base64_to_array_buffer(key_data.iv_base64);
+                    const salt = this.crypto_service._convert_base64_to_array_buffer(key_data.salt_base64);
+                    const iv = this.crypto_service._convert_base64_to_array_buffer(key_data.iv_base64);
                     const encryption_key = await this.crypto_service._derive_key_from_password(password, salt);
-                    const encrypted_private_key = this.crypto_service._base64_to_array_buffer(key_data.encrypted_private_key_base64);
+                    const encrypted_private_key = this.crypto_service._convert_base64_to_array_buffer(key_data.encrypted_private_key_base64);
                     const decrypted_private_key = await this.crypto_service._decrypt_data(encryption_key, encrypted_private_key, iv);
                     const private_key_jwk = JSON.parse(this.crypto_service.text_decoder.decode(decrypted_private_key));
-                    const private_key = await window.crypto.subtle.importKey("jwk", private_key_jwk, { name: "ECDSA", namedCurve: this.crypto_service.config.ecdsa_curve }, true, ["sign"]);
+                    const private_key = await window.crypto.subtle.importKey("jwk", private_key_jwk, { name: "ECDSA", namedCurve: this.crypto_service.configuration.ecdsa_curve }, true, ["sign"]);
 
                     loader_message.textContent = "Đang tạo chữ ký số...";
                     const new_entry_metadata = {
@@ -1074,14 +1118,14 @@
                         signed_at: new Date().toISOString(),
                         note: note_input.value
                     };
-                    
+
                     const data_to_sign_buffer = this._get_data_to_verify_buffer(signature_package.file_hash_sha384, new_entry_metadata);
                     const hash_to_sign_buffer = await this.crypto_service.calculate_sha384(data_to_sign_buffer);
                     const signature_buffer = await this.crypto_service.sign_hash(private_key, hash_to_sign_buffer);
-                    
+
                     const final_new_entry = {
                         ...new_entry_metadata,
-                        signature: this.crypto_service._array_buffer_to_base64(signature_buffer)
+                        signature: this.crypto_service._convert_array_buffer_to_base64(signature_buffer)
                     };
 
                     signature_package.signature_chain.push(final_new_entry);
@@ -1106,10 +1150,10 @@
                 result_section.innerHTML = "";
 
                 try {
-                    const file_bytes = new Uint8Array(await this._read_file(file, "buffer"));
+                    const file_bytes = new Uint8Array(await this._read_file(file));
                     const { original_pdf_bytes, signature_package } = this._extract_data_from_pdf(file_bytes);
                     let result_html = "";
-                    const recomputed_hash = this.crypto_service.array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
+                    const recomputed_hash = this.crypto_service.convert_array_buffer_to_hex(await this.crypto_service.calculate_sha384(original_pdf_bytes.buffer));
 
                     if (recomputed_hash === signature_package.file_hash_sha384) {
                         result_html += `<div class="status_message" style="display: block; color: var(--success-color); border-color: var(--success-color);">✓ Toàn vẹn tệp: Nội dung gốc không bị thay đổi.</div>`;
@@ -1147,18 +1191,18 @@
                 const status_text = { "valid": "Hợp lệ", "invalid": "Không hợp lệ", "untrusted": "Không đáng tin cậy (Chưa đăng ký)" }[status];
 
                 return `
-                   <div class="signer_block">
-                       <div class="signer_header ${status}">
-                           ${icons[status]}
-                           <span>Chữ ký ${index + 1}: ${status_text}</span>
-                       </div>
-                       <table class="signer_info_table">
-                           <tr><td>Tên bút ký:</td><td>${entry.key_name || "(Không có)"}</td></tr>
-                           <tr><td>Thời gian ký:</td><td>${new Date(entry.signed_at).toLocaleString("vi-VN")}</td></tr>
-                           <tr><td>Ghi chú:</td><td>${entry.note || "(Không có)"}</td></tr>
-                       </table>
-                   </div>
-                `;
+              <div class="signer_block">
+                  <div class="signer_header ${status}">
+                      ${icons[status]}
+                      <span>Chữ ký ${index + 1}: ${status_text}</span>
+                  </div>
+                  <table class="signer_info_table">
+                      <tr><td>Tên bút ký:</td><td>${entry.key_name || "(Không có)"}</td></tr>
+                      <tr><td>Thời gian ký:</td><td>${new Date(entry.signed_at).toLocaleString("vi-VN")}</td></tr>
+                      <tr><td>Ghi chú:</td><td>${entry.note || "(Không có)"}</td></tr>
+                  </table>
+              </div>
+          `;
             }
 
             _append_data_to_pdf(pdf_bytes, data_json_string) {
@@ -1179,7 +1223,7 @@
             _extract_data_from_pdf(file_bytes) {
                 const magic_start_index = file_bytes.length - this.magic_number_bytes.length;
                 const potential_magic_bytes = file_bytes.slice(magic_start_index);
-                if (potential_magic_bytes.length !== this.magic_number_bytes.length || !potential_magic_bytes.every((v, i) => v === this.magic_number_bytes[i])) {
+                if (potential_magic_bytes.length !== this.magic_number_bytes.length || !potential_magic_bytes.every((value, index) => value === this.magic_number_bytes[index])) {
                     throw new Error("Không tìm thấy khối dữ liệu chữ ký hợp lệ trong tệp.");
                 }
                 const length_view = new DataView(file_bytes.buffer, magic_start_index - 4, 4);
@@ -1196,7 +1240,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            const CRYPTO_CONFIG = {
+            const CRYPTOGRAPHY_CONFIGURATION = {
                 pbkdf2_iterations: 600000,
                 pbkdf2_salt_length_bytes: 32,
                 aes_iv_length_bytes: 12,
@@ -1205,12 +1249,10 @@
                 pbkdf2_hash: "SHA-256",
                 aes_algorithm: "AES-GCM"
             };
-            const crypto_service = new CryptoService(CRYPTO_CONFIG);
-            new UIManager(crypto_service, KEY_REGISTRY);
+            const crypto_service = new CryptoService(CRYPTOGRAPHY_CONFIGURATION);
+            new UIManager(crypto_service, SIGNATURE_KEY_REGISTRY);
         });
     </script>
 </body>
 
 </html>
-
-
