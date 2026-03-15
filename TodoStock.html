@@ -6,17 +6,14 @@
     <title>TodoStock</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Sử dụng cdnjs thay cho unpkg để tránh bị chặn bởi Tracking Prevention -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
     <script>
-        // Fallback: Nếu cdnjs cũng bị chặn, tự động thử tải từ jsdelivr
         if (typeof mqtt === 'undefined') {
             document.write('<script src="https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js"><\/script>');
         }
     </script>
     
     <script>
-        // Chặn cảnh báo của Tailwind CDN trong console
         const originalWarn = console.warn;
         console.warn = function(...args) {
             if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
@@ -34,8 +31,6 @@
             --text-dim: #525252;
             --accent: #3b82f6;
             --danger: #ef4444;
-            
-            /* KHOẢNG CÁCH LỀ */
             --spacing: 14px; 
         }
 
@@ -58,14 +53,14 @@
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
         *:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-        /* --- TODO FLEX LAYOUT (LEFT PANE) --- */
+        /* --- TODO & NOTE FLEX LAYOUT --- */
         .list-container { border-top: 1px solid var(--border); }
         
         .todo-row { 
             display: flex;
             align-items: center; 
-            padding: 10px var(--spacing); /* Lề 2 bên */
-            gap: var(--spacing); /* Khoảng cách bằng nhau */
+            padding: 10px var(--spacing); 
+            gap: var(--spacing); 
             border-bottom: 1px solid var(--border); 
             transition: background 0.2s ease; 
             width: 100%;
@@ -73,16 +68,43 @@
         }
         .todo-row:hover { background: rgba(255, 255, 255, 0.02); }
         
+        .todo-content {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: var(--spacing);
+            flex-grow: 1; 
+            overflow: hidden;
+            min-width: 0; 
+        }
+        
         .todo-text { 
-            flex-grow: 1; /* Hút toàn bộ khoảng trống thừa ở giữa */
+            flex-grow: 1; 
             font-weight: 700; 
             font-size: 0.95rem; 
             color: #e5e5e5; 
+            overflow-wrap: break-word;
             word-break: break-word; 
+            white-space: pre-wrap; /* Giữ nguyên dòng mới \n khi hiển thị */
             min-width: 0; 
         }
+        
+        /* Đồng bộ cơ chế cắt dòng cho Ghi chú khi ở chế độ Edit */
+        .note-edit {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            min-width: 0;
+        }
+        
+        /* Chống style rác khi bật edit mode */
+        .todo-text[contenteditable="true"]:focus,
+        .note-edit[contenteditable="true"]:focus {
+            outline: none;
+            cursor: text;
+        }
 
-        /* --- PORTFOLIO TABLE LAYOUT (RIGHT PANE) --- */
+        /* --- PORTFOLIO TABLE LAYOUT --- */
         .stock-table { 
             display: table; 
             width: 100%; 
@@ -98,36 +120,31 @@
         
         .stock-cell { 
             display: table-cell; 
-            vertical-align: middle; /* Căn giữa dọc tuyệt đối */
+            vertical-align: middle; 
             height: 56px;
         }
 
-        /* CỘT CỐ ĐỊNH */
         .cell-move, .cell-delete {
-            width: 1%; /* Giới hạn nhỏ nhất */
+            width: 1%; 
             padding-left: var(--spacing); 
             padding-right: var(--spacing);
         }
 
-        /* CỘT DỮ LIỆU: Bám sát text dài nhất (Shrink-wrap) */
         .cell-ma, .cell-gia, .cell-sohuu, .cell-lailo, .cell-trade {
             width: 1%;
             white-space: nowrap;
         }
         
-        /* CĂN LỀ TEXT (Alignment) */
         .cell-ma { text-align: left; }
         .cell-gia, .cell-sohuu, .cell-lailo { text-align: right; }
         .cell-trade { text-align: center; }
 
-        /* CỘT VÔ HÌNH (Spacer): Chia đều khoảng trống còn thừa của bảng */
         .spacer {
-            width: 25%; /* 4 spacer chia nhau khoảng không gian còn lại */
-            min-width: var(--spacing); /* Đảm bảo tối thiểu không dính vào nhau */
+            width: 25%; 
+            min-width: var(--spacing); 
             padding: 0 !important;
         }
 
-        /* Header dính */
         .list-header .stock-cell, .list-header .spacer {
             height: 36px;
             position: sticky;
@@ -182,25 +199,28 @@
 
         .stock-logo-wrap { width: 24px; height: 24px; flex-shrink: 0; background: white; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); }
 
-        #resizer { width: 4px; cursor: col-resize; background-color: var(--border); z-index: 50; flex-shrink: 0; transition: background-color 0.2s; }
-        #resizer:hover, #resizer.dragging-pane { background-color: var(--accent); }
+        .resizer { width: 4px; cursor: col-resize; background-color: var(--border); z-index: 50; flex-shrink: 0; transition: background-color 0.2s; }
+        .resizer:hover, .resizer.dragging-pane { background-color: var(--accent); }
 
         /* --- TOAST --- */
         #toastContainer { width: 100%; max-width: 400px; }
         @keyframes toastIn { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         .toast-active { animation: toastIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; width: max-content; max-width: calc(100vw - 2rem); }
 
-        /* --- NARROW MODE --- */
+        /* --- NARROW MODE --- 
+           Thứ tự ưu tiên ẩn: Logo -> Sở hữu -> Giao dịch -> Giá -> Lãi/lỗ */
         .narrow-hide-logo .stock-logo-wrap { display: none !important; }
-        .narrow-hide-lailo .cell-lailo, .narrow-hide-lailo .spacer-lailo { display: none !important; }
+        .narrow-hide-sohuu .cell-sohuu, .narrow-hide-sohuu .spacer-sohuu { display: none !important; }
+        .narrow-hide-trade .cell-trade, .narrow-hide-trade .spacer-trade { display: none !important; }
         .narrow-hide-price .cell-gia, .narrow-hide-price .spacer-gia { display: none !important; }
+        .narrow-hide-lailo .cell-lailo, .narrow-hide-lailo .spacer-lailo { display: none !important; }
 
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
         @media (max-width: 768px) {
             #mainContent { flex-direction: column; overflow-y: auto; }
-            #leftPane, #rightPane { width: 100% !important; height: auto !important; min-height: 400px; }
-            #resizer { display: none; }
+            #leftPane, #portfolioPane, #notePane { width: 100% !important; height: auto !important; min-height: 400px; }
+            .resizer { display: none; }
         }
     </style>
 </head>
@@ -210,11 +230,11 @@
 
     <main id="mainContent" class="flex flex-grow overflow-hidden">
         
-        <!-- CỘT TRÁI: VIỆC CẦN LÀM -->
-        <section id="leftPane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 40%;">
-            <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end">
+        <!-- CỘT 1: VIỆC CẦN LÀM -->
+        <section id="leftPane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 25%;">
+            <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Việc cần làm</h2>
-                <div id="pendingCash" class="text-2xl font-black mono tracking-tighter text-green-500 tabular-nums">0</div>
+                <div id="pendingCash" class="text-2xl font-black mono tracking-tighter text-blue-500 tabular-nums">0</div>
             </header>
             
             <div id="todoBody" class="flex-grow overflow-y-auto list-container"></div>
@@ -229,10 +249,10 @@
             </footer>
         </section>
 
-        <div id="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
+        <div id="resizer1" class="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
 
-        <!-- CỘT PHẢI: DANH MỤC ĐẦU TƯ -->
-        <section id="rightPane" class="flex flex-col overflow-hidden" style="width: 60%;">
+        <!-- CỘT 2: DANH MỤC ĐẦU TƯ -->
+        <section id="portfolioPane" class="flex flex-col overflow-hidden" style="width: 50%;">
             <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Danh mục đầu tư</h2>
                 <div id="totalAssets" class="text-2xl font-black mono tracking-tighter text-neutral-500 tabular-nums">0</div>
@@ -268,6 +288,32 @@
                 </label>
             </footer>
         </section>
+
+        <div id="resizer2" class="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
+
+        <!-- CỘT 3: GHI CHÚ -->
+        <section id="notePane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 25%;">
+            <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
+                <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Ghi chú</h2>
+                <!-- Khoảng trống tàng hình để cân bằng chiều cao Header -->
+                <div class="text-2xl font-black mono opacity-0 select-none tabular-nums">0</div>
+            </header>
+            
+            <div id="noteBody" class="flex-grow overflow-y-auto list-container flex flex-col"></div>
+
+            <footer id="noteFooterInput" class="h-14 flex items-center bg-[#050505] border-t border-[var(--border)] px-4 shrink-0">
+                <label class="flex items-center gap-3 w-full h-full cursor-text">
+                    <div class="flex-none w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center bg-white/5 text-white/40">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
+                    </div>
+                    <input type="text" id="noteInput" placeholder="Thêm tiêu đề ghi chú..." autocomplete="off" class="bg-transparent border-none outline-none w-full text-sm font-bold text-white placeholder-[#2a2a2a]">
+                </label>
+            </footer>
+
+            <footer id="noteFooterBack" class="hidden h-14 flex items-center justify-center bg-[#050505] border-t border-[var(--border)] px-4 shrink-0 cursor-pointer hover:bg-white/5 transition-colors" onclick="closeNote()">
+                <span class="text-sm font-bold text-[var(--accent)] tracking-widest uppercase">Trở lại danh sách</span>
+            </footer>
+        </section>
     </main>
 
     <script>
@@ -277,21 +323,25 @@
         const TOPIC_PREFIX = 'quotes/krx/mdds/stockinfo/v1/roundlot/symbol/';
 
         // Xử lý Storage
-        let state = { todo: { items: [], cash: 0 }, portfolio: [] };
+        let state = { todo: { items: [], cash: 0 }, portfolio: [], notes: [] };
         try {
             const saved = localStorage.getItem('TodoStock');
-            if (saved) state = JSON.parse(saved);
+            if (saved) {
+                state = JSON.parse(saved);
+                if (!state.notes) state.notes = []; 
+            }
         } catch (e) {
             console.log("Storage access restricted. Using in-memory state.");
         }
 
-        // Khởi tạo thuộc tính invested cho các bản ghi cũ
+        // Cập nhật các trường mới
         state.portfolio.forEach(item => {
             if (item.invested === undefined) item.invested = 0;
         });
 
         let prices = {}, refs = {}, ceils = {}, floors = {}, connected = false;
         let lastSnapshot = null, undoTimeout = null;
+        let activeNoteId = null;
 
         const save = () => {
             try { localStorage.setItem('TodoStock', JSON.stringify(state)); } catch (e) {}
@@ -304,7 +354,15 @@
             const el = document.createElement('div');
             el.className = `toast-active pointer-events-auto bg-[#111] border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-6`;
             let color = type === 'error' ? 'text-danger' : (type === 'success' ? 'text-green-500' : 'text-white');
-            el.innerHTML = `<span class="text-sm font-bold ${color}">${msg}</span><div class="flex gap-2 shrink-0">${onUndo ? `<button id="u" class="text-[10px] font-black uppercase tracking-widest bg-blue-600/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-600/30">Hoàn tác</button>` : ''}<button class="text-[10px] font-black uppercase tracking-widest text-neutral-500" onclick="this.closest('.toast-active').remove()">Đóng</button></div>`;
+            el.innerHTML = `
+                <span class="text-sm font-bold ${color}">${msg}</span>
+                <div class="flex gap-4 items-center shrink-0">
+                    ${onUndo ? `<button id="u" class="text-[10px] font-black uppercase tracking-widest bg-blue-600/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-600/30">Hoàn tác</button>` : ''}
+                    <button class="text-neutral-500 hover:text-white transition-colors flex items-center justify-center p-1" onclick="this.closest('.toast-active').remove()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            `;
             if (onUndo) el.querySelector('#u').onclick = () => { onUndo(); el.remove(); };
             container.appendChild(el);
             setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
@@ -324,8 +382,8 @@
         };
 
         window.moveItem = (type, key, direction) => {
-            let list = type === 'todo' ? state.todo.items : state.portfolio;
-            const index = type === 'todo' ? list.findIndex(i => i.id === key) : list.findIndex(i => i.symbol === key);
+            let list = type === 'todo' ? state.todo.items : (type === 'note' ? state.notes : state.portfolio);
+            const index = type === 'todo' ? list.findIndex(i => i.id === key) : (type === 'note' ? list.findIndex(i => i.id === key) : list.findIndex(i => i.symbol === key));
             if (index < 0) return;
             const newIndex = index + direction;
             if (newIndex < 0 || newIndex >= list.length) return;
@@ -333,35 +391,194 @@
             save(); renderAll();
         };
 
+        // --- GLOBAL PASTE FILTER ---
+        // Lọc hoàn toàn định dạng HTML/CSS rác khi người dùng copy/paste vào contenteditable
+        document.addEventListener('paste', function(e) {
+            if (e.target && e.target.isContentEditable) {
+                e.preventDefault();
+                let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
+            }
+        });
+        // Chặn Drop nội dung format rác
+        document.addEventListener('drop', function(e) {
+            if (e.target && e.target.isContentEditable) {
+                e.preventDefault();
+            }
+        });
+
+        // --- CƠ CHẾ SỬA TRỰC TIẾP ---
+        window.highlightHashtags = function(text) {
+            if (!text) return '';
+            // Thoát mã HTML hiểm độc (XSS) để an toàn tuyệt đối
+            const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // Tìm các từ bắt đầu bằng # và bọc thẻ màu xanh
+            return safeText.replace(/(#[^\s]+)/g, '<span class="text-blue-500 font-bold">$1</span>');
+        };
+
+        window.startEdit = function(id, el, type, field) {
+            let rawText = "";
+            if (type === 'todo') {
+                rawText = state.todo.items.find(t => t.id === id).text;
+            } else if (type === 'note') {
+                rawText = state.notes.find(n => n.id === id)[field] || "";
+            }
+            
+            // Xóa mọi <span> hashtag, trả lại text thô hoàn toàn để gõ tiếng Việt mượt mà
+            el.innerText = rawText; 
+            el.contentEditable = "true";
+            el.focus();
+            
+            // Đưa con trỏ xuống sát cuối dòng
+            if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        };
+
+        window.handleEditKeydown = function(e, el, preventEnter) {
+            // Cho phép Shift+Enter để xuống dòng thoải mái, nhưng Enter bình thường thì tự động save
+            if (e.key === 'Enter' && !e.shiftKey && preventEnter) {
+                e.preventDefault(); 
+                el.blur(); 
+            }
+        };
+
+        window.finishEdit = function(id, el, type, field) {
+            el.contentEditable = "false";
+            // Dùng innerText để rút sạch bong 100% các thẻ HTML <script> <b> <i> vô tình sót lại
+            const newVal = el.innerText.trim();
+            
+            if (type === 'todo') {
+                const item = state.todo.items.find(t => t.id === id);
+                if (item && newVal && item.text !== newVal) {
+                    item.text = newVal;
+                    save();
+                }
+                renderTodos();
+            } else if (type === 'note') {
+                const note = state.notes.find(n => n.id === id);
+                if (note && note[field] !== newVal) {
+                    note[field] = newVal;
+                    save();
+                }
+                renderNotes();
+            }
+        };
+
+        // --- RENDER TODOLIST ---
         function renderTodos() {
             const body = document.getElementById('todoBody');
-            body.innerHTML = state.todo.items.map((t, idx) => `
-                <div class="todo-row group">
-                    <div class="action-cell">
-                        <div class="order-btn-group">
-                            <button onclick="moveItem('todo', ${t.id}, -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}">
-                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
-                            </button>
-                            <button onclick="moveItem('todo', ${t.id}, 1)" class="order-btn ${idx === state.todo.items.length - 1 ? 'disabled' : ''}">
-                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
+            body.innerHTML = state.todo.items.map((t, idx) => {
+                return `
+                    <div class="todo-row group">
+                        <div class="action-cell">
+                            <div class="order-btn-group">
+                                <button onclick="moveItem('todo', ${t.id}, -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}">
+                                    <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
+                                </button>
+                                <button onclick="moveItem('todo', ${t.id}, 1)" class="order-btn ${idx === state.todo.items.length - 1 ? 'disabled' : ''}">
+                                    <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="todo-content">
+                            <div class="action-cell cb-container">
+                                <input type="checkbox" onchange="finishTodo(${t.id})" class="custom-cb">
+                            </div>
+                            <!-- Khung chứa contenteditable mượt mà -->
+                            <div class="todo-text cursor-pointer" 
+                                 contenteditable="false"
+                                 ondblclick="startEdit(${t.id}, this, 'todo', 'text')" 
+                                 onblur="finishEdit(${t.id}, this, 'todo', 'text')"
+                                 onkeydown="handleEditKeydown(event, this, true)">${highlightHashtags(t.text)}</div>
+                        </div>
+                        <div class="action-cell">
+                            <button onclick="delTodo(${t.id})" class="delete-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                     </div>
-                    <div class="action-cell cb-container">
-                        <input type="checkbox" onchange="finishTodo(${t.id})" class="custom-cb">
-                    </div>
-                    <span class="todo-text">${t.text}</span>
-                    <div class="action-cell">
-                        <button onclick="delTodo(${t.id})" class="delete-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             document.getElementById('pendingCash').textContent = new Intl.NumberFormat('de-DE').format(Math.round(state.todo.cash));
         }
 
-        // Function cập nhật nhanh UI từng mã khi có sóng MQTT
+        // --- RENDER NOTES ---
+        window.openNote = function(id) { activeNoteId = id; renderNotes(); };
+        window.closeNote = function() { activeNoteId = null; renderNotes(); };
+        window.delNote = function(id, event) {
+            event.stopPropagation();
+            snapshot();
+            state.notes = state.notes.filter(n => n.id !== id);
+            save(); renderNotes(); toast("Đã xóa ghi chú", "info", undo);
+        };
+
+        function renderNotes() {
+            const body = document.getElementById('noteBody');
+            const footerInput = document.getElementById('noteFooterInput');
+            const footerBack = document.getElementById('noteFooterBack');
+
+            if (activeNoteId) {
+                // CHẾ ĐỘ CHI TIẾT
+                footerInput.classList.add('hidden');
+                footerBack.classList.remove('hidden');
+                const note = state.notes.find(n => n.id === activeNoteId);
+                if (!note) { closeNote(); return; }
+
+                body.innerHTML = `
+                    <div class="flex flex-col flex-grow p-4 gap-4 h-full overflow-y-auto">
+                        <div contenteditable="false" 
+                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-pointer" 
+                             placeholder="Tiêu đề (Click đúp để sửa)..."
+                             ondblclick="startEdit(${note.id}, this, 'note', 'title')"
+                             onblur="finishEdit(${note.id}, this, 'note', 'title')"
+                             onkeydown="handleEditKeydown(event, this, true)">${highlightHashtags(note.title)}</div>
+                        
+                        <div contenteditable="false"
+                             class="note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-pointer" 
+                             placeholder="Nội dung (Click đúp để sửa)..."
+                             ondblclick="startEdit(${note.id}, this, 'note', 'content')"
+                             onblur="finishEdit(${note.id}, this, 'note', 'content')"
+                             onkeydown="handleEditKeydown(event, this, false)">${highlightHashtags(note.content)}</div>
+                    </div>
+                `;
+            } else {
+                // CHẾ ĐỘ DANH SÁCH
+                footerInput.classList.remove('hidden');
+                footerBack.classList.add('hidden');
+                
+                body.innerHTML = state.notes.map((n, idx) => {
+                    return `
+                    <div class="todo-row group cursor-pointer hover:bg-white/5" onclick="openNote(${n.id})">
+                        <div class="action-cell" onclick="event.stopPropagation()">
+                            <div class="order-btn-group">
+                                <button onclick="moveItem('note', ${n.id}, -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}">
+                                    <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
+                                </button>
+                                <button onclick="moveItem('note', ${n.id}, 1)" class="order-btn ${idx === state.notes.length - 1 ? 'disabled' : ''}">
+                                    <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="todo-content">
+                            <span class="todo-text text-justify">${highlightHashtags(n.title)}</span>
+                        </div>
+                        <div class="action-cell" onclick="event.stopPropagation()">
+                            <button onclick="delNote(${n.id}, event)" class="delete-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+        }
+
+        // --- RENDER PORTFOLIO ---
         function updateStockUI(s, p) {
             const pEl = document.getElementById(`p-${s}`);
             if (pEl) {
@@ -503,17 +720,20 @@
             updateTotalAssets();
         }
 
-        function renderAll() { renderTodos(); renderStocks(); }
+        function renderAll() { renderTodos(); renderNotes(); renderStocks(); }
 
+        // Cập nhật ưu tiên ẩn cột: Logo -> Sở hữu -> Giao dịch -> Giá -> Lãi/lỗ
         function checkNarrowMode() {
             const table = document.getElementById('stockTable');
-            const pane = document.getElementById('rightPane');
+            const pane = document.getElementById('portfolioPane');
             if (!pane || !table) return;
             const w = pane.offsetWidth;
             
             if (w < 560) table.classList.add('narrow-hide-logo'); else table.classList.remove('narrow-hide-logo');
-            if (w < 460) table.classList.add('narrow-hide-lailo'); else table.classList.remove('narrow-hide-lailo');
-            if (w < 380) table.classList.add('narrow-hide-price'); else table.classList.remove('narrow-hide-price');
+            if (w < 480) table.classList.add('narrow-hide-sohuu'); else table.classList.remove('narrow-hide-sohuu');
+            if (w < 400) table.classList.add('narrow-hide-trade'); else table.classList.remove('narrow-hide-trade');
+            if (w < 320) table.classList.add('narrow-hide-price'); else table.classList.remove('narrow-hide-price');
+            if (w < 240) table.classList.add('narrow-hide-lailo'); else table.classList.remove('narrow-hide-lailo');
         }
 
         window.finishTodo = (id) => { snapshot(); state.todo.cash += REWARD_VALUE; state.todo.items = state.todo.items.filter(t => t.id !== id); save(); renderAll(); toast("Đã hoàn thành việc", "success", undo); };
@@ -545,6 +765,14 @@
         window.delStock = (s) => { state.portfolio = state.portfolio.filter(i => i.symbol !== s); save(); renderStocks(); };
 
         document.getElementById('todoInput').onkeydown = (e) => { if (e.key === 'Enter' && e.target.value.trim()) { state.todo.items.push({ id: Date.now(), text: e.target.value.trim() }); e.target.value = ''; save(); renderTodos(); } };
+        document.getElementById('noteInput').onkeydown = (e) => { 
+            if (e.key === 'Enter' && e.target.value.trim()) { 
+                state.notes.push({ id: Date.now(), title: e.target.value.trim(), content: '' }); 
+                e.target.value = ''; 
+                save(); renderNotes(); 
+            } 
+        };
+
         document.getElementById('newStockInput').onkeydown = (e) => { 
             if (e.key === 'Enter' && e.target.value.trim()) { 
                 const s = e.target.value.trim().toUpperCase(); 
@@ -570,8 +798,38 @@
             } 
         };
 
-        const res = document.getElementById('resizer'), mw = document.getElementById('mainContent');
-        res.onmousedown = () => { res.classList.add('dragging-pane'); document.onmousemove = (e) => { let p = (e.clientX / mw.clientWidth) * 100; if (p > 15 && p < 85) { document.getElementById('leftPane').style.width = p + '%'; document.getElementById('rightPane').style.width = (100 - p) + '%'; checkNarrowMode(); } }; document.onmouseup = () => { res.classList.remove('dragging-pane'); document.onmousemove = null; }; };
+        // --- HỆ THỐNG ĐIỀU CHỈNH 3 CỘT ---
+        function setupResizer(resizerId, pane1Id, pane2Id) {
+            const res = document.getElementById(resizerId);
+            const p1 = document.getElementById(pane1Id);
+            const p2 = document.getElementById(pane2Id);
+            const mw = document.getElementById('mainContent');
+
+            res.onmousedown = (e) => { 
+                res.classList.add('dragging-pane');
+                const startX = e.clientX;
+                const w1 = p1.offsetWidth / mw.clientWidth * 100;
+                const w2 = p2.offsetWidth / mw.clientWidth * 100;
+
+                document.onmousemove = (ev) => { 
+                    const dx = (ev.clientX - startX) / mw.clientWidth * 100;
+                    let newW1 = w1 + dx;
+                    let newW2 = w2 - dx;
+                    
+                    if (newW1 > 10 && newW2 > 10) {
+                        p1.style.width = newW1 + '%'; 
+                        p2.style.width = newW2 + '%'; 
+                        checkNarrowMode(); 
+                    }
+                }; 
+                document.onmouseup = () => { 
+                    res.classList.remove('dragging-pane'); 
+                    document.onmousemove = null; 
+                }; 
+            };
+        }
+        setupResizer('resizer1', 'leftPane', 'portfolioPane');
+        setupResizer('resizer2', 'portfolioPane', 'notePane');
 
         function decode(b) { let bytes = new Uint8Array(b), pos = 0, res = {}; const rv = () => { let v = 0, s = 0; while (pos < bytes.length) { let b = bytes[pos++]; v += (b & 127) << s; if (!(b & 128)) return v; s += 7; } return v; }; try { while (pos < bytes.length) { let k = rv(), w = k & 7, f = k >> 3; if (w === 1) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 8).getFloat64(0, true); pos += 8; } else if (w === 0) rv(); else if (w === 2) { let l = rv(); let sl = bytes.slice(pos, pos + l); pos += l; Object.assign(res, decode(sl)); } else if (w === 5) pos += 4; else break; } } catch(e) {} return res; }
         
