@@ -86,18 +86,16 @@
             color: #e5e5e5; 
             overflow-wrap: break-word;
             word-break: break-word; 
-            white-space: pre-wrap; /* Giữ nguyên dòng mới \n khi hiển thị */
+            white-space: pre-wrap; 
             min-width: 0; 
         }
         
-        /* Đồng bộ cơ chế cắt dòng cho Ghi chú khi ở chế độ Edit */
         .note-edit {
             overflow-wrap: break-word;
             word-break: break-word;
             min-width: 0;
         }
         
-        /* Chống style rác khi bật edit mode */
         .todo-text[contenteditable="true"]:focus,
         .note-edit[contenteditable="true"]:focus {
             outline: none;
@@ -207,8 +205,7 @@
         @keyframes toastIn { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         .toast-active { animation: toastIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; width: max-content; max-width: calc(100vw - 2rem); }
 
-        /* --- NARROW MODE --- 
-           Thứ tự ưu tiên ẩn: Logo -> Sở hữu -> Giao dịch -> Giá -> Lãi/lỗ */
+        /* --- NARROW MODE --- */
         .narrow-hide-logo .stock-logo-wrap { display: none !important; }
         .narrow-hide-sohuu .cell-sohuu, .narrow-hide-sohuu .spacer-sohuu { display: none !important; }
         .narrow-hide-trade .cell-trade, .narrow-hide-trade .spacer-trade { display: none !important; }
@@ -295,7 +292,6 @@
         <section id="notePane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 25%;">
             <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Ghi chú</h2>
-                <!-- Khoảng trống tàng hình để cân bằng chiều cao Header -->
                 <div class="text-2xl font-black mono opacity-0 select-none tabular-nums">0</div>
             </header>
             
@@ -331,10 +327,9 @@
                 if (!state.notes) state.notes = []; 
             }
         } catch (e) {
-            console.log("Storage access restricted. Using in-memory state.");
+            console.log("Quyền truy cập Storage bị chặn. Ứng dụng đang chạy trên bộ nhớ tạm.");
         }
 
-        // Cập nhật các trường mới
         state.portfolio.forEach(item => {
             if (item.invested === undefined) item.invested = 0;
         });
@@ -392,7 +387,6 @@
         };
 
         // --- GLOBAL PASTE FILTER ---
-        // Lọc hoàn toàn định dạng HTML/CSS rác khi người dùng copy/paste vào contenteditable
         document.addEventListener('paste', function(e) {
             if (e.target && e.target.isContentEditable) {
                 e.preventDefault();
@@ -400,7 +394,6 @@
                 document.execCommand('insertText', false, text);
             }
         });
-        // Chặn Drop nội dung format rác
         document.addEventListener('drop', function(e) {
             if (e.target && e.target.isContentEditable) {
                 e.preventDefault();
@@ -410,10 +403,9 @@
         // --- CƠ CHẾ SỬA TRỰC TIẾP ---
         window.highlightHashtags = function(text) {
             if (!text) return '';
-            // Thoát mã HTML hiểm độc (XSS) để an toàn tuyệt đối
             const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            // Tìm các từ bắt đầu bằng # và bọc thẻ màu xanh
-            return safeText.replace(/(#[^\s]+)/g, '<span class="text-blue-500 font-bold">$1</span>');
+            // Nhận diện hashtag bắt đầu câu hoặc sau khoảng trắng; chỉ lấy chữ cái, chữ số và gạch dưới
+            return safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, '$1<span class="text-blue-500 font-bold">$2</span>');
         };
 
         window.startEdit = function(id, el, type, field) {
@@ -424,12 +416,10 @@
                 rawText = state.notes.find(n => n.id === id)[field] || "";
             }
             
-            // Xóa mọi <span> hashtag, trả lại text thô hoàn toàn để gõ tiếng Việt mượt mà
             el.innerText = rawText; 
             el.contentEditable = "true";
             el.focus();
             
-            // Đưa con trỏ xuống sát cuối dòng
             if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
                 const range = document.createRange();
                 range.selectNodeContents(el);
@@ -441,7 +431,6 @@
         };
 
         window.handleEditKeydown = function(e, el, preventEnter) {
-            // Cho phép Shift+Enter để xuống dòng thoải mái, nhưng Enter bình thường thì tự động save
             if (e.key === 'Enter' && !e.shiftKey && preventEnter) {
                 e.preventDefault(); 
                 el.blur(); 
@@ -450,7 +439,6 @@
 
         window.finishEdit = function(id, el, type, field) {
             el.contentEditable = "false";
-            // Dùng innerText để rút sạch bong 100% các thẻ HTML <script> <b> <i> vô tình sót lại
             const newVal = el.innerText.trim();
             
             if (type === 'todo') {
@@ -490,8 +478,7 @@
                             <div class="action-cell cb-container">
                                 <input type="checkbox" onchange="finishTodo(${t.id})" class="custom-cb">
                             </div>
-                            <!-- Khung chứa contenteditable mượt mà -->
-                            <div class="todo-text cursor-pointer" 
+                            <div class="todo-text cursor-text" 
                                  contenteditable="false"
                                  ondblclick="startEdit(${t.id}, this, 'todo', 'text')" 
                                  onblur="finishEdit(${t.id}, this, 'todo', 'text')"
@@ -524,7 +511,6 @@
             const footerBack = document.getElementById('noteFooterBack');
 
             if (activeNoteId) {
-                // CHẾ ĐỘ CHI TIẾT
                 footerInput.classList.add('hidden');
                 footerBack.classList.remove('hidden');
                 const note = state.notes.find(n => n.id === activeNoteId);
@@ -533,22 +519,21 @@
                 body.innerHTML = `
                     <div class="flex flex-col flex-grow p-4 gap-4 h-full overflow-y-auto">
                         <div contenteditable="false" 
-                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-pointer" 
-                             placeholder="Tiêu đề (Click đúp để sửa)..."
+                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text" 
+                             placeholder="Tiêu đề (Nhấn đúp để sửa)..."
                              ondblclick="startEdit(${note.id}, this, 'note', 'title')"
                              onblur="finishEdit(${note.id}, this, 'note', 'title')"
                              onkeydown="handleEditKeydown(event, this, true)">${highlightHashtags(note.title)}</div>
                         
                         <div contenteditable="false"
-                             class="note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-pointer" 
-                             placeholder="Nội dung (Click đúp để sửa)..."
+                             class="note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text" 
+                             placeholder="Nội dung (Nhấn đúp để sửa)..."
                              ondblclick="startEdit(${note.id}, this, 'note', 'content')"
                              onblur="finishEdit(${note.id}, this, 'note', 'content')"
                              onkeydown="handleEditKeydown(event, this, false)">${highlightHashtags(note.content)}</div>
                     </div>
                 `;
             } else {
-                // CHẾ ĐỘ DANH SÁCH
                 footerInput.classList.remove('hidden');
                 footerBack.classList.add('hidden');
                 
@@ -566,7 +551,7 @@
                             </div>
                         </div>
                         <div class="todo-content">
-                            <span class="todo-text text-justify">${highlightHashtags(n.title)}</span>
+                            <span class="todo-text text-justify cursor-pointer">${highlightHashtags(n.title)}</span>
                         </div>
                         <div class="action-cell" onclick="event.stopPropagation()">
                             <button onclick="delNote(${n.id}, event)" class="delete-btn">
@@ -594,7 +579,6 @@
                 pEl.className = `mono text-lg tracking-tighter ${color}`;
             }
 
-            // Cập nhật Lãi/lỗ Real-time
             const pnlEl = document.getElementById(`pnl-${s}`);
             if (pnlEl) {
                 const stockItem = state.portfolio.find(i => i.symbol === s);
@@ -722,7 +706,6 @@
 
         function renderAll() { renderTodos(); renderNotes(); renderStocks(); }
 
-        // Cập nhật ưu tiên ẩn cột: Logo -> Sở hữu -> Giao dịch -> Giá -> Lãi/lỗ
         function checkNarrowMode() {
             const table = document.getElementById('stockTable');
             const pane = document.getElementById('portfolioPane');
@@ -752,9 +735,6 @@
             state.todo.cash -= cost; 
             stockItem.qty += val; 
 
-            // Cập nhật giá trị Vốn đầu tư (invested)
-            // Mua (val > 0): cost > 0 -> invested tăng
-            // Bán (val < 0): cost < 0 -> invested giảm đúng bằng số tiền thu về
             if (stockItem.invested === undefined) stockItem.invested = 0;
             stockItem.invested += cost;
 
@@ -798,7 +778,6 @@
             } 
         };
 
-        // --- HỆ THỐNG ĐIỀU CHỈNH 3 CỘT ---
         function setupResizer(resizerId, pane1Id, pane2Id) {
             const res = document.getElementById(resizerId);
             const p1 = document.getElementById(pane1Id);
@@ -886,7 +865,6 @@
             } else {
                 mqttCheckCount++;
                 if (mqttCheckCount < 10) {
-                    // Chờ thêm 500ms để thư viện MQTT tải từ fallback
                     setTimeout(initMqttConnection, 500);
                 } else {
                     console.error("Thư viện MQTT không tồn tại. Trình duyệt hoặc AdBlocker có thể đã chặn nó tải về.");
