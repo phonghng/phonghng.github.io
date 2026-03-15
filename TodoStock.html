@@ -184,8 +184,7 @@
             display: flex; align-items: center; justify-content: center; background: transparent; margin: 0;
         }
         
-        .custom-cb:hover, .custom-cb:checked { border-color: var(--accent); }
-        .custom-cb:checked { background-color: var(--accent); }
+        .cb-container:hover .custom-cb, .custom-cb:checked { border-color: var(--accent); background-color: var(--accent); }
         
         .custom-cb::after {
             content: ""; width: 9px; height: 9px; background-color: #ffffff !important;
@@ -195,10 +194,9 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
         
-        .custom-cb:hover:not(:checked)::after { display: block; opacity: 0.5; }
-        .custom-cb:checked::after { display: block; opacity: 1; }
+        .cb-container:hover .custom-cb::after, .custom-cb:checked::after { display: block; opacity: 1; }
 
-        .custom-cb:hover ~ .todo-text, .custom-cb:checked ~ .todo-text { color: var(--text-dim) !important; text-decoration: line-through !important; opacity: 0.6; }
+        .cb-container:hover + .todo-text, .cb-container:has(.custom-cb:checked) + .todo-text { color: var(--text-dim) !important; text-decoration: line-through !important; opacity: 0.6; }
 
         .delete-btn { width: 20px; height: 20px; flex-shrink: 0; color: rgba(255,255,255,0.2); transition: all 0.2s; display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer; }
         .delete-btn:hover { color: var(--danger) !important; }
@@ -416,10 +414,8 @@
             return safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, '$1<span class="text-blue-500 font-bold">$2</span>');
         };
 
-        // Hàm lấy vị trí chính xác của con trỏ chuột từ tọa độ click hoặc bàn phím
         function getExactCaretPos(e, el) {
             if (!e || e.clientX === undefined) {
-                // Focus bằng bàn phím (Tab + Enter) -> đưa con trỏ xuống cuối
                 return el.textContent.length;
             }
 
@@ -443,7 +439,6 @@
             return 0;
         }
 
-        // Hàm đặt lại con trỏ chuột thành một điểm duy nhất
         function setCaret(el, pos) {
             const range = document.createRange();
             let current = 0, targetNode = null, targetOff = 0;
@@ -467,7 +462,7 @@
             
             try {
                 range.setStart(targetNode, targetOff);
-                range.collapse(true); // Đóng range lại thành 1 điểm nhấp nháy, tránh bôi đen
+                range.collapse(true); 
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(range);
@@ -495,15 +490,12 @@
 
         window.handleKeydown = function(e, id, el, type, field) {
             if (!el.isContentEditable) {
-                // Chưa bật sửa: Bấm Enter hoặc Space để bắt đầu sửa (a11y)
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     startEdit(id, el, type, field, e);
                 }
             } else {
-                // Đang sửa
                 if (e.key === 'Enter') {
-                    // Ctrl+Enter luôn là lưu & thoát ở mọi ô
                     if (e.ctrlKey || e.metaKey) {
                         e.preventDefault();
                         el.blur();
@@ -513,31 +505,19 @@
                     const isMultiline = (type === 'note' && field === 'content');
                     
                     if (!isMultiline) {
-                        // Todo và Title: Enter = Lưu; Shift+Enter = Xuống dòng
                         if (!e.shiftKey) {
                             e.preventDefault(); 
                             el.blur(); 
-                        } else {
-                            e.preventDefault();
-                            document.execCommand('insertText', false, '\n');
-                        }
-                    } else {
-                        // Content Note: Enter = Xuống dòng; 
-                        if (e.shiftKey) {
-                            e.preventDefault();
-                            document.execCommand('insertText', false, '\n');
-                        } else {
-                            // Cố tình dùng insertText để ngăn trình duyệt sinh thẻ <div><br> rác
-                            e.preventDefault();
-                            document.execCommand('insertText', false, '\n');
                         }
                     }
+                    // Nếu là content hoặc shift+enter, để trình duyệt xử lý native \n
                 }
             }
         };
 
         window.finishEdit = function(id, el, type, field) {
             el.contentEditable = "false";
+            // Lấy trực tiếp văn bản thô, tránh mọi thẻ div sinh ra bởi trình duyệt
             const newVal = el.innerText.trim();
             
             if (type === 'todo') {
@@ -614,6 +594,7 @@
             const footerBack = document.getElementById('noteFooterBack');
 
             if (activeNoteId) {
+                // CHẾ ĐỘ CHI TIẾT
                 footerInput.classList.add('hidden');
                 footerBack.classList.remove('hidden');
                 const note = state.notes.find(n => n.id === activeNoteId);
@@ -625,14 +606,12 @@
                              tabindex="0"
                              role="textbox"
                              aria-multiline="false"
-                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text" 
+                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-center whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text" 
                              placeholder="Tiêu đề (nhấn đúp hoặc Enter để sửa)..."
                              ondblclick="startEdit(${note.id}, this, 'note', 'title', event)"
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'title')"
                              onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${highlightHashtags(note.title)}</div>
-                        
-                        <hr class="w-[80%] mx-auto border-t border-[var(--border)] my-1">
 
                         <div contenteditable="false"
                              tabindex="0"
@@ -647,6 +626,7 @@
                     </div>
                 `;
             } else {
+                // CHẾ ĐỘ DANH SÁCH
                 footerInput.classList.remove('hidden');
                 footerBack.classList.add('hidden');
                 
