@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PhongHNg</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tích hợp Phosphor Icons (Light weight) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --surface-color: rgba(18, 18, 18, 0.4);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+        }
+
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 20px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100dvh;
+            display: grid;
+            place-items: center;
+            overflow-x: hidden;
+            padding: 4rem 1rem;
+        }
+
+        /* --- BENTO CONTAINER --- */
+        .bento-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            pointer-events: none;
+
+            --gap: 16px;
+            --cols: 4;
+        }
+
+        .bento-container[data-visible-count="1"] {
+            --cols: 1;
+        }
+
+        .bento-container[data-visible-count="2"] {
+            --cols: 2;
+        }
+
+        .bento-container[data-visible-count="3"] {
+            --cols: 3;
+        }
+
+        .bento-container[data-visible-count="4"] {
+            --cols: 4;
+        }
+
+        .bento-container[data-visible-count="5"] {
+            --cols: 3;
+        }
+
+        .bento-container[data-visible-count="6"] {
+            --cols: 3;
+        }
+
+        @media (max-width: 900px) {
+            .bento-container {
+                --cols: 3;
+            }
+
+            .bento-container[data-visible-count="4"] {
+                --cols: 2;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bento-container {
+                --cols: 2;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .bento-container {
+                --cols: 1;
+            }
+        }
+
+        /* --- BENTO CARD BASE --- */
+        .bento-card {
+            flex: 0 0 auto;
+            width: calc((100% - ((var(--cols) - 1) * var(--gap))) / var(--cols));
+            aspect-ratio: 1 / 1;
+            pointer-events: auto;
+            position: relative;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+            transition: all 0.4s var(--spring-easing);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: bentoPop 0.8s var(--spring-easing) forwards;
+        }
+
+        @media (max-width: 400px) {
+            .bento-card {
+                aspect-ratio: auto;
+                height: 160px;
+            }
+        }
+
+        @keyframes bentoPop {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bento-card:not(.type-text) {
+            cursor: pointer;
+        }
+
+        /* Mouse Glow */
+        .bento-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--item-color), transparent 45%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .bento-card::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            background: var(--bg-deep);
+            border-radius: inherit;
+            z-index: 2;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+        /* --- CARD DECORATION --- */
+        .card-icon-bg {
+            position: absolute;
+            right: -8%;
+            bottom: -8%;
+            font-size: 130px;
+            color: var(--item-color);
+            opacity: 0.04;
+            z-index: 3;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            transition: all 0.7s var(--spring-easing);
+        }
+
+        .card-bg-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 2;
+            transition: opacity 0.5s ease, transform 0.6s var(--spring-easing);
+            mix-blend-mode: luminosity;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 4;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .icon-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: color-mix(in srgb, var(--item-color) 10%, transparent);
+            color: var(--item-color);
+            transition: all 0.4s var(--spring-easing);
+        }
+
+        .icon-box i {
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            margin-top: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            transition: all 0.4s ease;
+        }
+
+        /* --- TYPE: TEXT --- */
+        .bento-card.type-text {
+            cursor: default;
+        }
+
+        .text-scroll-content {
+            position: relative;
+            z-index: 5;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            pointer-events: auto;
+        }
+
+        .text-scroll-content::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .text-scroll-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- HOVER EFFECTS --- */
+        @media (hover: hover) {
+            .bento-card:hover {
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+
+            .bento-card:not(.type-text):hover {
+                transform: translateY(-4px);
+            }
+
+            .bento-card:hover::before {
+                opacity: 0.15;
+            }
+
+            .bento-card:hover::after {
+                background: rgba(10, 10, 10, 0.7);
+            }
+
+            .bento-card:hover .card-icon-bg {
+                opacity: 0.08;
+                transform: rotate(0deg) scale(1.1);
+            }
+
+            .bento-card:hover .icon-box {
+                background: var(--item-color);
+                color: var(--bg-deep);
+            }
+
+            .bento-card:hover .card-bg-img {
+                opacity: 0.9;
+                transform: scale(1.05);
+                mix-blend-mode: normal;
+            }
+
+            /* CHỈ ẩn icon trang trí siêu lớn khi hover vào card có ảnh preview */
+            .bento-card:has(.card-bg-img):hover .card-icon-bg {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+
+            /* Action icon và Title vẫn giữ nguyên để hiển thị trên nền ảnh */
+            .bento-card:has(.card-bg-img):hover .card-title {
+                text-shadow: 0 4px 15px rgba(0, 0, 0, 1);
+            }
+        }
+
+        .bento-card:not(.type-text):active {
+            transform: scale(0.98);
+        }
+
+        .secret-item {
+            display: none;
+        }
+
+        .bento-container.revealed .secret-item {
+            display: flex;
+            opacity: 0;
+            animation: secretReveal 0.6s var(--spring-easing) forwards;
+        }
+
+        @keyframes secretReveal {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="bento-container" id="grid-container">
+        <!-- Rendered by JS -->
+    </main>
+
+    <script>
+        const PALETTE = [
+            '#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93',
+            '#EF476F', '#FFD166', '#06D6A0', '#118AB2', '#00BBF9',
+            '#7400B8', '#6930C3', '#5E60CE', '#4EA8DE', '#56CFE1',
+            '#64DFDF', '#72EFDD', '#F15BB5', '#9B5DE5', '#38bdf8'
+        ];
+
+        function getHashColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            return PALETTE[Math.abs(hash) % PALETTE.length];
+        }
+
+        const ITEMS = [
+            { type: 'image', title: 'Logo', url: './Logo.jpg', filename: 'Logo.jpg', isSecret: true, iconClass: 'ph-light ph-hexagon' },
+            { type: 'url', title: 'Ký số PDF', url: './PhongHNg_Chukyso.pdf.html', iconClass: 'ph-light ph-file-pdf' },
+            { type: 'image', title: 'Chữ ký', url: './Ch%E1%BB%AF%20k%C3%BD.jpg', filename: 'Chữ ký.jpg', isSecret: true, iconClass: 'ph-light ph-signature' },
+            { type: 'url', title: 'Điện ảnh và Truyền hình', url: './DATH.html', iconClass: 'ph-light ph-film-strip' },
+            { type: 'url', title: 'TodoStock', url: './TodoStock.html', iconClass: 'ph-light ph-trend-up' },
+
+            /*
+            { type: 'file', title: 'Tài liệu hướng dẫn', url: '#', filename: 'HuongDan.pdf', iconClass: 'ph-light ph-file-arrow-down' },
+            { 
+                type: 'text', 
+                content: '<p style="color:white; font-weight:600; margin-bottom:8px;">Về PhongHNg</p>Khám phá kho lưu trữ cá nhân nơi tập hợp các dự án về điện ảnh, truyền hình và công nghệ tối giản.',
+                iconClass: 'ph-light ph-identification-card'
+            },
+            { 
+                type: 'text', 
+                content: '<p style="color:white; font-weight:600; margin-bottom:8px;">Triết lý</p>Thiết kế tối giản không phải là làm cho nó trống rỗng, mà là chắt lọc đến mức không còn gì để lược bỏ mà vẫn giữ được giá trị cốt lõi nhất.',
+                iconClass: 'ph-light ph-leaf'
+            }
+            */
+        ];
+
+        const ACTION_ICONS = {
+            url: 'ph-light ph-arrow-up-right',
+            image: 'ph-light ph-download-simple',
+            file: 'ph-light ph-download-simple',
+            text: 'ph-light ph-text-align-left'
+        };
+
+        async function handleAction(e, item) {
+            if (item.type === 'text') return;
+            if (item.type === 'url') { window.location.href = item.url; return; }
+
+            e.preventDefault();
+            try {
+                const response = await fetch(item.url);
+                const blob = await response.blob();
+                const objectUrl = window.URL.createObjectURL(blob);
+                const tempLink = document.createElement('a');
+                tempLink.style.display = 'none';
+                tempLink.href = objectUrl;
+                tempLink.download = item.filename || 'download';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                setTimeout(() => { window.URL.revokeObjectURL(objectUrl); tempLink.remove(); }, 100);
+            } catch (err) {
+                const tempLink = document.createElement('a');
+                tempLink.style.display = 'none';
+                tempLink.href = item.url;
+                tempLink.download = item.filename || 'download';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                tempLink.remove();
+            }
+        }
+
+        function renderBento() {
+            const container = document.getElementById('grid-container');
+            const fragment = document.createDocumentFragment();
+            let visibleCount = 0;
+
+            ITEMS.forEach((item, index) => {
+                if (!item.isSecret) visibleCount++;
+                const card = document.createElement('div');
+                const secretClass = item.isSecret ? 'secret-item' : '';
+                const mainColor = getHashColor(item.title || item.content);
+
+                card.className = `bento-card type-${item.type} ${secretClass}`;
+                card.style.animationDelay = `${index * 0.08}s`;
+                card.style.setProperty('--item-color', mainColor);
+
+                const bgImageHtml = (item.type === 'image') ? `<div class="card-bg-img" style="background-image: url('${item.url}')"></div>` : '';
+                const decorIconClass = item.iconClass || (item.type === 'url' ? 'ph-light ph-link' : 'ph-light ph-file');
+                const actionIconClass = ACTION_ICONS[item.type] || ACTION_ICONS.url;
+
+                if (item.type === 'text') {
+                    card.innerHTML = `
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="icon-box"><i class="${actionIconClass}"></i></div>
+                            </div>
+                            <div class="text-scroll-content">
+                                ${item.content}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        ${bgImageHtml}
+                        <div class="card-icon-bg"><i class="${decorIconClass}"></i></div>
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="icon-box"><i class="${actionIconClass}"></i></div>
+                            </div>
+                            <div class="card-title">${item.title}</div>
+                        </div>
+                    `;
+                }
+
+                card.addEventListener('click', (e) => handleAction(e, item));
+                fragment.appendChild(card);
+            });
+
+            container.setAttribute('data-visible-count', visibleCount);
+            container.appendChild(fragment);
+            attachMouseTracking();
+        }
+
+        function attachMouseTracking() {
+            const container = document.getElementById('grid-container');
+            container.addEventListener('mousemove', (e) => {
+                const cards = container.querySelectorAll('.bento-card');
+                for (const card of cards) {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                }
+            });
+        }
+
+        function setupEasterEgg() {
+            let clicks = 0; let timeout;
+            const container = document.getElementById('grid-container');
+            document.body.addEventListener('click', (e) => {
+                if (e.target.closest('.bento-card')) return;
+                clicks++; clearTimeout(timeout);
+                if (clicks === 3) {
+                    if (!container.classList.contains('revealed')) {
+                        container.classList.add('revealed');
+                        container.setAttribute('data-visible-count', ITEMS.length);
+                        container.querySelectorAll('.secret-item').forEach((el, i) => el.style.animationDelay = `${i * 0.1}s`);
+                    }
+                    clicks = 0;
+                } else { timeout = setTimeout(() => { clicks = 0; }, 600); }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { renderBento(); setupEasterEgg(); });
+    </script>
+</body>
+
+</html>

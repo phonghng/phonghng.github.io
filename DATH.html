@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điện ảnh và Truyền hình</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-base: #000000;
+            --bg-surface: #121212;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #ef4444;
+            /* Đỏ cho yêu thích */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-y: scroll;
+            /* Chống giật trang khi xuất hiện scrollbar */
+        }
+
+        /* Tùy chỉnh thanh cuộn tinh tế */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Tiêu chuẩn Web - Focus State cho Accessibility */
+        *:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+
+        /* Utilities cho Poster */
+        .poster-aspect {
+            aspect-ratio: 2 / 3;
+            background-color: var(--bg-surface);
+        }
+    </style>
+</head>
+
+<body class="pb-24 pt-8 md:pt-12">
+
+    <main id="app-container" class="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-12">
+        <!-- Render qua JavaScript -->
+    </main>
+
+    <script>
+        // Cấu trúc dữ liệu chuẩn hóa mới
+        const DATA = [
+            // --- TEMPLATES (Được ẩn khỏi UI) ---
+            {
+                hidden: true,
+                status: 'favorite', // Các trạng thái: 'favorite' (Yêu), 'liked' (Thích), 'waitlist' (Chờ xem)
+                type: 'movie',
+                poster_url: 'URL_ANH',
+                title_vi: 'Tên Tiếng Việt',
+                title_original: 'Tên Gốc (Bắt buộc)',
+                release_year: 2026,
+                director: 'Đạo diễn',
+                producer: 'Nhà SX'
+            },
+            {
+                hidden: true,
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'URL_ANH',
+                title_vi: 'Tên TV Show (VI)',
+                title_original: 'Tên Gốc',
+                start_year: 2026,
+                platform: 'Nền tảng'
+            },
+
+            // --- NHÓM YÊU (FAVORITE) ---
+            {
+                status: 'favorite',
+                type: 'movie',
+                poster_url: 'https://images-cdn.ubuy.com.sa/65c69cf5b8094b335d2e0962-harry-potter-the-complete-8-film.jpg',
+                title_vi: 'Harry Potter',
+                title_original: 'Harry Potter',
+                release_year: "2001-2011",
+                director: '',
+                producer: 'Warner Bros. Pictures'
+            },
+            {
+                status: 'favorite',
+                type: 'tv_show',
+                poster_url: 'https://upload.wikimedia.org/wikipedia/vi/9/9e/Cu%E1%BB%99c_chi%E1%BA%BFn_th%C6%B0%E1%BB%A3ng_l%C6%B0u.jpg',
+                title_vi: 'Cuộc Chiến Thượng Lưu',
+                title_original: 'Penthouse: War in Life',
+                start_year: 2020,
+                platform: 'SBS'
+            },
+            {
+                status: 'favorite',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/M/MV5BOWMyMWY0ZTMtZTU2Yy00M2M2LWE3ZWMtZWZmZjQ4MDQ2OWJiXkEyXkFqcGc@._V1_.jpg',
+                title_vi: 'Diên Hy Công Lược',
+                title_original: 'Story of Yanxi Palace',
+                start_year: 2018,
+                platform: 'iQIYI'
+            },
+            {
+                status: 'favorite',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/I/71s1pXMK7ZL.jpg',
+                title_vi: 'Khi Anh Chạy Về Phía Em',
+                title_original: 'When I Fly Towards You',
+                start_year: 2023,
+                platform: 'Youku'
+            },
+            {
+                status: 'favorite',
+                type: 'tv_show',
+                poster_url: 'https://static.wikia.nocookie.net/powerrangers/images/d/d1/Go-Busters_Poster.jpg/revision/latest/scale-to-width-down/1000',
+                title_vi: 'Tokumei Sentai Go-Busters',
+                title_original: 'Tokumei Sentai Go-Busters',
+                start_year: 2012,
+                platform: 'TV Asahi'
+            },
+            {
+                status: 'favorite',
+                type: 'tv_show',
+                poster_url: 'https://i.ibb.co/BVZqyD5F/Gemini-Generated-Image-1y8qwm1y8qwm1y8q.png',
+                title_vi: 'Gặp Nhau Cuối Năm',
+                title_original: 'Gặp Nhau Cuối Năm',
+                start_year: 2003,
+                platform: 'VTV'
+            },
+
+            // --- NHÓM THÍCH (LIKED) ---
+            {
+                status: 'liked',
+                type: 'tv_show',
+                poster_url: 'https://i.pinimg.com/736x/ef/2b/04/ef2b045bce82875d5cef98aa835b5548.jpg',
+                title_vi: 'Doraemon',
+                title_original: 'Doraemon',
+                start_year: 1979,
+                platform: 'TV Asahi'
+            },
+            {
+                "status": "liked",
+                "type": "tv_show",
+                "poster_url": "https://m.media-amazon.com/images/M/MV5BNGNjMjVmODYtMGMzZi00MWUyLTk1ZDQtYzI2ZTk2MmYzYTZiXkEyXkFqcGc@._V1_.jpg",
+                "title_vi": "Thám Tử Lừng Danh Conan",
+                "title_original": "名探偵コナン",
+                "start_year": 1996,
+                "platform": "Nippon TV / YTV"
+            },
+            {
+                status: 'liked',
+                type: 'tv_show',
+                poster_url: 'https://bloganchoi.com/wp-content/uploads/2021/07/mua-he-cua-huong-bac-ha-1.jpg',
+                title_vi: 'Mùa Hè Hương Bạc Hà',
+                title_original: '薄荷之夏',
+                start_year: 2021,
+                platform: 'iQIYI'
+            },
+            {
+                status: 'liked',
+                type: 'tv_show',
+                poster_url: 'https://kenh14cdn.com/2019/2/21/running-man-poster2-15507589639271529269685.jpg',
+                title_vi: 'Chạy Đi Chờ Chi',
+                title_original: 'Running Man Vietnam',
+                start_year: 2019,
+                platform: 'HTV7'
+            },
+            {
+                status: 'liked',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/M/MV5BZDUyZmMwZmItNjgyNy00YzliLWE2MGYtM2ViMTNiZWRkYjFlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
+                title_vi: 'Đường Lên Đỉnh Olympia',
+                title_original: 'Đường Lên Đỉnh Olympia',
+                start_year: 1999,
+                platform: 'VTV'
+            },
+            {
+                status: 'liked',
+                type: 'movie',
+                poster_url: 'https://upload.wikimedia.org/wikipedia/vi/4/49/Mua_do_poster.jpg',
+                title_vi: 'Mưa Đỏ',
+                title_original: 'Mưa Đỏ',
+                release_year: 2025,
+                director: 'Đặng Nhật Minh',
+                producer: 'Điện ảnh Quân đội'
+            },
+
+            // --- NHÓM CHƯA XEM (WAITLIST) ---
+            {
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/I/7118ecsxO3L._AC_UF894,1000_QL80_.jpg',
+                title_vi: 'Trò Chơi Con Mực',
+                title_original: 'Squid Game',
+                start_year: 2021,
+                platform: 'Netflix'
+            },
+            {
+                status: 'waitlist',
+                type: 'movie',
+                poster_url: 'https://m.media-amazon.com/images/I/91KArYP03YL._AC_UF894,1000_QL80_.jpg',
+                title_vi: 'Ký Sinh Trùng',
+                title_original: 'Parasite',
+                release_year: 2019,
+                director: 'Bong Joon-ho',
+                producer: 'Barunson E&A'
+            },
+            {
+                status: 'waitlist',
+                type: 'movie',
+                poster_url: 'https://m.media-amazon.com/images/I/71thFiIUSpL._AC_UF894,1000_QL80_.jpg',
+                title_vi: 'Kẻ Trộm Giấc Mơ',
+                title_original: 'Inception',
+                release_year: 2010,
+                director: 'Christopher Nolan',
+                producer: 'Syncopy Inc.'
+            },
+            {
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/M/MV5BODcxMWI2NDMtYTc3NC00OTZjLWFmNmUtM2NmY2I1ODkxYzczXkEyXkFqcGc@._V1_.jpg',
+                title_vi: 'Gương Đen',
+                title_original: 'Black Mirror',
+                start_year: 2011,
+                platform: 'Netflix'
+            },
+            {
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'https://upload.wikimedia.org/wikipedia/en/3/3c/Hidden_Love_2023_TV_series.jpg',
+                title_vi: 'Vụng Trộm Không Thể Giấu',
+                title_original: 'Hidden Love',
+                start_year: 2023,
+                platform: 'Youku'
+            },
+            {
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'https://m.media-amazon.com/images/M/MV5BYjg0MmM5ODYtNjFjYS00YTYxLTk0NDktNTAxOWViOTMzMzU5XkEyXkFqcGc@._V1_.jpg',
+                title_vi: 'Chiếc Bật Lửa Và Váy Công Chúa',
+                title_original: 'Lighter and Princess',
+                start_year: 2022,
+                platform: 'Youku'
+            },
+            {
+                status: 'waitlist',
+                type: 'tv_show',
+                poster_url: 'https://upload.wikimedia.org/wikipedia/vi/f/f7/The_First_Frost_Poster.jpg',
+                title_vi: 'Khó Dỗ Dành',
+                title_original: 'First Frost',
+                start_year: 2025,
+                platform: 'Youku'
+            }
+        ];
+
+        // Tạo SVG Trái tim cho mục Yêu (Yêu thích)
+        const IconHeartSmall = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        `;
+
+        // Tạo SVG Thumbs Up cho mục Thích
+        const IconLikeSmall = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+            </svg>
+        `;
+
+        // Render từng thẻ phim (Card)
+        function createCard(item) {
+            const isMovie = (item.type === 'movie');
+            const isFav = (item.status === 'favorite');
+            const isLiked = (item.status === 'liked');
+            const isWaitlist = (item.status === 'waitlist');
+            const displayTitle = item.title_vi || item.title_original;
+
+            // Lọc và chuyển đổi thành dạng mảng tag (đánh dấu in nghiêng cho tên gốc)
+            let infoArray = [];
+            if (isMovie) {
+                if (item.title_vi && item.title_vi !== item.title_original) infoArray.push({ text: item.title_original, italic: true });
+                if (item.release_year) infoArray.push({ text: item.release_year });
+                if (item.director) infoArray.push({ text: item.director });
+                if (item.producer) infoArray.push({ text: item.producer });
+            } else {
+                if (item.title_vi && item.title_vi !== item.title_original) infoArray.push({ text: item.title_original, italic: true });
+                if (item.start_year) infoArray.push({ text: item.start_year });
+                if (item.platform) infoArray.push({ text: item.platform });
+            }
+
+            // Tạo HTML cho các tag (thêm class italic nếu được đánh dấu)
+            const tagsHtml = infoArray.map(info =>
+                `<span class="inline-block px-2 py-1 bg-white/10 text-neutral-300 text-[0.7rem] md:text-xs rounded-md break-words ${info.italic ? 'italic' : ''}">${info.text}</span>`
+            ).join('');
+
+            // Tag icon trái tim nếu là yêu thích (favorite)
+            const favTag = isFav
+                ? `<span class="inline-flex items-center justify-center px-2 py-1 bg-red-500/20 border border-red-500/30 text-red-500 rounded-md shadow-sm" aria-label="Đã yêu thích">${IconHeartSmall}</span>`
+                : '';
+
+            // Tag icon thumbs up nếu là thích (liked)
+            const likedTag = isLiked
+                ? `<span class="inline-flex items-center justify-center px-2 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-md shadow-sm" aria-label="Đã thích">${IconLikeSmall}</span>`
+                : '';
+
+            // Class làm mờ và đen trắng cho phim chưa xem (waitlist)
+            const posterDimClass = isWaitlist ? 'grayscale blur-[5px]' : '';
+
+            // Layout Card: Hover chỉ zoom poster, ảnh co dãn khớp 100% tỉ lệ (object-fill)
+            return `
+                <article class="flex flex-col gap-3 h-full outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg" tabindex="0" aria-label="${displayTitle}">
+                    <div class="group relative w-full poster-aspect rounded-lg overflow-hidden bg-neutral-900 ring-1 ring-white/5 shrink-0">
+                        <img 
+                            src="${item.poster_url}" 
+                            alt="Poster của ${displayTitle}" 
+                            class="absolute inset-0 w-full h-full object-fill transition-transform duration-500 ease-out group-hover:scale-105 ${posterDimClass}"
+                            loading="lazy"
+                            onerror="this.src='https://placehold.co/400x600/121212/333333?text=No+Poster'"
+                        >
+                    </div>
+                    <div class="flex flex-col px-0.5 flex-1">
+                        <h3 class="text-sm md:text-base font-semibold text-white/95 break-words">
+                            ${displayTitle}
+                        </h3>
+                        <div class="flex flex-wrap gap-1.5 mt-2 content-start">
+                            ${favTag}
+                            ${likedTag}
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Main Render Logic
+        function render() {
+            const container = document.getElementById('app-container');
+
+            // Lọc dữ liệu hợp lệ (loại bỏ template)
+            const activeData = DATA.filter(item => !item.hidden);
+
+            // Render toàn bộ vào một lưới (grid) duy nhất, stretch để chiều cao bằng nhau
+            container.innerHTML = `
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 md:gap-x-6 gap-y-10 items-stretch">
+                    ${activeData.map(item => createCard(item)).join('')}
+                </div>
+            `;
+        }
+
+        // Tối ưu hóa sự kiện resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(render, 150);
+        });
+
+        // Khởi chạy
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+
+</html>

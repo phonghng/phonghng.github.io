@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoStock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        // Chặn cảnh báo của Tailwind CDN trong console
+        const originalWarn = console.warn;
+        console.warn = function (...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+            originalWarn.apply(console, args);
+        };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+        :root {
+            --bg: #000000;
+            --surface: #080808;
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #525252;
+            --accent: #3b82f6;
+            --danger: #ef4444;
+
+            /* KHOẢNG CÁCH TUYỆT ĐỐI 1:1:1:1 */
+            --spacing: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 4px;
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        /* --- TODO FLEX LAYOUT (LEFT PANE) --- */
+        .list-container {
+            border-top: 1px solid var(--border);
+        }
+
+        .todo-row {
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing);
+            /* Lề 2 bên */
+            gap: var(--spacing);
+            /* Khoảng cách giữa các phần tử */
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+            width: 100%;
+            min-height: 56px;
+        }
+
+        .todo-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .todo-content {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            /* Ép không bao giờ ngắt dòng để rớt checkbox */
+            align-items: center;
+            gap: var(--spacing);
+            flex-grow: 1;
+            /* Hút khoảng trống để đẩy nút xóa kịch phải */
+            overflow: hidden;
+            min-width: 0;
+            /* Cho phép thu nhỏ nội dung */
+        }
+
+        .todo-text {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #e5e5e5;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            min-width: 0;
+        }
+
+        /* --- PORTFOLIO TABLE LAYOUT (RIGHT PANE) --- */
+        .stock-table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            /* Chia cột TỰ ĐỘNG dựa trên HTML (nội dung text) */
+        }
+
+        .stock-row {
+            display: table-row;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .stock-row:not(.list-header):hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .stock-cell {
+            display: table-cell;
+            vertical-align: middle;
+            /* Căn giữa dọc tuyệt đối */
+            height: 56px;
+        }
+
+        /* Thiết lập Khoảng cách tuyệt đối (--spacing) cho Bảng */
+        .cell-move {
+            width: 1%;
+            /* Giới hạn nhỏ nhất để không chiếm chỗ content */
+            padding-left: var(--spacing);
+            padding-right: var(--spacing);
+        }
+
+        .cell-delete {
+            width: 1%;
+            padding-left: var(--spacing);
+            padding-right: var(--spacing);
+        }
+
+        /* 4 cột con: Căn giữa theo chiều ngang toàn bộ */
+        .cell-ma,
+        .cell-gia,
+        .cell-sohuu,
+        .cell-trade {
+            text-align: center;
+        }
+
+        /* Header dính */
+        .list-header .stock-cell {
+            height: 36px;
+            position: sticky;
+            top: 0;
+            background-color: #020202;
+            z-index: 10;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* --- CONTROLS UI --- */
+        .order-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .order-btn {
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .order-btn:hover {
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .order-btn.disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cb-container {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .custom-cb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .cb-container:hover .custom-cb,
+        .custom-cb:checked {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+        }
+
+        .custom-cb::after {
+            content: "";
+            width: 9px;
+            height: 9px;
+            background-color: #ffffff !important;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+            display: none;
+            transition: opacity 0.15s ease;
+        }
+
+        .custom-cb:checked::after,
+        .cb-container:hover .custom-cb::after {
+            display: block;
+        }
+
+        .cb-container:hover .custom-cb:not(:checked)::after {
+            opacity: 0.5;
+        }
+
+        .cb-container:hover~.todo-text {
+            color: var(--text-dim) !important;
+            text-decoration: line-through !important;
+            opacity: 0.6;
+        }
+
+        .delete-btn {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger) !important;
+        }
+
+        .stock-logo-wrap {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #resizer {
+            width: 4px;
+            cursor: col-resize;
+            background-color: var(--border);
+            z-index: 50;
+            flex-shrink: 0;
+            transition: background-color 0.2s;
+        }
+
+        #resizer:hover,
+        #resizer.dragging-pane {
+            background-color: var(--accent);
+        }
+
+        /* --- TOAST --- */
+        #toastContainer {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        @keyframes toastIn {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-active {
+            animation: toastIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            width: max-content;
+            max-width: calc(100vw - 2rem);
+        }
+
+        /* --- NARROW MODE --- */
+        .narrow-hide-logo .stock-logo-wrap {
+            display: none !important;
+        }
+
+        .narrow-hide-price .cell-gia {
+            display: none !important;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            #mainContent {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            #leftPane,
+            #rightPane {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 400px;
+            }
+
+            #resizer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-blue-500/20">
+
+    <div id="toastContainer"
+        class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none items-center px-4">
+    </div>
+
+    <main id="mainContent" class="flex flex-grow overflow-hidden">
+
+        <!-- CỘT TRÁI: VIỆC CẦN LÀM -->
+        <section id="leftPane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 40%;">
+            <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end">
+                <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Việc cần làm</h2>
+                <div id="pendingCash" class="text-2xl font-black mono tracking-tighter text-green-500 tabular-nums">0
+                </div>
+            </header>
+
+            <div id="todoBody" class="flex-grow overflow-y-auto list-container"></div>
+
+            <footer class="h-14 flex items-center bg-[#050505] border-t border-[var(--border)] px-4 shrink-0">
+                <label class="flex items-center gap-3 w-full h-full cursor-text">
+                    <div
+                        class="flex-none w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center bg-white/5 text-white/40">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <input type="text" id="todoInput" placeholder="Thêm việc mới..." autocomplete="off"
+                        class="bg-transparent border-none outline-none w-full text-sm font-bold text-white placeholder-[#2a2a2a]">
+                </label>
+            </footer>
+        </section>
+
+        <div id="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
+
+        <!-- CỘT PHẢI: DANH MỤC ĐẦU TƯ -->
+        <section id="rightPane" class="flex flex-col overflow-hidden" style="width: 60%;">
+            <header
+                class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
+                <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Danh mục đầu tư</h2>
+                <div id="totalAssets" class="text-2xl font-black mono tracking-tighter text-neutral-500 tabular-nums">0
+                </div>
+            </header>
+
+            <div id="stockBody" class="flex-grow overflow-y-auto">
+                <div id="stockTable" class="stock-table">
+                    <!-- HEADER (Bảng thực sự) -->
+                    <div class="stock-row list-header">
+                        <div class="stock-cell cell-move"></div>
+                        <div class="stock-cell cell-ma">Mã</div>
+                        <div class="stock-cell cell-gia">Giá</div>
+                        <div class="stock-cell cell-sohuu">Sở hữu</div>
+                        <div class="stock-cell cell-trade">Giao dịch</div>
+                        <div class="stock-cell cell-delete"></div>
+                    </div>
+                    <!-- LIST RENDERED HERE -->
+                    <div id="stockList" style="display: contents;"></div>
+                </div>
+            </div>
+
+            <footer class="h-14 flex items-center bg-[#050505] border-t border-[var(--border)] px-4 shrink-0">
+                <label class="flex items-center gap-3 w-full h-full cursor-text">
+                    <div
+                        class="flex-none w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center bg-white/5 text-white/40">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <input type="text" id="newStockInput" placeholder="Thêm mã cổ phiếu..." autocomplete="off"
+                        class="bg-transparent border-none outline-none w-full text-sm font-bold text-white placeholder-[#2a2a2a]">
+                </label>
+            </footer>
+        </section>
+    </main>
+
+    <script>
+        const BASE_SALARY = 2340000, WORKING_HOURS = 208;
+        const REWARD_VALUE = BASE_SALARY / WORKING_HOURS;
+        const BROKER_URL = 'wss://datafeed-krx.dnse.com.vn/wss';
+        const TOPIC_PREFIX = 'quotes/krx/mdds/stockinfo/v1/roundlot/symbol/';
+
+        // Xử lý Storage bị chặn trong môi trường Canvas
+        let state = { todo: { items: [], cash: 0 }, portfolio: [] };
+        try {
+            const saved = localStorage.getItem('TodoStock');
+            if (saved) state = JSON.parse(saved);
+        } catch (e) {
+            console.log("Storage access restricted by environment. Using in-memory state.");
+        }
+
+        let prices = {}, refs = {}, ceils = {}, floors = {}, connected = false;
+        let lastSnapshot = null, undoTimeout = null;
+
+        const save = () => {
+            try { localStorage.setItem('TodoStock', JSON.stringify(state)); } catch (e) { }
+        };
+
+        const num = (v) => (connected && v !== null && !isNaN(v)) ? new Intl.NumberFormat('de-DE').format(Math.round(v)) : '---';
+
+        window.toast = function (msg, type = 'info', onUndo = null) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast-active pointer-events-auto bg-[#111] border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-6`;
+            let color = type === 'error' ? 'text-danger' : (type === 'success' ? 'text-green-500' : 'text-white');
+            el.innerHTML = `<span class="text-sm font-bold ${color}">${msg}</span><div class="flex gap-2 shrink-0">${onUndo ? `<button id="u" class="text-[10px] font-black uppercase tracking-widest bg-blue-600/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-600/30">Hoàn tác</button>` : ''}<button class="text-[10px] font-black uppercase tracking-widest text-neutral-500" onclick="this.closest('.toast-active').remove()">Đóng</button></div>`;
+            if (onUndo) el.querySelector('#u').onclick = () => { onUndo(); el.remove(); };
+            container.appendChild(el);
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
+        };
+
+        function snapshot() {
+            lastSnapshot = JSON.parse(JSON.stringify(state));
+            if (undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => lastSnapshot = null, 5000);
+        }
+
+        window.undo = function () {
+            if (!lastSnapshot) return;
+            state = JSON.parse(JSON.stringify(lastSnapshot));
+            lastSnapshot = null;
+            save(); renderAll();
+        };
+
+        window.moveItem = (type, key, direction) => {
+            let list = type === 'todo' ? state.todo.items : state.portfolio;
+            const index = type === 'todo' ? list.findIndex(i => i.id === key) : list.findIndex(i => i.symbol === key);
+            if (index < 0) return;
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= list.length) return;
+            [list[index], list[newIndex]] = [list[newIndex], list[index]];
+            save(); renderAll();
+        };
+
+        function renderTodos() {
+            const body = document.getElementById('todoBody');
+            body.innerHTML = state.todo.items.map((t, idx) => `
+                <div class="todo-row group">
+                    <div class="action-cell">
+                        <div class="order-btn-group">
+                            <button onclick="moveItem('todo', ${t.id}, -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}">
+                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
+                            </button>
+                            <button onclick="moveItem('todo', ${t.id}, 1)" class="order-btn ${idx === state.todo.items.length - 1 ? 'disabled' : ''}">
+                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="todo-content">
+                        <div class="action-cell cb-container">
+                            <input type="checkbox" onchange="finishTodo(${t.id})" class="custom-cb">
+                        </div>
+                        <span class="todo-text">${t.text}</span>
+                    </div>
+                    <div class="action-cell">
+                        <button onclick="delTodo(${t.id})" class="delete-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('pendingCash').textContent = new Intl.NumberFormat('de-DE').format(Math.round(state.todo.cash));
+        }
+
+        // Function để cập nhật UI từng giá cổ phiếu
+        function updateStockUI(s, p) {
+            const pEl = document.getElementById(`p-${s}`);
+            if (pEl) {
+                pEl.textContent = num(p * 1000);
+                let color = 'text-white';
+                if (refs[s]) {
+                    if (p >= ceils[s]) color = 'text-purple-500';
+                    else if (p <= floors[s]) color = 'text-blue-400';
+                    else if (p > refs[s]) color = 'text-green-500';
+                    else if (p < refs[s]) color = 'text-red-500';
+                    else color = 'text-yellow-500';
+                }
+                pEl.className = `mono text-lg tracking-tighter ${color}`;
+            }
+        }
+
+        function updateTotalAssets() {
+            let total = 0;
+            state.portfolio.forEach(i => { if (prices[i.symbol]) total += (i.qty * prices[i.symbol] * 1000); });
+            document.getElementById('totalAssets').textContent = num(total);
+        }
+
+        function renderStocks() {
+            const body = document.getElementById('stockList');
+            body.innerHTML = '';
+
+            state.portfolio.forEach((item, idx) => {
+                const s = item.symbol, q = item.qty;
+                const p = prices[s] ? prices[s] * 1000 : null;
+
+                let color = 'text-white';
+                if (connected && prices[s] && refs[s]) {
+                    if (prices[s] >= ceils[s]) color = 'text-purple-500';
+                    else if (prices[s] <= floors[s]) color = 'text-blue-400';
+                    else if (prices[s] > refs[s]) color = 'text-green-500';
+                    else if (prices[s] < refs[s]) color = 'text-red-500';
+                    else color = 'text-yellow-500';
+                }
+
+                const row = document.createElement('div');
+                row.className = `stock-row group`;
+                row.innerHTML = `
+                    <div class="stock-cell cell-move">
+                        <div class="order-btn-group mx-auto">
+                            <button onclick="moveItem('portfolio', '${s}', -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}">
+                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
+                            </button>
+                            <button onclick="moveItem('portfolio', '${s}', 1)" class="order-btn ${idx === state.portfolio.length - 1 ? 'disabled' : ''}">
+                                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-cell cell-ma">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="stock-logo-wrap">
+                                <img src="https://storage.googleapis.com/cdn-entrade/company/${s}" 
+                                     class="w-full h-full object-contain p-0.5" 
+                                     onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')">
+                                <div class="hidden w-full h-full flex items-center justify-center text-[10px] font-black text-black/40 uppercase bg-gray-100">${s.substring(0, 2)}</div>
+                            </div>
+                            <span class="font-bold text-base tracking-tighter">${s}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-cell cell-gia">
+                        <div id="p-${s}" class="mono text-lg tracking-tighter ${color}">${num(p)}</div>
+                    </div>
+                    
+                    <div class="stock-cell cell-sohuu">
+                        <span class="font-bold text-base tracking-tighter text-white">${q.toLocaleString('vi-VN')}</span>
+                    </div>
+                    
+                    <div class="stock-cell cell-trade">
+                        <div class="flex justify-center">
+                            <input type="number" id="tr-${s}" placeholder="±" oninput="upTrade('${s}')" onkeydown="if(event.key==='Enter') doTrade('${s}')" 
+                                   class="w-[70px] bg-white/5 border border-white/10 rounded px-2 py-1 text-center text-sm font-bold outline-none focus:border-white/30 transition-all placeholder-white/5">
+                        </div>
+                    </div>
+
+                    <div class="stock-cell cell-delete">
+                        ${q === 0 ? `
+                        <button onclick="delStock('${s}')" class="delete-btn mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>` : '<div style="width:20px;height:20px;" class="mx-auto"></div>'}
+                    </div>`;
+                body.appendChild(row);
+            });
+
+            updateTotalAssets();
+        }
+
+        function renderAll() { renderTodos(); renderStocks(); }
+
+        function checkNarrowMode() {
+            const table = document.getElementById('stockTable');
+            const pane = document.getElementById('rightPane');
+            if (!pane || !table) return;
+            const w = pane.offsetWidth;
+
+            if (w < 480) table.classList.add('narrow-hide-logo'); else table.classList.remove('narrow-hide-logo');
+            if (w < 380) table.classList.add('narrow-hide-price'); else table.classList.remove('narrow-hide-price');
+        }
+
+        window.finishTodo = (id) => { snapshot(); state.todo.cash += REWARD_VALUE; state.todo.items = state.todo.items.filter(t => t.id !== id); save(); renderAll(); toast("Đã hoàn thành việc", "success", undo); };
+        window.delTodo = (id) => { snapshot(); state.todo.items = state.todo.items.filter(t => t.id !== id); save(); renderTodos(); toast("Đã xóa việc", "info", undo); };
+        window.upTrade = (s) => { const inp = document.getElementById(`tr-${s}`); const val = parseFloat(inp.value); if (!val) { inp.style.outline = 'none'; inp.style.background = 'rgba(255,255,255,0.05)'; return; } inp.style.outline = val > 0 ? '1px solid #22c55e' : '1px solid #ef4444'; inp.style.background = val > 0 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'; };
+        window.doTrade = (s) => { const inp = document.getElementById(`tr-${s}`); const val = parseFloat(inp.value); if (!val || !prices[s]) return; const cost = val * prices[s] * 1000; if (val > 0 && state.todo.cash < cost) return toast("Số dư không đủ!", "error"); let stockItem = state.portfolio.find(i => i.symbol === s); if (val < 0 && (!stockItem || stockItem.qty + val < 0)) return toast("Không đủ cổ phiếu!", "error"); snapshot(); state.todo.cash -= cost; stockItem.qty += val; save(); renderAll(); toast(`Khớp lệnh ${val > 0 ? 'mua' : 'bán'} ${Math.abs(val)} ${s}`, "success", undo); };
+        window.delStock = (s) => { state.portfolio = state.portfolio.filter(i => i.symbol !== s); save(); renderStocks(); };
+
+        document.getElementById('todoInput').onkeydown = (e) => { if (e.key === 'Enter' && e.target.value.trim()) { state.todo.items.push({ id: Date.now(), text: e.target.value.trim() }); e.target.value = ''; save(); renderTodos(); } };
+        document.getElementById('newStockInput').onkeydown = (e) => { if (e.key === 'Enter' && e.target.value.trim()) { const s = e.target.value.trim().toUpperCase(); if (!state.portfolio.find(i => i.symbol === s)) { state.portfolio.push({ symbol: s, qty: 0 }); if (connected && typeof client !== 'undefined' && client) client.subscribe(TOPIC_PREFIX + s); save(); renderStocks(); e.target.value = ''; setTimeout(() => { if (!prices[s]) { state.portfolio = state.portfolio.filter(i => i.symbol !== s); save(); renderStocks(); toast(`Mã ${s} không hợp lệ hoặc không có dữ liệu`, "error"); } }, 5000); } } };
+
+        const res = document.getElementById('resizer'), mw = document.getElementById('mainContent');
+        res.onmousedown = () => { res.classList.add('dragging-pane'); document.onmousemove = (e) => { let p = (e.clientX / mw.clientWidth) * 100; if (p > 15 && p < 85) { document.getElementById('leftPane').style.width = p + '%'; document.getElementById('rightPane').style.width = (100 - p) + '%'; checkNarrowMode(); } }; document.onmouseup = () => { res.classList.remove('dragging-pane'); document.onmousemove = null; }; };
+
+        function decode(b) { let bytes = new Uint8Array(b), pos = 0, res = {}; const rv = () => { let v = 0, s = 0; while (pos < bytes.length) { let b = bytes[pos++]; v += (b & 127) << s; if (!(b & 128)) return v; s += 7; } return v; }; try { while (pos < bytes.length) { let k = rv(), w = k & 7, f = k >> 3; if (w === 1) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 8).getFloat64(0, true); pos += 8; } else if (w === 0) rv(); else if (w === 2) { let l = rv(); let sl = bytes.slice(pos, pos + l); pos += l; Object.assign(res, decode(sl)); } else if (w === 5) pos += 4; else break; } } catch (e) { } return res; }
+
+        let isReconnecting = false;
+        let client = null;
+
+        // MQTT với tính năng kiểm tra an toàn xem thư viện có bị chặn tải không
+        if (typeof mqtt !== 'undefined') {
+            client = mqtt.connect(BROKER_URL, {
+                username: 'entrade',
+                password: 'entrade',
+                keepalive: 60,
+                reconnectPeriod: 5000
+            });
+
+            client.on('connect', () => {
+                connected = true;
+                if (isReconnecting) {
+                    toast("Đã kết nối lại thành công với máy chủ dữ liệu", "success");
+                    isReconnecting = false;
+                }
+                state.portfolio.forEach(i => client.subscribe(TOPIC_PREFIX + i.symbol));
+                renderStocks();
+            });
+
+            client.on('error', (err) => {
+                if (!isReconnecting) {
+                    toast("Lỗi kết nối máy chủ. Đang tự động thử lại...", "error");
+                    isReconnecting = true;
+                }
+                connected = false;
+                renderStocks();
+            });
+
+            client.on('close', () => {
+                if (!isReconnecting && connected) {
+                    toast("Mất kết nối máy chủ. Đang tự động thử lại...", "error");
+                    isReconnecting = true;
+                }
+                connected = false;
+                renderStocks();
+            });
+
+            client.on('message', (t, m) => {
+                const s = t.split('/').pop(), d = decode(m);
+                if (d.F9) refs[s] = d.F9; if (d.F10) ceils[s] = d.F10; if (d.F11) floors[s] = d.F11;
+                if (d.F15) {
+                    prices[s] = d.F15;
+                    updateStockUI(s, d.F15);
+                    updateTotalAssets();
+                }
+            });
+        } else {
+            console.error("Thư viện MQTT không tồn tại. Có thể do Tracking Prevention chặn.");
+            setTimeout(() => {
+                toast("Lỗi tải thư viện dữ liệu (Tracking Prevention/AdBlock).", "error");
+            }, 1000);
+        }
+
+        renderAll();
+        window.addEventListener('resize', checkNarrowMode);
+        setTimeout(checkNarrowMode, 100);
+    </script>
+</body>
+
+</html>

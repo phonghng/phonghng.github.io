@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhongHNg_Chukyso.pdf</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+    <style>
+        :root {
+            /* Modern SaaS/DevTool Palette (Zinc/Emerald) */
+            --bg-base: #09090b;
+            --bg-panel: #18181b;
+            --bg-input: #27272a;
+            --bg-input-hover: #3f3f46;
+
+            --fg-main: #f4f4f5;
+            --fg-muted: #a1a1aa;
+
+            --border: #3f3f46;
+            --border-hover: #52525b;
+
+            --accent-primary: #10b981;
+            --accent-primary-hover: #059669;
+            --accent-secondary: #3b82f6;
+
+            --status-err: #ef4444;
+            --status-ok: #10b981;
+
+            --radius-md: 6px;
+            --radius-sm: 4px;
+
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --focus-ring: 0 0 0 2px #09090b, 0 0 0 4px var(--accent-primary);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--fg-main);
+            /* Điều chỉnh padding tổng thể cho viewport */
+            padding: 3vh 3vw;
+            font-size: 14px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LAYOUT */
+        main.terminal-layout {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            width: 100%;
+            /* Thu hẹp max-width lại một chút để tập trung hơn */
+            max-width: 1300px;
+            margin: 0 auto;
+            overflow: hidden;
+            /* Giảm gap giữa 2 cột để nhìn liền lạc hơn */
+            gap: 12px;
+        }
+
+        .controls-pane {
+            flex: 1 1 45%;
+            overflow-y: auto;
+            /* Giảm padding-right để cân đối với cột bên phải */
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .console-pane {
+            flex: 1 1 55%;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            /* Thêm một chút margin-left nếu cần, nhưng gap đã lo việc này */
+        }
+
+        /* RESIZER */
+        .resizer {
+            flex: 0 0 4px;
+            /* Thu hẹp lại để tinh tế hơn */
+            background: transparent;
+            cursor: col-resize;
+            /* Loại bỏ margin thừa để tận dụng gap của parent */
+            margin: 0;
+            border-radius: 2px;
+            transition: background 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Đường line ở giữa resizer */
+        .resizer::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 24px;
+            background-color: var(--border);
+            border-radius: 1px;
+            transition: background-color 0.2s;
+        }
+
+        .resizer:hover,
+        .resizer.resizing {
+            background: var(--border-hover);
+        }
+
+        .resizer:hover::after,
+        .resizer.resizing::after {
+            background-color: var(--fg-main);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 15px;
+            }
+
+            main.terminal-layout {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .controls-pane {
+                padding-right: 0;
+                padding-bottom: 0;
+                flex: 1 1 auto;
+            }
+
+            .resizer {
+                cursor: row-resize;
+                flex: 0 0 4px;
+                width: 100%;
+            }
+
+            .resizer::after {
+                width: 30px;
+                height: 2px;
+            }
+        }
+
+        /* UI CARDS */
+        .section-pane {
+            display: none;
+        }
+
+        .section-pane.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(2px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            /* Điều chỉnh padding card cho gọn gàng hơn */
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-header {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--fg-main);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* FORMS & INPUTS */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--fg-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        input[type="password"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--fg-main);
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:hover,
+        textarea:hover {
+            border-color: var(--border-hover);
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: var(--focus-ring);
+            background: var(--bg-panel);
+        }
+
+        input[type="file"] {
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: var(--bg-input-hover);
+            color: var(--fg-main);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            margin-right: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: var(--border);
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        /* BUTTONS */
+        button {
+            width: 100%;
+            padding: 10px 16px;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+            outline: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid transparent;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:focus-visible {
+            box-shadow: var(--focus-ring);
+        }
+
+        .btn-primary {
+            background: var(--fg-main);
+            color: var(--bg-base);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #d4d4d8;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--fg-main);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-input-hover);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--fg-muted);
+            width: auto;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-ghost:hover {
+            color: var(--fg-main);
+            background: var(--bg-input);
+        }
+
+        /* CONSOLE */
+        .console-header {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-panel);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--fg-muted);
+        }
+
+        .console-output {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            background: var(--bg-base);
+        }
+
+        .console-output div {
+            margin-bottom: 6px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .log-time {
+            color: var(--fg-muted);
+            margin-right: 12px;
+            user-select: none;
+        }
+
+        .log-info {
+            color: var(--fg-main);
+        }
+
+        .log-success {
+            color: var(--status-ok);
+        }
+
+        .log-error {
+            color: var(--status-err);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* VISUAL RESULT UI */
+        .verify-result-ui {
+            margin-top: 16px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .verify-result-ui.has-content {
+            display: block;
+            border: 1px solid var(--border);
+            background: var(--bg-base);
+        }
+
+        .ui-res-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ui-res-item:last-child {
+            border-bottom: none;
+        }
+
+        .ui-res-item::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .ui-res-success {
+            color: var(--fg-main);
+        }
+
+        .ui-res-success::before {
+            background: var(--status-ok);
+            box-shadow: 0 0 4px var(--status-ok);
+        }
+
+        .ui-res-error {
+            color: var(--status-err);
+        }
+
+        .ui-res-error::before {
+            background: var(--status-err);
+            box-shadow: 0 0 4px var(--status-err);
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: var(--fg-muted);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="terminal-layout" id="main-container">
+
+        <!-- CONTROLS PANE -->
+        <section class="controls-pane" id="controls-pane">
+
+            <!-- SETUP SECTION -->
+            <div id="setup-section" class="section-pane">
+                <div class="card">
+                    <div class="card-header">Setup Required</div>
+                    <p class="helper-text">System is not configured. Generate encryption keys to proceed.</p>
+
+                    <div class="form-group">
+                        <label for="setup-password">Master Password</label>
+                        <input type="password" id="setup-password" placeholder="Enter secure password">
+                    </div>
+                    <button id="btn-setup" class="btn-primary">Generate Keys</button>
+
+                    <div id="code-output-area" style="display: none; margin-top: 24px;">
+                        <label for="generated-code">Configuration (Replace PRIVATE_CONFIG in source):</label>
+                        <textarea id="generated-code" readonly></textarea>
+                        <button id="btn-copy" class="btn-secondary" style="margin-top: 12px;">Copy Config</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APP SECTION -->
+            <div id="app-section" class="section-pane">
+
+                <!-- SIGN MODULE -->
+                <div class="card">
+                    <div class="card-header">Sign Document</div>
+                    <div class="form-group">
+                        <label for="sign-pdf-file">Target File</label>
+                        <input type="file" id="sign-pdf-file" accept=".pdf">
+                    </div>
+                    <div class="form-group">
+                        <label for="sign-password">Master Password</label>
+                        <input type="password" id="sign-password" placeholder="Decrypt key">
+                    </div>
+                    <button id="btn-sign" class="btn-primary">Sign & Download</button>
+                </div>
+
+                <!-- VERIFY MODULE -->
+                <div class="card">
+                    <div class="card-header">Verify Document</div>
+                    <div class="form-group">
+                        <label for="verify-pdf-file">Target File</label>
+                        <input type="file" id="verify-pdf-file" accept=".pdf">
+                    </div>
+                    <button id="btn-verify" class="btn-secondary">Check Integrity</button>
+
+                    <div id="verify-result-ui" class="verify-result-ui"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Thanh resizer mới -->
+        <div class="resizer" id="resizer" title="Drag to resize"></div>
+
+        <!-- CONSOLE PANE -->
+        <aside class="console-pane" id="console-pane">
+            <div class="console-header">
+                <span>Output Console</span>
+                <button id="btn-clear-console" class="btn-ghost">Clear</button>
+            </div>
+            <div id="system-console" class="console-output"></div>
+        </aside>
+
+    </main>
+
+    <script>
+        // ============================================================================
+        // CONFIGURATION
+        // ============================================================================
+        /* const PRIVATE_CONFIG = {
+            isConfigured: false,
+            encryptedPrivateKey: "",
+            certificatePem: "",
+            salt: "",
+            iv: ""
+        }; */
+        const PRIVATE_CONFIG = {
+            isConfigured: true,
+            encryptedPrivateKey: "oVYifZOteZLnwvrVe5Sil6XrFQov77nsE/usD9e4Nbu2cfjaku6+9sJP3Yk1NBQPWxFYQoI5ywS1/iI7gwl+KsCEVu6btLXYJsfD5g4QrRIg8PIFWMBVQBnzk3wbRITl72f0G7+4WFmeb7NQtreMXxvYWicUNNzPfSlecYuF6Hblu7TmmUGqvBciKGfq51CDb98NYkB7USNeeBZ/+gv3lCEusDQNxjKWlAVwgqNafmp9HX71tzVS8yiKJUj1W0lktpWvqBMgMZSTE7W2pHT2/eh9j8sGNpXnt+Kfo5m0XYzjz9DgUwtNK8ZCtyQQn6clmC89cKTtKl5sfEGclxfJcmI28pKoE8SUviR7GCh6kWOShJm2thIKP/mC7t9vIXwsp8JdpPLhCbdCU6JTrxnRoeyRW6vRtofcgUmniAkfHDHmxBDJBRqg8hRiE3JGwh/gBEQVSfsAC1wmMI2n0VbIUZi0MdvVPOFJChIU81EKg2t6j8IIYZAqcjaRevPghkLAf4XJb9w9mXMNE+GSxPrKp/u0dOLBYNxmEB7AfoMn8T74BOnxB30kBk6wML6dYup96fHU6E6lchVu0BbunT9ry/USMKyJ8l90MuS+uer5RhTdXP6S2smzf4SWyLoTVuKFIAQEwn8XkOIVFH1fkqWAwi9wXsjKZxMXBRdgsmqyCH6eHuPDqP3CX2m8Wa/SEh5qeEBBbtGw8M1PdgZWGFstXstFQV72BcMprDoPMThPicx1tGSmQ7fzihKMTx71kpVtFsCFEAnG4jfAdG46vVbhGStHP4/fpADqdX5PnF7DcokHgnYJiWc+0MSdaAlF7SU7G00QvrC8OnLxh8moQWepP7olyLtCFvEIcwMLQtqJi8CDHcuxu9O5gawlSNgr1ryugJOqE92NxVAzX2vPmpN5bi43Q/kGvHl1gl5beN2ccRvLnsxHvIA3r1U1+3WMzaykvxjO5t/KH/xV873+NpgSMxqQTMk7g7J8ZDw8ifazC0GZawE1o6ZSL1WGtKMDwgKyaxS+/NJUELX1kGtEpyUOvN8EDUtl/QkZjntp17gOqZb+sq7eAmoLNEy3VmbFyaiRsJ4+rAZGV5ic6Z4P36aai8pRTuf0cvG8meO8qk/bZxNWKk3X/xgbPMJFk0ZUK2Hno5PnPDKdAQxdgcdm83k6GvtvNV1gPPOk8Ldf+o9pU3PkDShhd45/gk0X9IY3agN/IJh+85dEmuGGaZR02A2P49/8T0GxrnEq8GXpMXafOjMjxKj92axWOsrK+6/Y16uSeHVIZy/qcge4ctPXFXjgbGhKrK/pFQg6q0iNnKesIHB60P2wNO5IeIvPcv5dOkAexR5CGEy0iQ6nFGrcW/X0YOeE+86WS9tKBxweGRgztVnlLWNPf6tV/wkrr4ByyGxhaaMoqKDU8TIlTZaiD2w+K9I2/aPjnjrr3uVLvOXw3u806aM+y+qyrfNeLrAwNpsde5Ev5jumMZTQrDpehoIn3dKUwU7FNjmwPMVx9BAYpE2+mbY608e21KOf4229EFJCVCcJGyo4IM/3mrheCwToaOyWP2W8a19TyEyW+DAwwTQyCI2MhG9F6Xcq/dHY8qlgWjUNyHld8MfmBtWbjmrFX3xxUxmQJ55f6MsFTmUR6NLww5QRM0aPbioOlYS2r9lW31P4tiuG7HSdcIkVqOQUtbRD3jzbc0XUEPpwE2RhBaKF/EVhHQ2HNwEHOR0yEqZcGClXU0AGBZ0Ps6ItcQ0YBZeF569FoDDmsHOEeoJIuSAGDkaLIPv8gmPt8EYzdI7mQVT/wRxQIFu4U5U9CimrYJWI6KN6suOA+ibhrVnt24MDiLEgy2elXKJ3izL8LOK6BFjHUolGVFijGgF89MDWA0/8lxLNcQzJgra9Te9NBCMaiZeUBYixFmmCONd2zMFyg0STTbBUfGQEMESqo1761uMNnVCq/DHnTR5uQIALDIovqc1EW8o/nCSLoSI/gE4LlOHYzRRdney/Qj9lRes9G3vbUHMLd3mHLCENVXNtfxuibxSCiEqtYmGpaJKpXqd4tqlzKhPKo6RPiqyO/7V9I8tRj/1fvgPAMlmTxvs3u4PtxcFQT96Uh11lW+NNR28pvwKkQsXtnRJ6kw9aPkS1KTa24G94zhzNwPncrTDCCwhr55GCSGnUwc8yTpYy6NScKQFfVtmD4RCfGmzPHiJ98I5CF1ZY7hfT/k1Zew5Ogv2Vyc/Tdqu7pX6ighrfPcYONP1a39opxyRTMomKru2JMDxHmHSBAgdjgmCHH9C1yRYN32DXa39FxDgIAGj2WSge060oCqiml9+ESs64rfiNxi82eGr8YhtOV7Pv/q8hBj1J9StJlss4jLtCLXWgnkrqUm/gksTRzd+fvPmwPhFDlZ1Hq3WTplLqeNWk1cGLsWSfMdT5SGGqp/FYTd6OXg2ygBccjbf9sU0Q4474USdSjehqjG8crh6drcsQLydabnI4w3Cb0lcNG7laH3bQjHHpREclssDdV2ZPTbN06N2d4P/g6QtCCGFr7XajftrIxP6zLn1OAJxvHev1zCSK5ktsj9zm9fP3iChkVrU+x7xnxj4RUzzt9gNxm484VaQ7tz+sCIbI3CSCfoGyYzO+Xw53aMRAEIKT/mTidG6PI48PNj4AKdBw7jfhLzD5clzNH+ZQWF++1eVc5dznQ1bL6nr+9VNWf2QmQrJEeim8TOhq8xBRWz7jgjk9JNFNJlXOGK0a+YZ9H5Vpi5Y1xl3/pg0s002QjFDwbxeghgf9hZw2kLu/BInSw5HwksS89NA5IP0RVySGNeeZ1criEJwF/z1EjktROYa3nHuCXGq3kUjBzwryr/Jdm9PaT3omYsoXGv3OC8iAk5H7XaV16m49xBGl3snl4fGIaouf2oXsQbUxpG72ssINNgNJRclbYAb2a+rTHMjvhGZ4uvpX64HhPk3GjF2IeEFJxl/2+ED1VSaVsRKW64qK0HjVbetH+/eE6OFR9beXKwWcmRcJUJJMzTeEASzK5T2OsQLOAM/AHePdY3B5fxtHHehbQiq2TI5HDaLhAlo/eUTXtaAaQdynW+tX++1tNml319tvGho80iMgSzJndeL83ya08Hg3xQjGqB5nmZihs9l0LBzWsWzaYbMN/n5tDo5fva9LoVPv6Ss2vwTIptV4nW092PlQe9LJpiMpyBEFAGFbk8jxUCnV+7y2oovQE5KYFegvJucl3RRsuaUYy3gxxgmogYlE+8V7H1LVUDHoykL9T0Brnh88RCBIqY3U/4uy2Gtv0XHabWaOInO6ERcd/Z8tiyaCIeK4M2qY6zFezugSQ/th3R+/TDz45SnNDugty6t4KyPHOgkxTw07tUD9Vki6iBQuOe3FT7H0MUGSYDI48iXA2zqZ8ilJja5zw/eDupKmfVzSCy3Xdm8C7v10QRdnP2zvtHiOVDXXWCOdsO3KPHjpzmhojG4M09DK0My8mtS2b1+uoE6u5FpDoylFndMWifVVVqGlYHIuuth4rdRnqK8b/RzBxMgL62eWaxlfkXwAVQLaKGVju11juO2j/Caq9GfnXuRCXIuFhmFW/5BisVolQ4u2O3f2iq5HnZKz6sZas+NLTuVt5pZC5AR8daz10JOPr2gT0woSjtLwInHLABEdpzup1x/K7u1ru2eA07H9CCVQSTk/wWsM2uL+E31D8VnnUqzH0FiG4MpsDUQy5VAVqzo0cBO8LpHnHYIvHKKwjUu+boC1jSQyPyruNccULcK94YHCByl5v75hxHsi4x3+lTmVAEhJp4+bDGsP+KKoHcCoWL4lil7BQ/orVDjUFKopivM5T8oPPcG1pIahXnH+nYS48c3MZP7/BTNLatEUclzUdFy7fTAKy1ih+4IRKZOTEgb1oKf3451liz34c5hI9UpGe4jE1bYeiglJ4+1DktQhAEEWYomobFDP7PIcRwuPL4tXvh/nQU+cUM22AdyKEaTktiojbNxU/ePgsBJLQTNUpJ6H6izSnw/ttSdO2vvxBHzAGtPSAqzE7hDfbopx8Qj6MqI7vp0AR9Ncdpll3otpMDklDLEa+sl+Uk6PVlbHWe0fkuwZcmPXU/MCjjr6fRLIqRK1mclkODj6TK56k9Az4Sh4MBM5cQQz5tU79mGTFyrPvFvPm4KojNYY3BUplmzb3ip5bgdamyZkmhLJ6YZsAWKaM3XeI0HQhUlC6A3YsQZlWWdUpgD3uypu3GB9hY4MfYWFZGkPXtqfQNEeN7DBmO49+J3wON0QdyJ6Usapf7L9VCATM7FWIGHg4Rp2+DwMhB6B0+wBiniLbY4lPajgvEQrczeZlVOMyWNyJBDy97Wto9Zd+FI2PM9fjdezuhaNkE+a9qud4jnmB913EZ5og4qQUOQxZNwcwK2XqLHCVpAqtjs5D4dBSy+2zzUnBnKc/ICA8+caTGCAEInLOXkAvK0bOA==",
+            certificatePem: `-----BEGIN CERTIFICATE-----
+MIIEuzCCAqOgAwIBAgIDFoMBMA0GCSqGSIb3DQEBDQUAMB8xHTAbBgNVBAMTFFBo
+b25nSE5nX0NodWt5c28ucGRmMCAXDTI2MDMxMjEzMTM1M1oYDzIxMjYwMzEyMTMx
+MzUzWjAfMR0wGwYDVQQDExRQaG9uZ0hOZ19DaHVreXNvLnBkZjCCAiIwDQYJKoZI
+hvcNAQEBBQADggIPADCCAgoCggIBAMXqLua8c11Kg9g7f0XZ2dIwxy2ogiBpueqx
+VC+bU7vuAguzsqZWL0UHeDu+KRSPcEBgYcr3M1NlLJgYJxbhdpktz7I0ZfVzzES9
+N+suWwLDBDSJ6XVI0ThUgqn6H7hxz4AQ5WJYNZYoeVmkHl4jX9EN62evMONTKvDQ
+LNnh+qNRB5SqYb3IwRKMlpjr9fwICikE90HOfvXuGk0NixRxruRuJlKoTRiHUtbi
+gpqZyNh3W1CdZAtWyqGlY8pxZd4CiG/rr6qwrYm6r2vdW0iBZxhEmMzqFibqOtRL
+qP7Vx4ZEOEOYrGgbCEO+MZymlt3mMrPGrK4cumAHCm02pPGJyjzhk61eYgr7EuoR
+m5VvFavH2IohBTQjw/IENI4eFJCqBSvPXYqvbURQYMyotjs79D71PU/2sRHlMNgL
+UWElpeC2P9ZKO2AM3NU4sFLYrB9tWPOQR9fr/LfiHNOlcoweofl1tFF6eGKr+GaP
+p8S886+qDK9dyt1ShJG81BwMgj9i/f2dwLxIxw0nlVX1llJeFb53AzVyV+GcMhBV
+h1CGqVX7qTUQHPHdmPIuDMNx55sTt19ZycKKBDTGEGaow1/OmH7BkQDEYac0mg6M
+j1RK3u4+v62oaZdto0T+mpp3OU0BSbtVpv7OGxlPcxDFSg56r0ywTv05rKDy3rKy
+IYkwYMrrAgMBAAEwDQYJKoZIhvcNAQENBQADggIBAKw8YVaZRdi6IdQDk8wAQbXU
+IWovg7L7mFVD4go0A6EsysrytMY0e1d2MS9sL9/MXLw1TFzLChXvWzgESyEsiy6Q
+LJYiJ27jxvWSOoWsHzS5qb/xkfI+bKLPmFdl8lSiMa7wXHCRx2PaBwZmKEI+4dk1
+BRfId9KmNfOPGwz6uAZSggv+v1vGK8mizI1n+/wa2O6tJCaxGSX/ResxR6hnbh5O
+3/7qVCQpfRAYGUSbxWmEj8gv4tOkO0TrLUga/nDQfYj7dtTwbMMS+5g4l4oB4qkK
+r6z1C5daE9QYPg03n63UDdF03rjGUwvtvAhydRRLU4JgMOXnVzpHqNfpDK0Bi+eC
+Tn3LfSCxlLmZZ3Qy4EN3xKpXt9KGWpDQ7Lx9YzH363+tK3doSU6VzayyMxUE145N
+JkMvPohau07JHBeYB1m1dHGvF/Zq+HaDOCQbiXOjCgJGtEsdlHeFTYbEc7l90nRk
+sKqklL2wwP8dZCISbIjLh8A6WZif9PZxABf38Nbhrr9O0A2ezSmPkHwAbQay84Fu
+uomaGnS4aaWdsn5WTLDuL1+GjwAsHEKo7beZ40JeMIqPKxPl1cDvc0jziJP54eYf
+yvmNT1QOOvljnp6k+hiI0FGQdaYTtu3kszDifZvd5+9gI3ET6xN0JCuhAHibCITP
+WuZOFzNJhtCogJPCNmBU
+-----END CERTIFICATE-----
+`,
+            salt: "fN8yC2MNdIHrLdV6fQK4h8fdcHgX2ReqGZUrl/NPymk=",
+            iv: "ocOFau07zhgJRLW6nhwYsg=="
+        };
+        // ============================================================================
+
+        /** CORE CRYPTO ENGINE */
+        class CoreCryptoEngine {
+            static pemToArrayBuffer(pem) {
+                const b64 = pem.replace(/(-----(BEGIN|END).*-----|\n|\r)/g, '');
+                const binary = atob(b64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                return bytes.buffer;
+            }
+
+            static async generateRSA4096KeyPair() {
+                return new Promise((resolve, reject) => {
+                    forge.pki.rsa.generateKeyPair({ bits: 4096, workers: -1 }, (err, keypair) => {
+                        if (err) reject(err); else resolve(keypair);
+                    });
+                });
+            }
+
+            static createSelfSignedCert(keys, commonName) {
+                const cert = forge.pki.createCertificate();
+                cert.publicKey = keys.publicKey;
+                cert.serialNumber = '01' + Math.floor(Math.random() * 1000000);
+                cert.validity.notBefore = new Date();
+                cert.validity.notAfter = new Date();
+                cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 100);
+                cert.setSubject([{ name: 'commonName', value: commonName }]);
+                cert.setIssuer([{ name: 'commonName', value: commonName }]);
+                cert.sign(keys.privateKey, forge.md.sha512.create());
+                return forge.pki.certificateToPem(cert);
+            }
+
+            static encryptPrivateKey(privateKey, password) {
+                const privateKeyInfo = forge.pki.wrapRsaPrivateKey(forge.pki.privateKeyToAsn1(privateKey));
+                const pkcs8Pem = forge.pki.privateKeyInfoToPem(privateKeyInfo);
+
+                const salt = forge.random.getBytesSync(32);
+                const iv = forge.random.getBytesSync(16);
+                const derivedKey = forge.pkcs5.pbkdf2(password, salt, 200000, 32);
+
+                const cipher = forge.cipher.createCipher('AES-CBC', derivedKey);
+                cipher.start({ iv: iv });
+                cipher.update(forge.util.createBuffer(pkcs8Pem));
+                cipher.finish();
+
+                return { encryptedBytes: cipher.output.getBytes(), salt, iv };
+            }
+
+            static async decryptToCryptoKey(encryptedB64, saltB64, ivB64, password) {
+                const encryptedBytes = forge.util.decode64(encryptedB64);
+                const salt = forge.util.decode64(saltB64);
+                const iv = forge.util.decode64(ivB64);
+
+                const derivedKey = forge.pkcs5.pbkdf2(password, salt, 200000, 32);
+                const decipher = forge.cipher.createDecipher('AES-CBC', derivedKey);
+
+                decipher.start({ iv: iv });
+                decipher.update(forge.util.createBuffer(encryptedBytes));
+                if (!decipher.finish()) throw new Error("Decryption failed. Bad password.");
+
+                const pkcs8Pem = decipher.output.toString();
+                const keyBuffer = this.pemToArrayBuffer(pkcs8Pem);
+
+                return crypto.subtle.importKey(
+                    "pkcs8", keyBuffer,
+                    { name: "RSA-PSS", hash: "SHA-512" },
+                    false, ["sign"]
+                );
+            }
+
+            static async signBytes(cryptoKey, fileBytes) {
+                return await crypto.subtle.sign(
+                    { name: "RSA-PSS", saltLength: 64 },
+                    cryptoKey,
+                    fileBytes
+                );
+            }
+
+            static async verifyBytes(certPem, signatureBytes, dataToVerify) {
+                const certObj = forge.pki.certificateFromPem(certPem);
+                const spkiPem = forge.pki.publicKeyToPem(certObj.publicKey);
+                const verifyKey = await crypto.subtle.importKey(
+                    "spki", this.pemToArrayBuffer(spkiPem),
+                    { name: "RSA-PSS", hash: "SHA-512" }, false, ["verify"]
+                );
+                return await crypto.subtle.verify(
+                    { name: "RSA-PSS", saltLength: 64 },
+                    verifyKey,
+                    signatureBytes,
+                    dataToVerify
+                );
+            }
+
+            static scanSignatures(buffer, markerString) {
+                const markerBytes = new TextEncoder().encode(markerString);
+                let signatures = [];
+                let index = 0;
+
+                while (index <= buffer.length - markerBytes.length) {
+                    let match = true;
+                    for (let j = 0; j < markerBytes.length; j++) {
+                        if (buffer[index + j] !== markerBytes[j]) { match = false; break; }
+                    }
+
+                    if (match) {
+                        let endOfLine = index + markerBytes.length;
+                        while (endOfLine < buffer.length && buffer[endOfLine] !== 10) { endOfLine++; }
+
+                        const lineBytes = buffer.slice(index + markerBytes.length, endOfLine);
+                        const lineStr = new TextDecoder().decode(lineBytes);
+                        const parts = lineStr.split(':');
+
+                        if (parts.length === 2) {
+                            signatures.push({ startIndex: index, sigBase64: parts[0], certBase64: parts[1] });
+                        }
+                        index = endOfLine;
+                    } else {
+                        index++;
+                    }
+                }
+                return signatures;
+            }
+        }
+
+
+        /** SIGNATURE CONTROLLER */
+        class SignatureController {
+            constructor(logCallback) {
+                this.log = logCallback || console.log;
+                this.IDENTITY_NAME = 'PhongHNg_Chukyso.pdf';
+                this.SIGNATURE_MARKER = `\n%${this.IDENTITY_NAME}:`;
+            }
+
+            async yieldThread() {
+                return new Promise(resolve => setTimeout(resolve, 15));
+            }
+
+            async setupIdentity(password) {
+                const startTime = performance.now();
+                this.log("Initializing generation sequence...", "info");
+                await this.yieldThread();
+
+                this.log("Generating RSA-4096 keypair...", "info");
+                const keys = await CoreCryptoEngine.generateRSA4096KeyPair();
+                this.log("Keypair generated.", "success");
+                await this.yieldThread();
+
+                this.log(`Creating certificate for: ${this.IDENTITY_NAME}`, "info");
+                const pemCert = CoreCryptoEngine.createSelfSignedCert(keys, this.IDENTITY_NAME);
+                this.log("Certificate created.", "success");
+                await this.yieldThread();
+
+                this.log("Encrypting private key...", "info");
+                const { encryptedBytes, salt, iv } = CoreCryptoEngine.encryptPrivateKey(keys.privateKey, password);
+                this.log("Key encrypted.", "success");
+                await this.yieldThread();
+
+                const execTime = (performance.now() - startTime).toFixed(2);
+                this.log(`Configuration ready in ${execTime}ms.`, "success");
+                return `const PRIVATE_CONFIG = {
+    isConfigured: true,
+    encryptedPrivateKey: "${forge.util.encode64(encryptedBytes)}",
+    certificatePem: \`${pemCert}\`,
+    salt: "${forge.util.encode64(salt)}",
+    iv: "${forge.util.encode64(iv)}"
+};`;
+            }
+
+            async executeSign(fileBuffer, password, config) {
+                const startTime = performance.now();
+                const fileBytes = new Uint8Array(fileBuffer);
+                this.log(`Target loaded: ${fileBytes.length} bytes.`, "info");
+                await this.yieldThread();
+
+                this.log("Decrypting key...", "info");
+                let cryptoKey;
+                try {
+                    cryptoKey = await CoreCryptoEngine.decryptToCryptoKey(
+                        config.encryptedPrivateKey, config.salt, config.iv, password
+                    );
+                } catch (e) {
+                    throw new Error("Authentication failed: Incorrect password.");
+                }
+                this.log("Key decrypted.", "success");
+                await this.yieldThread();
+
+                this.log(`Hashing and signing...`, "info");
+                const signatureBuffer = await CoreCryptoEngine.signBytes(cryptoKey, fileBytes);
+                this.log(`Signature created (${signatureBuffer.byteLength} bytes).`, "success");
+                await this.yieldThread();
+
+                this.log("Injecting signature...", "info");
+                const sigBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(signatureBuffer)));
+                const certBase64 = btoa(config.certificatePem);
+
+                const blockStr = `${this.SIGNATURE_MARKER}${sigBase64}:${certBase64}\n`;
+                const blockBytes = new TextEncoder().encode(blockStr);
+
+                const finalBuffer = new Uint8Array(fileBytes.length + blockBytes.length);
+                finalBuffer.set(fileBytes);
+                finalBuffer.set(blockBytes, fileBytes.length);
+
+                const execTime = (performance.now() - startTime).toFixed(2);
+                this.log(`Injection complete (${execTime}ms).`, "success");
+                return finalBuffer;
+            }
+
+            async executeVerify(fileBuffer, config) {
+                const startTime = performance.now();
+                const buffer = new Uint8Array(fileBuffer);
+                this.log(`Scanning document (${buffer.length} bytes)...`, "info");
+                await this.yieldThread();
+
+                const signatures = CoreCryptoEngine.scanSignatures(buffer, this.SIGNATURE_MARKER);
+
+                if (signatures.length === 0) {
+                    this.log("No signatures found.", "error");
+                    return [];
+                }
+
+                this.log(`Found ${signatures.length} signature(s). Validating...`, "info");
+                await this.yieldThread();
+
+                let results = [];
+                for (let i = 0; i < signatures.length; i++) {
+                    const sig = signatures[i];
+                    this.log(`Analyzing block at offset: ${sig.startIndex}...`, "info");
+
+                    const dataToVerify = buffer.slice(0, sig.startIndex);
+                    const signatureBytes = new Uint8Array(atob(sig.sigBase64).split('').map(c => c.charCodeAt(0)));
+                    const certPem = atob(sig.certBase64);
+
+                    let isMine = (certPem.trim() === config.certificatePem.trim());
+                    let isValid = false;
+
+                    try {
+                        isValid = await CoreCryptoEngine.verifyBytes(certPem, signatureBytes, dataToVerify);
+                    } catch (e) {
+                        isValid = false;
+                    }
+
+                    results.push({ layer: i + 1, isValid, isMine });
+                    this.log(`Layer ${i + 1}: ${isValid ? 'Valid' : 'Corrupted'}`, isValid ? "success" : "error");
+                }
+
+                const execTime = (performance.now() - startTime).toFixed(2);
+                this.log(`Verification complete (${execTime}ms).`, "info");
+                return results;
+            }
+        }
+
+
+        /** UI MANAGER & RESIZER */
+        class UIManager {
+            constructor() {
+                this.consoleElement = document.getElementById('system-console');
+                this.resultUI = document.getElementById('verify-result-ui');
+                this.initResizer();
+                this.bindEvents();
+                this.initViews();
+                this.printLog("System ready.", "info");
+            }
+
+            initViews() {
+                if (PRIVATE_CONFIG.isConfigured) {
+                    document.getElementById('app-section').classList.add('active');
+                } else {
+                    document.getElementById('setup-section').classList.add('active');
+                }
+            }
+
+            initResizer() {
+                const resizer = document.getElementById('resizer');
+                const leftSide = document.getElementById('controls-pane');
+                const rightSide = document.getElementById('console-pane');
+
+                let isResizing = false;
+                let direction = 'horizontal';
+
+                resizer.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    direction = window.innerWidth > 900 ? 'horizontal' : 'vertical';
+                    document.body.style.cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
+                    resizer.classList.add('resizing');
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isResizing) return;
+                    e.preventDefault();
+                    const container = document.getElementById('main-container');
+                    const rect = container.getBoundingClientRect();
+
+                    if (direction === 'horizontal') {
+                        let newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+                        if (newWidth < 20) newWidth = 20; if (newWidth > 80) newWidth = 80;
+                        // Tính toán flex trực tiếp mà không trừ đi kích thước px cố định để mượt hơn
+                        leftSide.style.flex = `1 1 ${newWidth}%`;
+                        rightSide.style.flex = `1 1 ${100 - newWidth}%`;
+                    } else {
+                        let newHeight = ((e.clientY - rect.top) / rect.height) * 100;
+                        if (newHeight < 20) newHeight = 20; if (newHeight > 80) newHeight = 80;
+                        leftSide.style.flex = `1 1 ${newHeight}%`;
+                        rightSide.style.flex = `1 1 ${100 - newHeight}%`;
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isResizing) {
+                        isResizing = false;
+                        document.body.style.cursor = 'default';
+                        resizer.classList.remove('resizing');
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    leftSide.style.flex = '';
+                    rightSide.style.flex = '';
+                });
+            }
+
+            printLog(message, type = "info") {
+                const time = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+                const cssClass = type === "info" ? "log-info" : (type === "success" ? "log-success" : "log-error");
+
+                const line = document.createElement('div');
+                line.className = cssClass;
+                line.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+
+                this.consoleElement.appendChild(line);
+                this.consoleElement.scrollTop = this.consoleElement.scrollHeight;
+            }
+
+            bindEvents() {
+                document.getElementById('btn-clear-console').addEventListener('click', () => {
+                    this.consoleElement.innerHTML = '';
+                    this.printLog("Console cleared.", "info");
+                });
+
+                // SETUP
+                const btnSetup = document.getElementById('btn-setup');
+                btnSetup.addEventListener('click', async () => {
+                    const pwd = document.getElementById('setup-password').value;
+                    if (!pwd) return alert("Password required.");
+
+                    btnSetup.disabled = true;
+                    btnSetup.innerHTML = "<span class='loader'></span> Processing...";
+
+                    const controller = new SignatureController((msg, type) => this.printLog(msg, type));
+
+                    try {
+                        const configString = await controller.setupIdentity(pwd);
+                        document.getElementById('generated-code').value = configString;
+                        document.getElementById('code-output-area').style.display = "block";
+                        btnSetup.innerHTML = "Generated";
+                        this.printLog("Keys generated successfully.", "success");
+                    } catch (err) {
+                        this.printLog("Error: " + err.message, "error");
+                        btnSetup.disabled = false;
+                        btnSetup.innerHTML = "Generate Keys";
+                    }
+                });
+
+                document.getElementById('btn-copy').addEventListener('click', () => {
+                    document.getElementById('generated-code').select();
+                    document.execCommand('copy');
+                    alert("Copied. Replace PRIVATE_CONFIG and refresh.");
+                });
+
+                // SIGN
+                const btnSign = document.getElementById('btn-sign');
+                btnSign.addEventListener('click', async () => {
+                    const fileInput = document.getElementById('sign-pdf-file');
+                    const pwd = document.getElementById('sign-password').value;
+
+                    if (!fileInput.files[0] || !pwd) {
+                        alert("File and password required.");
+                        return;
+                    }
+
+                    btnSign.disabled = true;
+                    btnSign.innerHTML = "<span class='loader' style='border-color:rgba(0,0,0,0.3); border-top-color:#000;'></span> Signing...";
+
+                    const controller = new SignatureController((msg, type) => this.printLog(msg, type));
+
+                    try {
+                        const originalFile = fileInput.files[0];
+                        const fileBuffer = await originalFile.arrayBuffer();
+
+                        const signedBuffer = await controller.executeSign(fileBuffer, pwd, PRIVATE_CONFIG);
+
+                        if (window.showSaveFilePicker) {
+                            try {
+                                const fileHandle = await window.showSaveFilePicker({
+                                    suggestedName: originalFile.name,
+                                    types: [{
+                                        description: 'PDF Document',
+                                        accept: { 'application/pdf': ['.pdf'] },
+                                    }],
+                                });
+                                const writable = await fileHandle.createWritable();
+                                await writable.write(signedBuffer);
+                                await writable.close();
+                                this.printLog(`File saved successfully.`, "success");
+                            } catch (err) {
+                                if (err.name !== 'AbortError') throw err;
+                            }
+                        } else {
+                            const blob = new Blob([signedBuffer], { type: "application/pdf" });
+                            const link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = originalFile.name;
+                            link.click();
+                            this.printLog(`File downloaded.`, "success");
+                        }
+
+                    } catch (error) {
+                        this.printLog("Error: " + error.message, "error");
+                        alert(error.message);
+                    } finally {
+                        btnSign.disabled = false;
+                        btnSign.innerHTML = "Sign & Download";
+                    }
+                });
+
+                // VERIFY
+                const btnVerify = document.getElementById('btn-verify');
+                btnVerify.addEventListener('click', async () => {
+                    const fileInput = document.getElementById('verify-pdf-file');
+
+                    if (!fileInput.files[0]) {
+                        alert("File required.");
+                        return;
+                    }
+
+                    btnVerify.disabled = true;
+                    btnVerify.innerHTML = "<span class='loader'></span> Verifying...";
+                    this.resultUI.innerHTML = '';
+                    this.resultUI.classList.remove('has-content');
+
+                    const controller = new SignatureController((msg, type) => this.printLog(msg, type));
+
+                    try {
+                        const fileBuffer = await fileInput.files[0].arrayBuffer();
+                        const results = await controller.executeVerify(fileBuffer, PRIVATE_CONFIG);
+
+                        this.resultUI.classList.add('has-content');
+
+                        if (results.length === 0) {
+                            this.resultUI.innerHTML = `
+                                <div class="ui-res-item ui-res-error">Unsigned document.</div>
+                            `;
+                        } else {
+                            let uiHtml = ``;
+                            results.forEach(res => {
+                                const identity = res.isMine ? "Match config" : "Unknown";
+                                if (res.isValid) {
+                                    uiHtml += `<div class="ui-res-item ui-res-success">Layer ${res.layer}: Valid (${identity})</div>`;
+                                } else {
+                                    uiHtml += `<div class="ui-res-item ui-res-error">Layer ${res.layer}: Invalid/Corrupted (${identity})</div>`;
+                                }
+                            });
+                            this.resultUI.innerHTML = uiHtml;
+                        }
+                    } catch (error) {
+                        this.printLog("Error: " + error.message, "error");
+                        this.resultUI.classList.add('has-content');
+                        this.resultUI.innerHTML = `
+                            <div class="ui-res-item ui-res-error">Failed to parse document.</div>
+                        `;
+                    } finally {
+                        btnVerify.disabled = false;
+                        btnVerify.innerHTML = "Check Integrity";
+                    }
+                });
+            }
+        }
+
+        // INIT APP
+        const app = new UIManager();
+
+    </script>
+</body>
+
+</html>
