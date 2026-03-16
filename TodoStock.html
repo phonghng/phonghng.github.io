@@ -686,7 +686,6 @@
                     let pnlText = new Intl.NumberFormat('de-DE').format(Math.round(pnl));
                     if (pnl > 0) {
                         pnlColor = 'text-green-500';
-                        pnlText = '+' + pnlText;
                     } else if (pnl < 0) {
                         pnlColor = 'text-red-500';
                     } else {
@@ -694,7 +693,7 @@
                     }
                     
                     pnlEl.textContent = pnlText;
-                    pnlEl.className = `font-bold text-base tracking-tighter ${pnlColor}`;
+                    pnlEl.className = `mono text-lg tracking-tighter ${pnlColor}`;
                 }
             }
         }
@@ -728,7 +727,7 @@
                 let pnlText = '---';
                 if (pnl !== null) {
                     pnlText = new Intl.NumberFormat('de-DE').format(Math.round(pnl));
-                    if (pnl > 0) { pnlColor = 'text-green-500'; pnlText = '+' + pnlText; } 
+                    if (pnl > 0) { pnlColor = 'text-green-500'; } 
                     else if (pnl < 0) { pnlColor = 'text-red-500'; }
                     else { pnlText = '---'; }
                 }
@@ -775,7 +774,7 @@
                     <div class="stock-cell spacer spacer-lailo"></div>
 
                     <div class="stock-cell cell-lailo" role="cell">
-                        <div id="pnl-${s}" class="font-bold text-base tracking-tighter ${pnlColor}">${pnlText}</div>
+                        <div id="pnl-${s}" class="mono text-lg tracking-tighter ${pnlColor}">${pnlText}</div>
                     </div>
 
                     <div class="stock-cell spacer spacer-trade"></div>
