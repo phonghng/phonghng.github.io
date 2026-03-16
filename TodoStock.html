@@ -407,11 +407,37 @@
             }
         });
 
-        // --- CƠ CHẾ SỬA TRỰC TIẾP ---
-        window.highlightHashtags = function(text) {
+        // --- CƠ CHẾ ĐỊNH DẠNG (HASHTAG VÀ LINK) ---
+        window.formatContent = function(text) {
             if (!text) return '';
-            const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, '$1<span class="text-blue-500 font-bold">$2</span>');
+            let safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // 1. Nhận diện link http:// hoặc https:// (loại trừ dấu câu ở cuối)
+            safeText = safeText.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+                let trailing = '';
+                const match = url.match(/[.,!?;:]+$/);
+                if (match) {
+                    trailing = match[0];
+                    url = url.substring(0, url.length - trailing.length);
+                }
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline cursor-pointer" onclick="event.stopPropagation()">${url}</a>${trailing}`;
+            });
+
+            // 2. Nhận diện link bắt đầu bằng www.
+            safeText = safeText.replace(/(^|\s)(www\.[^\s]+)/g, function(match, p1, url) {
+                let trailing = '';
+                const m = url.match(/[.,!?;:]+$/);
+                if (m) {
+                    trailing = m[0];
+                    url = url.substring(0, url.length - trailing.length);
+                }
+                return `${p1}<a href="http://${url}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline cursor-pointer" onclick="event.stopPropagation()">${url}</a>${trailing}`;
+            });
+
+            // 3. Nhận diện hashtag
+            safeText = safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, '$1<span class="text-blue-500 font-bold">$2</span>');
+            
+            return safeText;
         };
 
         function getExactCaretPos(e, el) {
@@ -510,14 +536,12 @@
                             el.blur(); 
                         }
                     }
-                    // Nếu là content hoặc shift+enter, để trình duyệt xử lý native \n
                 }
             }
         };
 
         window.finishEdit = function(id, el, type, field) {
             el.contentEditable = "false";
-            // Lấy trực tiếp văn bản thô, tránh mọi thẻ div sinh ra bởi trình duyệt
             const newVal = el.innerText.trim();
             
             if (type === 'todo') {
@@ -565,7 +589,7 @@
                                  ondblclick="startEdit(${t.id}, this, 'todo', 'text', event)" 
                                  onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                                  onblur="finishEdit(${t.id}, this, 'todo', 'text')"
-                                 onkeydown="handleKeydown(event, ${t.id}, this, 'todo', 'text')">${highlightHashtags(t.text)}</div>
+                                 onkeydown="handleKeydown(event, ${t.id}, this, 'todo', 'text')">${formatContent(t.text)}</div>
                         </div>
                         <div class="action-cell">
                             <button onclick="delTodo(${t.id})" class="delete-btn" aria-label="Xóa">
@@ -611,7 +635,7 @@
                              ondblclick="startEdit(${note.id}, this, 'note', 'title', event)"
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'title')"
-                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${highlightHashtags(note.title)}</div>
+                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${formatContent(note.title)}</div>
 
                         <div contenteditable="false"
                              tabindex="0"
@@ -622,7 +646,7 @@
                              ondblclick="startEdit(${note.id}, this, 'note', 'content', event)"
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'content')"
-                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'content')">${highlightHashtags(note.content)}</div>
+                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'content')">${formatContent(note.content)}</div>
                     </div>
                 `;
             } else {
@@ -644,7 +668,7 @@
                             </div>
                         </div>
                         <div class="todo-content">
-                            <span class="todo-text text-justify cursor-pointer">${highlightHashtags(n.title)}</span>
+                            <span class="todo-text text-justify cursor-pointer">${formatContent(n.title)}</span>
                         </div>
                         <div class="action-cell" onclick="event.stopPropagation()">
                             <button onclick="delNote(${n.id}, event)" class="delete-btn" aria-label="Xóa">
