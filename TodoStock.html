@@ -110,6 +110,24 @@
             outline-offset: 4px;
         }
 
+        /* CSS vẽ Huy hiệu đếm số cho Hashtag mà không ảnh hưởng tới text nodes */
+        .hashtag-badge[data-count]::after {
+            content: attr(data-count);
+            font-size: 0.7em;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.1em 0.4em;
+            border-radius: 4px;
+            margin-left: 4px;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+            user-select: none;
+            pointer-events: none;
+        }
+
         /* --- PORTFOLIO TABLE LAYOUT --- */
         .stock-table { 
             display: table; 
@@ -325,13 +343,14 @@
         const BROKER_URL = 'wss://datafeed-krx.dnse.com.vn/wss';
         const TOPIC_PREFIX = 'quotes/krx/mdds/stockinfo/v1/roundlot/symbol/';
 
-        // Xử lý Storage
-        let state = { todo: { items: [], cash: 0 }, portfolio: [], notes: [] };
+        // Xử lý Storage có thêm bộ đếm hashtag
+        let state = { todo: { items: [], cash: 0, completedHashtags: {} }, portfolio: [], notes: [] };
         try {
             const saved = localStorage.getItem('TodoStock');
             if (saved) {
                 state = JSON.parse(saved);
                 if (!state.notes) state.notes = []; 
+                if (!state.todo.completedHashtags) state.todo.completedHashtags = {};
             }
         } catch (e) {
             console.log("Quyền truy cập Storage bị chặn. Ứng dụng đang chạy trên bộ nhớ tạm.");
@@ -418,7 +437,7 @@
         });
 
         // --- CƠ CHẾ ĐỊNH DẠNG (HASHTAG VÀ LINK) ---
-        window.formatContent = function(text) {
+        window.formatContent = function(text, showBadges = false) {
             if (!text) return '';
             let safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             
@@ -444,8 +463,18 @@
                 return `${p1}<a href="http://${url}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline cursor-pointer" onclick="event.stopPropagation()">${url}</a>${trailing}`;
             });
 
-            // 3. Nhận diện hashtag
-            safeText = safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, '$1<span class="text-blue-500 font-bold">$2</span>');
+            // 3. Nhận diện hashtag và gắn badge nếu cần thiết
+            safeText = safeText.replace(/(^|\s)(#[\p{L}\p{N}_]+)/gu, function(match, p1, tag) {
+                let badgeAttr = '';
+                if (showBadges && state.todo.completedHashtags) {
+                    const normalized = tag.toLowerCase();
+                    const count = state.todo.completedHashtags[normalized] || 0;
+                    if (count > 0) {
+                        badgeAttr = ` data-count="${count}"`;
+                    }
+                }
+                return `${p1}<span class="text-blue-500 font-bold${badgeAttr ? ' hashtag-badge' : ''}"${badgeAttr}>${tag}</span>`;
+            });
             
             return safeText;
         };
@@ -579,10 +608,10 @@
                     <div class="todo-row group" role="listitem">
                         <div class="action-cell">
                             <div class="order-btn-group">
-                                <button onclick="moveItem('todo', ${t.id}, -1)" class="order-btn" aria-label="Di chuyển lên">
+                                <button onclick="moveItem('todo', ${t.id}, -1)" class="order-btn ${idx === 0 ? 'disabled' : ''}" aria-label="Di chuyển lên">
                                     <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L6 2L10 6"/></svg>
                                 </button>
-                                <button onclick="moveItem('todo', ${t.id}, 1)" class="order-btn" aria-label="Di chuyển xuống">
+                                <button onclick="moveItem('todo', ${t.id}, 1)" class="order-btn ${idx === state.todo.items.length - 1 ? 'disabled' : ''}" aria-label="Di chuyển xuống">
                                     <svg width="10" height="6" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2L6 6L10 2"/></svg>
                                 </button>
                             </div>
@@ -599,7 +628,7 @@
                                  ondblclick="startEdit(${t.id}, this, 'todo', 'text', event)" 
                                  onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                                  onblur="finishEdit(${t.id}, this, 'todo', 'text')"
-                                 onkeydown="handleKeydown(event, ${t.id}, this, 'todo', 'text')">${formatContent(t.text)}</div>
+                                 onkeydown="handleKeydown(event, ${t.id}, this, 'todo', 'text')">${formatContent(t.text, false)}</div>
                         </div>
                         <div class="action-cell">
                             <button onclick="delTodo(${t.id})" class="delete-btn" aria-label="Xóa">
@@ -645,7 +674,7 @@
                              ondblclick="startEdit(${note.id}, this, 'note', 'title', event)"
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'title')"
-                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${formatContent(note.title)}</div>
+                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${formatContent(note.title, true)}</div>
 
                         <div contenteditable="false"
                              tabindex="0"
@@ -656,7 +685,7 @@
                              ondblclick="startEdit(${note.id}, this, 'note', 'content', event)"
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'content')"
-                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'content')">${formatContent(note.content)}</div>
+                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'content')">${formatContent(note.content, true)}</div>
                     </div>
                 `;
             } else {
@@ -678,7 +707,7 @@
                             </div>
                         </div>
                         <div class="todo-content">
-                            <span class="todo-text text-justify cursor-pointer">${formatContent(n.title)}</span>
+                            <span class="todo-text text-justify cursor-pointer">${formatContent(n.title, true)}</span>
                         </div>
                         <div class="action-cell" onclick="event.stopPropagation()">
                             <button onclick="delNote(${n.id}, event)" class="delete-btn" aria-label="Xóa">
@@ -855,7 +884,29 @@
             if (w < 240) table.classList.add('narrow-hide-lailo'); else table.classList.remove('narrow-hide-lailo');
         }
 
-        window.finishTodo = (id) => { snapshot(); state.todo.cash += REWARD_VALUE; state.todo.items = state.todo.items.filter(t => t.id !== id); save(); renderAll(); toast("Đã hoàn thành việc", "success", undo); };
+        window.finishTodo = (id) => { 
+            snapshot(); 
+            const itemToFinish = state.todo.items.find(t => t.id === id);
+            if (itemToFinish) {
+                if (!state.todo.completedHashtags) state.todo.completedHashtags = {};
+                const regex = /(^|\s)(#[\p{L}\p{N}_]+)/gu;
+                const tags = new Set();
+                let match;
+                while ((match = regex.exec(itemToFinish.text)) !== null) {
+                    tags.add(match[2].toLowerCase());
+                }
+                tags.forEach(tag => {
+                    state.todo.completedHashtags[tag] = (state.todo.completedHashtags[tag] || 0) + 1;
+                });
+                
+                state.todo.cash += REWARD_VALUE; 
+                state.todo.items = state.todo.items.filter(t => t.id !== id); 
+                save(); 
+                renderAll(); 
+                toast("Đã hoàn thành việc", "success", undo); 
+            }
+        };
+
         window.delTodo = (id) => { snapshot(); state.todo.items = state.todo.items.filter(t => t.id !== id); save(); renderTodos(); toast("Đã xóa việc", "info", undo); };
         window.upTrade = (s) => { const inp = document.getElementById(`tr-${s}`); const val = parseFloat(inp.value); if (!val) { inp.style.outline = 'none'; inp.style.background = 'rgba(255,255,255,0.05)'; return; } inp.style.outline = val > 0 ? '1px solid #22c55e' : '1px solid #ef4444'; inp.style.background = val > 0 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'; };
         window.doTrade = (s) => { 
