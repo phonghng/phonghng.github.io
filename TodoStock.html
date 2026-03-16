@@ -703,17 +703,22 @@
                 if (stockItem) {
                     const q = stockItem.qty;
                     const invested = stockItem.invested || 0;
-                    const currentValue = q * p * 1000;
-                    const pnl = currentValue - invested;
                     
-                    let pnlColor = 'text-neutral-500';
-                    let pnlText = new Intl.NumberFormat('de-DE').format(Math.round(pnl));
-                    if (pnl > 0) {
-                        pnlColor = 'text-green-500';
-                    } else if (pnl < 0) {
-                        pnlColor = 'text-red-500';
-                    } else {
-                        pnlText = '---';
+                    let pnlColor = 'text-white';
+                    let pnlText = '---';
+                    
+                    if (connected && p !== null && !isNaN(p)) {
+                        const currentValue = q * p * 1000;
+                        const pnl = currentValue - invested;
+                        pnlText = new Intl.NumberFormat('de-DE').format(Math.round(pnl));
+                        if (pnl > 0) {
+                            pnlColor = 'text-green-500';
+                        } else if (pnl < 0) {
+                            pnlColor = 'text-red-500';
+                        } else {
+                            pnlColor = 'text-white';
+                            pnlText = '0';
+                        }
                     }
                     
                     pnlEl.textContent = pnlText;
@@ -724,7 +729,11 @@
 
         function updateTotalAssets() {
             let total = 0;
-            state.portfolio.forEach(i => { if (prices[i.symbol]) total += (i.qty * prices[i.symbol] * 1000); });
+            state.portfolio.forEach(i => { 
+                if (prices[i.symbol] !== undefined && prices[i.symbol] !== null) {
+                    total += (i.qty * prices[i.symbol] * 1000); 
+                }
+            });
             document.getElementById('totalAssets').textContent = num(total);
         }
 
@@ -734,12 +743,10 @@
             
             state.portfolio.forEach((item, idx) => {
                 const s = item.symbol, q = item.qty, invested = item.invested || 0;
-                const p = prices[s] ? prices[s] * 1000 : null;
-                const v = p ? q * p : 0;
-                const pnl = p ? (v - invested) : null;
+                const p = (prices[s] !== undefined && prices[s] !== null) ? prices[s] * 1000 : null;
 
                 let color = 'text-white';
-                if (connected && prices[s] && refs[s]) {
+                if (connected && p !== null && refs[s]) {
                     if (prices[s] >= ceils[s]) color = 'text-purple-500';
                     else if (prices[s] <= floors[s]) color = 'text-blue-400';
                     else if (prices[s] > refs[s]) color = 'text-green-500';
@@ -747,13 +754,14 @@
                     else color = 'text-yellow-500';
                 }
 
-                let pnlColor = 'text-neutral-500';
+                let pnlColor = 'text-white';
                 let pnlText = '---';
-                if (pnl !== null) {
+                if (connected && p !== null && !isNaN(p)) {
+                    const pnl = (q * p) - invested;
                     pnlText = new Intl.NumberFormat('de-DE').format(Math.round(pnl));
                     if (pnl > 0) { pnlColor = 'text-green-500'; } 
                     else if (pnl < 0) { pnlColor = 'text-red-500'; }
-                    else { pnlText = '---'; }
+                    else { pnlColor = 'text-white'; pnlText = '0'; }
                 }
 
                 const row = document.createElement('div');
