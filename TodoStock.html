@@ -724,15 +724,7 @@
             const pEl = document.getElementById(`p-${s}`);
             if (pEl) {
                 pEl.textContent = num(p * 1000);
-                let color = 'text-white';
-                if (refs[s]) {
-                    if (p >= ceils[s]) color = 'text-purple-500';
-                    else if (p <= floors[s]) color = 'text-blue-400';
-                    else if (p > refs[s]) color = 'text-green-500';
-                    else if (p < refs[s]) color = 'text-red-500';
-                    else color = 'text-yellow-500';
-                }
-                pEl.className = `mono text-lg tracking-tighter ${color}`;
+                pEl.className = `mono text-lg tracking-tighter text-white`;
             }
 
             // Cập nhật Lãi/lỗ Real-time
@@ -784,15 +776,6 @@
                 const s = item.symbol, q = item.qty, invested = item.invested || 0;
                 const p = (prices[s] !== undefined && prices[s] !== null) ? prices[s] * 1000 : null;
 
-                let color = 'text-white';
-                if (connected && p !== null && refs[s]) {
-                    if (prices[s] >= ceils[s]) color = 'text-purple-500';
-                    else if (prices[s] <= floors[s]) color = 'text-blue-400';
-                    else if (prices[s] > refs[s]) color = 'text-green-500';
-                    else if (prices[s] < refs[s]) color = 'text-red-500';
-                    else color = 'text-yellow-500';
-                }
-
                 let pnlColor = 'text-white';
                 let pnlText = '---';
                 if (connected && p !== null && !isNaN(p)) {
@@ -833,7 +816,7 @@
                     <div class="stock-cell spacer spacer-gia"></div>
                     
                     <div class="stock-cell cell-gia" role="cell">
-                        <div id="p-${s}" class="mono text-lg tracking-tighter ${color}">${num(p)}</div>
+                        <div id="p-${s}" class="mono text-lg tracking-tighter text-white">${num(p)}</div>
                     </div>
 
                     <div class="stock-cell spacer spacer-sohuu"></div>
@@ -954,13 +937,13 @@
                     }
 
                     setTimeout(() => { 
-                        if (!prices[s]) { 
+                        if (prices[s] === undefined && refs[s] === undefined) { 
                             state.portfolio = state.portfolio.filter(i => i.symbol !== s); 
                             save(); 
                             renderStocks(); 
                             toast(`Mã ${s} không hợp lệ hoặc không có dữ liệu`, "error"); 
                         } 
-                    }, 5000); 
+                    }, 8000); 
                 } 
             } 
         };
@@ -997,7 +980,21 @@
         setupResizer('resizer1', 'leftPane', 'portfolioPane');
         setupResizer('resizer2', 'portfolioPane', 'notePane');
 
-        function decode(b) { let bytes = new Uint8Array(b), pos = 0, res = {}; const rv = () => { let v = 0, s = 0; while (pos < bytes.length) { let b = bytes[pos++]; v += (b & 127) << s; if (!(b & 128)) return v; s += 7; } return v; }; try { while (pos < bytes.length) { let k = rv(), w = k & 7, f = k >> 3; if (w === 1) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 8).getFloat64(0, true); pos += 8; } else if (w === 0) rv(); else if (w === 2) { let l = rv(); let sl = bytes.slice(pos, pos + l); pos += l; Object.assign(res, decode(sl)); } else if (w === 5) pos += 4; else break; } } catch(e) {} return res; }
+        function decode(b) { 
+            let bytes = new Uint8Array(b), pos = 0, res = {}; 
+            const rv = () => { let v = 0, s = 0; while (pos < bytes.length) { let b = bytes[pos++]; v += (b & 127) << s; if (!(b & 128)) return v; s += 7; } return v; }; 
+            try { 
+                while (pos < bytes.length) { 
+                    let k = rv(), w = k & 7, f = k >> 3; 
+                    if (w === 1) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 8).getFloat64(0, true); pos += 8; } 
+                    else if (w === 5) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 4).getFloat32(0, true); pos += 4; } 
+                    else if (w === 0) { res[`F${f}`] = rv(); } 
+                    else if (w === 2) { let l = rv(); let sl = bytes.slice(pos, pos + l); pos += l; Object.assign(res, decode(sl)); } 
+                    else break; 
+                } 
+            } catch(e) {} 
+            return res; 
+        }
         
         let isReconnecting = false;
         let client = null;
@@ -1018,7 +1015,9 @@
                         toast("Đã kết nối lại thành công với máy chủ dữ liệu", "success");
                         isReconnecting = false;
                     }
-                    state.portfolio.forEach(i => client.subscribe(TOPIC_PREFIX + i.symbol)); 
+                    state.portfolio.forEach(i => {
+                        client.subscribe(TOPIC_PREFIX + i.symbol);
+                    }); 
                     renderStocks(); 
                 });
                 
@@ -1041,11 +1040,32 @@
                 });
 
                 client.on('message', (t, m) => { 
-                    const s = t.split('/').pop(), d = decode(m); 
-                    if (d.F9) refs[s] = d.F9; if (d.F10) ceils[s] = d.F10; if (d.F11) floors[s] = d.F11; 
-                    if (d.F15) { 
-                        prices[s] = d.F15; 
-                        updateStockUI(s, d.F15);
+                    const s = t.split('/').pop();
+                    let d = {};
+                    try {
+                        const str = m.toString();
+                        if (str.startsWith('{')) {
+                            const p = JSON.parse(str);
+                            d.F9 = p.refPrice || p.referencePrice || p.F9;
+                            d.F10 = p.ceilPrice || p.ceilingPrice || p.F10;
+                            d.F11 = p.floorPrice || p.F11;
+                            // Gán F28 hoặc dự phòng F15
+                            d.F15 = p.matchPrice || p.lastPrice || p.price || p.F28 || p.F15;
+                        } else {
+                            d = decode(m);
+                        }
+                    } catch (err) {
+                        d = decode(m);
+                    }
+                    
+                    if (d.F9 !== undefined) refs[s] = d.F9; 
+                    if (d.F10 !== undefined) ceils[s] = d.F10; 
+                    if (d.F11 !== undefined) floors[s] = d.F11; 
+                    
+                    const matchPrice = d.F28 !== undefined ? d.F28 : d.F15;
+                    if (matchPrice !== undefined) { 
+                        prices[s] = matchPrice; 
+                        updateStockUI(s, matchPrice);
                         updateTotalAssets();
                     } 
                 });
@@ -1054,7 +1074,6 @@
                 if (mqttCheckCount < 10) {
                     setTimeout(initMqttConnection, 500);
                 } else {
-                    console.error("Thư viện MQTT không tồn tại. Trình duyệt hoặc AdBlocker có thể đã chặn nó tải về.");
                     toast("Lỗi tải thư viện dữ liệu (Tracking Prevention/AdBlock).", "error");
                 }
             }
