@@ -645,14 +645,17 @@
                 });
 
                 // Cấu hình giao diện PiP
-                pipWindow.document.body.className = "bg-[var(--bg)] text-white p-5 antialiased flex flex-col h-screen overflow-y-auto";
+                pipWindow.document.body.className = "bg-[var(--bg)] text-white antialiased h-screen flex flex-col overflow-hidden";
                 pipWindow.document.body.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+                pipWindow.document.body.style.margin = "0";
                 
                 const note = state.notes.find(n => n.id === id);
                 
                 // Khởi tạo thẻ content cho PiP
                 const contentEl = document.createElement('div');
-                contentEl.className = "note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text";
+                contentEl.className = "note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 cursor-text overflow-y-auto";
+                contentEl.style.padding = "24px";
+                contentEl.style.boxSizing = "border-box";
                 contentEl.setAttribute("contenteditable", "false");
                 contentEl.setAttribute("tabindex", "0");
                 contentEl.setAttribute("role", "textbox");
@@ -760,7 +763,7 @@
                     // Chế độ đang mở PiP -> Hiện Placeholder
                     contentHTML = `
                         <div class="flex-grow flex items-center justify-center min-h-[150px] select-none">
-                            <span class="text-sm font-bold text-gray-600 tracking-widest uppercase">Nội dung đang hiển thị trong PiP</span>
+                            <span class="text-sm font-medium text-white/20 tracking-wider">Nội dung đang hiển thị trong PiP</span>
                         </div>
                     `;
                 } else {
