@@ -251,7 +251,6 @@
 
     <main id="mainContent" class="flex flex-grow overflow-hidden">
         
-        <!-- CỘT 1: VIỆC CẦN LÀM -->
         <section id="leftPane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 33%;">
             <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Việc cần làm</h2>
@@ -272,7 +271,6 @@
 
         <div id="resizer1" class="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
 
-        <!-- CỘT 2: DANH MỤC ĐẦU TƯ -->
         <section id="portfolioPane" class="flex flex-col overflow-hidden" style="width: 41.5%;">
             <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Danh mục đầu tư</h2>
@@ -281,7 +279,6 @@
 
             <div id="stockBody" class="flex-grow overflow-y-auto">
                 <div id="stockTable" class="stock-table" role="table" aria-label="Danh mục cổ phiếu">
-                    <!-- HEADER -->
                     <div class="stock-row list-header" role="row">
                         <div class="stock-cell cell-move" role="columnheader"></div>
                         <div class="stock-cell cell-ma" role="columnheader">Mã</div>
@@ -295,7 +292,6 @@
                         <div class="stock-cell cell-trade" role="columnheader">Giao dịch</div>
                         <div class="stock-cell cell-delete" role="columnheader"></div>
                     </div>
-                    <!-- LIST RENDERED HERE -->
                     <div id="stockList" style="display: contents;"></div>
                 </div>
             </div>
@@ -312,11 +308,9 @@
 
         <div id="resizer2" class="resizer" role="separator" title="Kéo để chỉnh độ rộng"></div>
 
-        <!-- CỘT 3: GHI CHÚ -->
         <section id="notePane" class="flex flex-col bg-[#020202] overflow-hidden" style="width: 25.5%;">
             <header class="p-5 pb-4 shrink-0 border-b border-[var(--border)] flex justify-between items-end bg-[#020202]">
                 <h2 class="text-lg font-extrabold italic uppercase tracking-tighter text-white">Ghi chú</h2>
-                <!-- Khoảng trống tàng hình để cân bằng chiều cao Header -->
                 <div class="text-2xl font-black mono opacity-0 select-none tabular-nums">0</div>
             </header>
             
@@ -331,8 +325,13 @@
                 </label>
             </footer>
 
-            <footer id="noteFooterBack" class="hidden h-14 flex items-center justify-center bg-[#050505] border-t border-[var(--border)] px-4 shrink-0 cursor-pointer hover:bg-white/5 transition-colors" onclick="closeNote()">
-                <span class="text-sm font-bold text-[var(--accent)] tracking-widest uppercase">Trở lại danh sách</span>
+            <footer id="noteFooterBack" class="hidden h-14 flex bg-[#050505] border-t border-[var(--border)] shrink-0 w-full">
+                <button class="flex-1 h-full flex items-center justify-center hover:bg-white/5 transition-colors border-r border-[var(--border)]" aria-label="Đóng ghi chú" onclick="closeNote()">
+                    <span class="text-sm font-bold text-gray-400 hover:text-white tracking-widest uppercase transition-colors">Đóng</span>
+                </button>
+                <button id="pipToggleBtn" class="flex-1 h-full flex items-center justify-center hover:bg-white/5 transition-colors" aria-label="Đóng/Mở Document Picture-in-Picture">
+                    <span class="text-sm font-bold text-[var(--accent)] tracking-widest uppercase">Mở PiP</span>
+                </button>
             </footer>
         </section>
     </main>
@@ -363,6 +362,7 @@
         let prices = {}, refs = {}, ceils = {}, floors = {}, connected = false;
         let lastSnapshot = null, undoTimeout = null;
         let activeNoteId = null;
+        let pipWindow = null; // Biến lưu trữ cửa sổ PiP
 
         const save = () => {
             try { localStorage.setItem('TodoStock', JSON.stringify(state)); } catch (e) {}
@@ -597,6 +597,87 @@
                     save();
                 }
                 renderNotes();
+
+                // Đồng bộ nội dung PiP nếu đang sửa phần content
+                if (pipWindow && activeNoteId === id && field === 'content') {
+                    const contentEl = pipWindow.document.querySelector('.note-edit');
+                    if (contentEl) contentEl.innerHTML = formatContent(note[field], true);
+                }
+            }
+        };
+
+        // --- DOCUMENT PICTURE-IN-PICTURE (PiP) LOGIC ---
+        window.closePiP = function() {
+            if (pipWindow) {
+                pipWindow.close();
+            }
+        };
+
+        window.togglePiP = async function(id) {
+            if (!('documentPictureInPicture' in window)) {
+                return toast("Trình duyệt của bạn không hỗ trợ Document PiP. Hãy thử Chrome/Edge mới nhất.", "error");
+            }
+            
+            if (pipWindow) {
+                pipWindow.close();
+                return;
+            }
+            
+            try {
+                pipWindow = await documentPictureInPicture.requestWindow({
+                    width: 400,
+                    height: 350,
+                });
+                
+                // Sao chép toàn bộ Style (CSS Rules)
+                [...document.styleSheets].forEach((styleSheet) => {
+                    try {
+                        const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                        const style = document.createElement('style');
+                        style.textContent = cssRules;
+                        pipWindow.document.head.appendChild(style);
+                    } catch (e) {
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        if (styleSheet.href) link.href = styleSheet.href;
+                        pipWindow.document.head.appendChild(link);
+                    }
+                });
+
+                // Cấu hình giao diện PiP
+                pipWindow.document.body.className = "bg-[var(--bg)] text-white p-5 antialiased flex flex-col h-screen overflow-y-auto";
+                pipWindow.document.body.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+                
+                const note = state.notes.find(n => n.id === id);
+                
+                // Khởi tạo thẻ content cho PiP
+                const contentEl = document.createElement('div');
+                contentEl.className = "note-edit bg-transparent text-sm font-medium text-gray-300 outline-none w-full flex-grow text-justify whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text";
+                contentEl.setAttribute("contenteditable", "false");
+                contentEl.setAttribute("tabindex", "0");
+                contentEl.setAttribute("role", "textbox");
+                contentEl.setAttribute("aria-multiline", "true");
+                contentEl.setAttribute("placeholder", "Nội dung (nhấn đúp hoặc Enter để sửa)...");
+                
+                // Bind event listeners cho PiP (đồng bộ với Main Window)
+                contentEl.ondblclick = (e) => startEdit(id, contentEl, 'note', 'content', e);
+                contentEl.onmousedown = (e) => { if(e.detail > 1 && !contentEl.isContentEditable) e.preventDefault(); };
+                contentEl.onblur = () => finishEdit(id, contentEl, 'note', 'content');
+                contentEl.onkeydown = (e) => handleKeydown(e, id, contentEl, 'note', 'content');
+                
+                contentEl.innerHTML = formatContent(note.content, true);
+                
+                pipWindow.document.body.appendChild(contentEl);
+                
+                pipWindow.addEventListener("pagehide", () => {
+                    pipWindow = null;
+                    renderNotes(); // Trả lại giao diện gốc
+                });
+                
+                renderNotes(); // Cập nhật giao diện gốc thành Placeholder
+            } catch (e) {
+                console.error(e);
+                toast("Không thể mở chế độ PiP", "error");
             }
         };
 
@@ -643,7 +724,11 @@
 
         // --- RENDER NOTES ---
         window.openNote = function(id) { activeNoteId = id; renderNotes(); };
-        window.closeNote = function() { activeNoteId = null; renderNotes(); };
+        window.closeNote = function() { 
+            activeNoteId = null; 
+            if (pipWindow) pipWindow.close();
+            renderNotes(); 
+        };
         window.delNote = function(id, event) {
             event.stopPropagation();
             snapshot();
@@ -663,19 +748,24 @@
                 const note = state.notes.find(n => n.id === activeNoteId);
                 if (!note) { closeNote(); return; }
 
-                body.innerHTML = `
-                    <div class="flex flex-col flex-grow p-4 gap-4 h-full overflow-y-auto">
-                        <div contenteditable="false" 
-                             tabindex="0"
-                             role="textbox"
-                             aria-multiline="false"
-                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-center whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text" 
-                             placeholder="Tiêu đề (nhấn đúp hoặc Enter để sửa)..."
-                             ondblclick="startEdit(${note.id}, this, 'note', 'title', event)"
-                             onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
-                             onblur="finishEdit(${note.id}, this, 'note', 'title')"
-                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${formatContent(note.title, true)}</div>
+                // Cập nhật trạng thái nút PiP ở Footer
+                const pipBtn = document.getElementById('pipToggleBtn');
+                if (pipBtn) {
+                    pipBtn.innerHTML = `<span class="text-sm font-bold ${pipWindow ? 'text-red-500' : 'text-[var(--accent)]'} tracking-widest uppercase">${pipWindow ? 'Đóng PiP' : 'Mở PiP'}</span>`;
+                    pipBtn.onclick = () => togglePiP(note.id);
+                }
 
+                let contentHTML = '';
+                if (pipWindow && activeNoteId === note.id) {
+                    // Chế độ đang mở PiP -> Hiện Placeholder
+                    contentHTML = `
+                        <div class="flex-grow flex items-center justify-center min-h-[150px] select-none">
+                            <span class="text-sm font-bold text-gray-600 tracking-widest uppercase">Nội dung đang hiển thị trong PiP</span>
+                        </div>
+                    `;
+                } else {
+                    // Chế độ Bình thường -> Hiện nội dung để xem/sửa
+                    contentHTML = `
                         <div contenteditable="false"
                              tabindex="0"
                              role="textbox"
@@ -686,6 +776,23 @@
                              onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
                              onblur="finishEdit(${note.id}, this, 'note', 'content')"
                              onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'content')">${formatContent(note.content, true)}</div>
+                    `;
+                }
+
+                body.innerHTML = `
+                    <div class="flex flex-col flex-grow p-4 gap-4 h-full overflow-y-auto">
+                        <div contenteditable="false" 
+                             tabindex="0"
+                             role="textbox"
+                             aria-multiline="false"
+                             class="note-edit bg-transparent text-xl font-bold text-white outline-none w-full text-center whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-gray-500 min-h-[1.5em] cursor-text shrink-0" 
+                             placeholder="Tiêu đề (nhấn đúp hoặc Enter để sửa)..."
+                             ondblclick="startEdit(${note.id}, this, 'note', 'title', event)"
+                             onmousedown="if(event.detail > 1 && !this.isContentEditable) event.preventDefault();"
+                             onblur="finishEdit(${note.id}, this, 'note', 'title')"
+                             onkeydown="handleKeydown(event, ${note.id}, this, 'note', 'title')">${formatContent(note.title, true)}</div>
+
+                        ${contentHTML}
                     </div>
                 `;
             } else {
@@ -982,10 +1089,19 @@
 
         function decode(b) { 
             let bytes = new Uint8Array(b), pos = 0, res = {}; 
-            const rv = () => { let v = 0, s = 0; while (pos < bytes.length) { let b = bytes[pos++]; v += (b & 127) << s; if (!(b & 128)) return v; s += 7; } return v; }; 
+            const rv = () => { 
+                let v = 0, s = 0; 
+                while (pos < bytes.length) { 
+                    let b = bytes[pos++]; 
+                    v += (b & 127) * Math.pow(2, s); 
+                    if (!(b & 128)) return v; 
+                    s += 7; 
+                } 
+                return v; 
+            }; 
             try { 
                 while (pos < bytes.length) { 
-                    let k = rv(), w = k & 7, f = k >> 3; 
+                    let k = rv(), w = k & 7, f = Math.floor(k / 8); 
                     if (w === 1) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 8).getFloat64(0, true); pos += 8; } 
                     else if (w === 5) { res[`F${f}`] = new DataView(bytes.buffer, bytes.byteOffset + pos, 4).getFloat32(0, true); pos += 4; } 
                     else if (w === 0) { res[`F${f}`] = rv(); } 
