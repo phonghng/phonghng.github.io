@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ausccore</title>
+    
+    <!-- DOMPurify for XSS Protection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        /* Dark Mode Base */
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #111827; color: #f3f4f6; margin: 0; }
+        
+        .katex { font-size: 1.05em; color: inherit; }
+        .katex-display { overflow-x: auto; overflow-y: hidden; padding-bottom: 8px; }
+
+        /* Custom Scrollbar Dark/Flat */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        .drag-active { border-color: #3b82f6 !important; background-color: #1f2937 !important; }
+        
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .timer-pulse { animation: pulseWarning 1s infinite; color: #f87171; }
+        @keyframes pulseWarning { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Accessibility focus */
+        *:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col bg-gray-900">
+
+    <!-- VIEW 1: UPLOAD ONLY -->
+    <section id="view-upload" style="display: flex;" class="flex-1 w-full h-full overflow-hidden fade-in">
+        <div class="w-full h-full flex flex-col items-center justify-center p-4 sm:p-8">
+            <label id="dropzone" for="file-picker" class="w-full max-w-2xl bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg h-[60vh] min-h-[300px] max-h-[400px] flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-gray-800/80 transition-colors relative group text-center focus-within:ring-2 focus-within:ring-blue-500">
+                <input type="file" id="file-picker" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Tải lên tệp dữ liệu đề thi">
+                
+                <i data-lucide="upload-cloud" class="w-16 h-16 sm:w-20 sm:h-20 text-blue-500 mb-6 transition-transform duration-300 group-hover:-translate-y-2"></i>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-100 mb-2">Tải lên tệp dữ liệu đề thi</h1>
+                <p class="text-sm text-gray-400 px-4">Kéo thả tệp định dạng JSON vào khu vực này hoặc nhấn để chọn tệp</p>
+                
+                <div id="upload-error" class="absolute bottom-4 sm:bottom-6 bg-red-900/40 border border-red-500/50 text-red-300 px-4 sm:px-6 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm font-medium flex items-center justify-center gap-2 w-max max-w-[90%]" style="display: none;" role="alert" aria-live="assertive">
+                    <i data-lucide="alert-circle" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"></i>
+                    <span id="upload-error-text" class="truncate"></span>
+                </div>
+            </label>
+        </div>
+    </section>
+
+    <!-- VIEW 2: PREVIEW -->
+    <section id="view-preview" style="display: none;" class="flex-1 w-full h-full overflow-hidden fade-in">
+        <div class="h-full w-full flex flex-col items-center justify-center p-4 sm:p-8">
+            <article class="w-full max-w-2xl bg-gray-800 rounded-lg border border-gray-700 flex flex-col overflow-hidden max-h-full shadow-lg">
+                <div class="p-6 sm:p-8 overflow-y-auto custom-scroll flex flex-col items-center text-center">
+                    <span class="inline-flex flex-wrap items-center justify-center px-3 py-1.5 bg-gray-900 border border-gray-700 text-gray-300 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3 sm:mb-4 max-w-full break-all">
+                        Mã đề thi: <span id="prev-id" class="ml-1">---</span>
+                    </span>
+                    <h2 id="prev-title" class="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6 leading-tight break-words">---</h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full mb-5 sm:mb-6 py-5 sm:py-6 border-y border-gray-700">
+                        <div class="bg-gray-900 border border-gray-700 p-3 sm:p-4 rounded-lg flex flex-col justify-center">
+                            <p class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Thời gian làm bài</p>
+                            <p class="text-lg sm:text-xl font-bold text-blue-400"><span id="prev-time">0</span> phút</p>
+                        </div>
+                        <div class="bg-gray-900 border border-gray-700 p-3 sm:p-4 rounded-lg flex flex-col justify-center">
+                            <p class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Tổng điểm tối đa</p>
+                            <p class="text-lg sm:text-xl font-bold text-gray-100" id="prev-score">0</p>
+                        </div>
+                        <div class="bg-gray-900 border border-gray-700 p-3 sm:p-4 rounded-lg flex flex-col justify-center">
+                            <p class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Tổng số câu hỏi</p>
+                            <p class="text-lg sm:text-xl font-bold text-gray-100" id="prev-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <button type="button" onclick="startExam()" class="w-full py-3 sm:py-4 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md transition-colors text-base sm:text-lg">
+                        Bắt đầu làm bài thi
+                    </button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- VIEW 3 & 4: UNIFIED WORKSPACE (EXAM + RESULT) -->
+    <section id="view-workspace" style="display: none;" class="flex-1 flex-col w-full relative overflow-hidden">
+        
+        <!-- Header Tool Bar -->
+        <header class="shrink-0 bg-gray-800 border-b border-gray-700 z-20 px-4 sm:px-6 py-3 sm:py-4 shadow-sm">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                
+                <!-- Exam Info -->
+                <div class="w-full sm:w-auto flex-1 min-w-0 text-center sm:text-left">
+                    <h2 id="work-title" class="font-bold text-base sm:text-lg text-gray-100 truncate w-full" title="Tên đề thi">---</h2>
+                    <div class="text-[11px] sm:text-xs text-gray-400 font-medium mt-1 flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4">
+                        <span id="work-meta-time"><i data-lucide="clock" class="inline w-3 h-3 mr-1"></i>0 phút</span>
+                        <span id="work-meta-score"><i data-lucide="target" class="inline w-3 h-3 mr-1"></i>0 điểm</span>
+                        <span id="work-meta-count"><i data-lucide="list-ordered" class="inline w-3 h-3 mr-1"></i>0 câu</span>
+                    </div>
+                </div>
+
+                <!-- Actions / Stats -->
+                <div id="work-actions" class="w-full sm:w-auto shrink-0 flex items-center justify-center sm:justify-end gap-3">
+                    <!-- Timer (Exam mode only) -->
+                    <div id="timer-wrapper" class="bg-gray-900 border border-gray-700 px-4 py-2 sm:py-2.5 rounded-md font-mono text-base sm:text-xl font-bold text-gray-100 w-fit shrink-0" aria-live="polite">
+                        --:--
+                    </div>
+                    <!-- Submit Btn (Exam mode only) -->
+                    <button id="btn-submit" type="button" onclick="confirmSubmit()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-md font-medium transition-colors flex items-center gap-2 text-sm sm:text-base">
+                        <i data-lucide="check-square" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        Xác nhận nộp bài
+                    </button>
+                </div>
+
+                <!-- Compact Result Stats (Result mode only) -->
+                <div id="result-compact-stats" class="hidden w-full sm:w-auto shrink-0 items-center justify-center sm:justify-end gap-2 sm:gap-3">
+                    <div class="bg-gray-900 border border-gray-700 px-3 sm:px-4 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-1.5 sm:gap-2">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400"></i>
+                        <span id="res-time-taken" class="font-bold text-gray-100"></span>
+                    </div>
+                    <div class="bg-blue-900/30 border border-blue-500/50 px-3 sm:px-4 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium text-blue-300 flex items-center gap-1.5 sm:gap-2 shadow-sm">
+                        <i data-lucide="award" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400"></i>
+                        <span class="hidden sm:inline">Điểm số:</span> 
+                        <span id="res-score-gained" class="font-bold text-blue-100 text-sm sm:text-base"></span> 
+                        <span class="text-blue-400/70">/ <span id="res-score-max"></span></span>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Main Workspace Body with Split Panes -->
+        <main class="flex flex-col lg:flex-row flex-1 overflow-hidden relative" id="workspace-layout">
+            
+            <!-- Shared Stimulus Pane (Dock) -->
+            <aside id="stimulus-pane" class="flex-col bg-gray-900 border-gray-700 z-10 transition-all duration-300 shrink-0 hidden">
+                <div class="flex justify-between items-center px-4 py-2.5 bg-gray-800 border-b border-gray-700 shrink-0">
+                    <span id="stimulus-pane-title" class="font-bold text-xs sm:text-sm text-gray-200 flex items-center gap-2 truncate">
+                        <i data-lucide="pin" class="w-4 h-4 text-blue-500 shrink-0"></i>
+                        <span class="truncate">Ngữ liệu dùng chung</span>
+                    </span>
+                    <div class="flex bg-gray-900 border border-gray-700 rounded-md p-1 gap-1 shrink-0 ml-2">
+                        <button id="dock-left" onclick="dockStimulus('left')" class="hidden md:inline-flex p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-gray-100 transition-colors items-center justify-center" title="Ghim trái" aria-label="Ghim trái"><i data-lucide="panel-left" class="w-4 h-4"></i></button>
+                        <button id="dock-right" onclick="dockStimulus('right')" class="hidden md:inline-flex p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-gray-100 transition-colors items-center justify-center" title="Ghim phải" aria-label="Ghim phải"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
+                        <button id="dock-top" onclick="dockStimulus('top')" class="inline-flex p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-gray-100 transition-colors items-center justify-center" title="Ghim trên" aria-label="Ghim trên"><i data-lucide="panel-top" class="w-4 h-4"></i></button>
+                        <button id="dock-bottom" onclick="dockStimulus('bottom')" class="inline-flex p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-gray-100 transition-colors items-center justify-center" title="Ghim dưới" aria-label="Ghim dưới"><i data-lucide="panel-bottom" class="w-4 h-4"></i></button>
+                        <div class="w-px bg-gray-700 mx-1"></div>
+                        <button onclick="dockStimulus('close')" class="inline-flex p-1.5 hover:bg-red-900/50 hover:text-red-400 text-gray-400 rounded transition-colors items-center justify-center" title="Đóng panel" aria-label="Đóng panel"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+                <div id="stimulus-content" class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-8 text-gray-200 bg-gray-900 text-sm sm:text-base leading-relaxed"></div>
+            </aside>
+
+            <!-- Questions Pane -->
+            <section id="questions-pane" class="flex-1 overflow-y-auto custom-scroll p-4 md:p-8 bg-gray-900 relative scroll-smooth focus:outline-none" tabindex="-1">
+                <div id="questions-container" class="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-32"></div>
+            </section>
+        </main>
+    </section>
+
+    <!-- Custom Dialog / Modal -->
+    <div id="app-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 transition-opacity p-4" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 sm:p-8 w-full max-w-sm text-center transform scale-95 transition-transform" id="app-modal-box">
+            <h3 id="modal-title" class="text-xl sm:text-2xl font-bold text-gray-100 mb-2">Xác nhận</h3>
+            <p id="modal-desc" class="text-sm sm:text-base text-gray-400 font-medium mb-8"></p>
+            <div id="modal-actions" class="flex flex-col sm:flex-row gap-3 justify-center"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- State ---
+        let examData = null;
+        let questionsList = [];
+        let userAnswers = {};
+        
+        let timerInterval = null;
+        let timeLeft = 0;
+        let isSubmitted = false;
+        
+        let startTime = null;
+        let endTime = null;
+        let currentDockPos = 'left';
+
+        lucide.createIcons();
+
+        // --- Utils ---
+        const sanitize = (html) => DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+        
+        const formatDuration = (ms) => {
+            const totalSecs = Math.floor(ms / 1000);
+            const m = Math.floor(totalSecs / 60);
+            const s = totalSecs % 60;
+            return `${m} phút ${s} giây`;
+        };
+
+        // --- File Upload ---
+        const dropzone = document.getElementById('dropzone');
+        const filePicker = document.getElementById('file-picker');
+        const errBox = document.getElementById('upload-error');
+        const errText = document.getElementById('upload-error-text');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dropzone.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }, false));
+        ['dragenter', 'dragover'].forEach(eName => dropzone.addEventListener(eName, () => dropzone.classList.add('drag-active'), false));
+        ['dragleave', 'drop'].forEach(eName => dropzone.addEventListener(eName, () => dropzone.classList.remove('drag-active'), false));
+
+        dropzone.addEventListener('drop', e => { if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        filePicker.addEventListener('change', e => { if(e.target.files.length) handleFile(e.target.files[0]); filePicker.value = ''; });
+
+        function handleFile(file) {
+            errBox.style.display = 'none';
+            if(!file.name.endsWith('.json')) return throwErr("Chỉ chấp nhận tệp định dạng .json");
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(validate(data)) {
+                        examData = data;
+                        buildData();
+                        showPreview();
+                    }
+                } catch(err) { throwErr("Tệp dữ liệu không hợp lệ hoặc bị hỏng."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function validate(obj) {
+            const req = ["exam_id", "exam_title", "duration_minutes", "max_score", "items"];
+            for(let f of req) if(!(f in obj)) { throwErr(`Thiếu trường dữ liệu bắt buộc: ${f}`); return false; }
+            if(!Array.isArray(obj.items)) { throwErr("Trường dữ liệu câu hỏi (items) phải là danh sách."); return false; }
+            return true;
+        }
+
+        function throwErr(msg) {
+            errText.textContent = msg;
+            errBox.style.display = 'flex';
+        }
+
+        function buildData() {
+            questionsList = [];
+            let idx = 1;
+            examData.items.forEach(item => {
+                if (item.sub_questions) {
+                    let s = idx, e = idx + item.sub_questions.length - 1;
+                    item.sub_questions.forEach(sq => questionsList.push({ q: sq, idx: idx++, parent: { ...item, _s: s, _e: e } }));
+                } else {
+                    questionsList.push({ q: item, idx: idx++, parent: null });
+                }
+            });
+        }
+
+        // --- Views ---
+        function switchView(viewId) {
+            ['view-upload', 'view-preview', 'view-workspace'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(viewId).style.display = 'flex';
+        }
+
+        function showPreview() {
+            switchView('view-preview');
+            document.getElementById('prev-id').textContent = sanitize(examData.exam_id);
+            document.getElementById('prev-title').textContent = sanitize(examData.exam_title);
+            document.getElementById('prev-time').textContent = examData.duration_minutes;
+            document.getElementById('prev-score').textContent = examData.max_score;
+            document.getElementById('prev-count').textContent = questionsList.length;
+        }
+
+        // --- Exam & Workspace Logic ---
+        function startExam() {
+            startTime = new Date();
+            isSubmitted = false;
+            userAnswers = {};
+            
+            document.getElementById('work-title').textContent = sanitize(examData.exam_title);
+            document.getElementById('work-meta-time').innerHTML = `<i data-lucide="clock" class="inline w-3 h-3 mr-1"></i>${examData.duration_minutes} phút`;
+            document.getElementById('work-meta-score').innerHTML = `<i data-lucide="target" class="inline w-3 h-3 mr-1"></i>${examData.max_score} điểm`;
+            document.getElementById('work-meta-count').innerHTML = `<i data-lucide="list-ordered" class="inline w-3 h-3 mr-1"></i>${questionsList.length} câu`;
+
+            switchView('view-workspace');
+            renderWorkspace('exam');
+            startTimer(examData.duration_minutes * 60);
+        }
+
+        function startTimer(sec) {
+            timeLeft = sec;
+            const el = document.getElementById('timer-wrapper');
+            
+            const updateUI = () => {
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                el.textContent = `${m}:${s}`;
+                if(timeLeft <= 60 && !el.classList.contains('timer-pulse')) el.classList.add('timer-pulse');
+            };
+            
+            updateUI();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateUI();
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    executeSubmit(true);
+                }
+            }, 1000);
+        }
+
+        function renderWorkspace(mode) {
+            const container = document.getElementById('questions-container');
+            dockStimulus('close');
+
+            if(mode === 'exam') {
+                document.getElementById('work-actions').style.display = 'flex';
+                document.getElementById('result-compact-stats').style.display = 'none';
+            } else if (mode === 'result') {
+                let totalScore = 0; let correctCount = 0;
+                questionsList.forEach(item => {
+                    const ans = (userAnswers[item.idx] || "").trim().toLowerCase();
+                    const isCorrect = item.q.accepted_answers.some(a => a.trim().toLowerCase() === ans);
+                    if(isCorrect) { totalScore += item.q.score; correctCount++; }
+                    item._res = { isCorrect, uAns: userAnswers[item.idx] || "" };
+                });
+
+                document.getElementById('work-actions').style.display = 'none';
+                
+                document.getElementById('res-time-taken').textContent = formatDuration(endTime - startTime);
+                document.getElementById('res-score-gained').textContent = Number.isInteger(totalScore) ? totalScore : totalScore.toFixed(2);
+                document.getElementById('res-score-max').textContent = examData.max_score;
+                
+                document.getElementById('result-compact-stats').style.display = 'flex';
+            }
+
+            container.innerHTML = '';
+            let currentGrpId = null;
+
+            questionsList.forEach(item => {
+                // Group Stimulus Header
+                if(item.parent && item.parent.id !== currentGrpId) {
+                    currentGrpId = item.parent.id;
+                    const encodedHTML = encodeURIComponent(item.parent.shared_stimulus);
+                    const groupTitle = `Ngữ liệu dùng chung (Câu ${item.parent._s} - Câu ${item.parent._e})`;
+                    
+                    container.innerHTML += `
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-5 mb-4 mt-6">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                                <div>
+                                    <h3 class="font-bold text-gray-200 text-sm flex items-center gap-2">
+                                        <i data-lucide="book-open-text" class="w-4 h-4 text-blue-500"></i>
+                                        ${groupTitle}
+                                    </h3>
+                                </div>
+                                <button onclick="pinStimulus('${encodedHTML}', '${groupTitle}')" class="w-full sm:w-auto shrink-0 bg-gray-700 border border-gray-600 text-gray-200 text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-600 transition-colors flex justify-center items-center gap-2" aria-label="Ghim ngữ liệu này vào màn hình">
+                                    <i data-lucide="pin" class="w-4 h-4"></i>
+                                    Ghim vào màn hình
+                                </button>
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-300 bg-gray-900 p-4 sm:p-6 rounded-md border border-gray-700 overflow-x-auto leading-relaxed">
+                                ${sanitize(item.parent.shared_stimulus)}
+                            </div>
+                        </div>
+                    `;
+                } else if(!item.parent) currentGrpId = null;
+
+                // Question Block
+                let qHTML = `
+                    <div class="bg-gray-800 p-4 sm:p-6 md:p-8 rounded-lg border border-gray-700 relative">
+                        <div class="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
+                            <span class="shrink-0 w-8 h-8 rounded bg-gray-700 border border-gray-600 text-gray-300 flex items-center justify-center font-bold text-sm">${item.idx}</span>
+                            <div class="text-sm sm:text-base text-gray-200 font-medium leading-relaxed pt-1 w-full overflow-x-auto">
+                                ${sanitize(item.q.stem)}
+                            </div>
+                        </div>
+                `;
+
+                if(mode === 'exam') {
+                    qHTML += `
+                        <div class="ml-0 sm:ml-12">
+                            <input type="text" id="ans-${item.idx}" oninput="userAnswers[${item.idx}] = this.value" value="${userAnswers[item.idx]||''}" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors bg-gray-900 rounded-md text-gray-100 font-medium text-sm sm:text-base" placeholder="Nhập câu trả lời tại đây..." autocomplete="off" aria-label="Nhập đáp án cho câu ${item.idx}">
+                        </div>
+                    `;
+                } else {
+                    const r = item._res;
+                    const acceptedBadges = item.q.accepted_answers.map(a => 
+                        `<span class="inline-block px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gray-700 border border-gray-600 rounded text-gray-200 font-mono text-xs sm:text-sm">${sanitize(a)}</span>`
+                    ).join(' ');
+
+                    qHTML += `
+                        <div class="ml-0 sm:ml-12 flex flex-col gap-3 sm:gap-4 border-t border-gray-700 pt-4 sm:pt-5 mt-4">
+                            <div>
+                                <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 sm:mb-2">Câu trả lời của thí sinh</p>
+                                <div class="px-3 py-2.5 sm:px-4 sm:py-3 rounded-md border ${r.isCorrect ? 'bg-green-900/20 border-green-500/50 text-green-300' : 'bg-red-900/20 border-red-500/50 text-red-300'} font-medium break-words text-sm sm:text-base">
+                                    ${sanitize(r.uAns) || '<span class="italic opacity-60">Thí sinh không đưa ra câu trả lời</span>'}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 sm:mb-2">Đáp án được hệ thống chấp nhận</p>
+                                <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                                    ${acceptedBadges}
+                                </div>
+                            </div>
+
+                            <div class="mt-1 sm:mt-2 text-xs sm:text-sm font-bold ${r.isCorrect?'text-green-400':'text-gray-500'}">
+                                Điểm số đạt được: ${r.isCorrect ? item.q.score : 0} / ${item.q.score} điểm
+                            </div>
+                        </div>
+                    `;
+                }
+                qHTML += `</div>`;
+                container.innerHTML += qHTML;
+            });
+
+            lucide.createIcons();
+            renderMath();
+            document.getElementById('questions-pane').scrollTo(0,0);
+        }
+
+        // --- Docking System ---
+        function pinStimulus(encodedHTML, title) {
+            document.getElementById('stimulus-content').innerHTML = sanitize(decodeURIComponent(encodedHTML));
+            document.getElementById('stimulus-pane-title').innerHTML = `
+                <i data-lucide="pin" class="w-4 h-4 text-blue-500 shrink-0"></i>
+                <span class="truncate">${title}</span>
+            `;
+            lucide.createIcons();
+            renderMath();
+            dockStimulus(currentDockPos);
+        }
+
+        function closeStimulus() {
+            document.getElementById('stimulus-pane').style.display = 'none';
+        }
+
+        function dockStimulus(pos) {
+            if(pos === 'close') return closeStimulus();
+            
+            const isMobile = window.innerWidth < 768;
+            let effectivePos = pos;
+            
+            // Nếu là thiết bị di động, không cho phép ghim trái/phải, mặc định ghim lên trên
+            if(isMobile && (pos === 'left' || pos === 'right')) effectivePos = 'top';
+            
+            currentDockPos = effectivePos;
+            
+            const layout = document.getElementById('workspace-layout');
+            const stimPane = document.getElementById('stimulus-pane');
+            
+            layout.className = 'flex flex-1 overflow-hidden relative'; 
+            stimPane.className = 'flex-col bg-gray-900 border-gray-700 z-10 transition-all duration-300 shrink-0 shadow-[0_0_15px_rgba(0,0,0,0.3)]'; 
+            stimPane.style.display = 'flex'; 
+
+            if(effectivePos === 'left') {
+                layout.classList.add('flex-row');
+                stimPane.classList.add('w-1/2', 'lg:w-2/5', 'border-r');
+            } else if (effectivePos === 'right') {
+                layout.classList.add('flex-row-reverse');
+                stimPane.classList.add('w-1/2', 'lg:w-2/5', 'border-l');
+            } else if (effectivePos === 'top') {
+                layout.classList.add('flex-col');
+                stimPane.classList.add('h-1/3', 'lg:h-2/5', 'border-b');
+            } else if (effectivePos === 'bottom') {
+                layout.classList.add('flex-col-reverse');
+                stimPane.classList.add('h-1/3', 'lg:h-2/5', 'border-t');
+            }
+
+            // Cập nhật trạng thái Active của các nút
+            ['left', 'right', 'top', 'bottom'].forEach(p => {
+                const btn = document.getElementById(`dock-${p}`);
+                if (btn) {
+                    if (p === effectivePos) {
+                        btn.classList.add('bg-gray-700', 'text-gray-100');
+                        btn.classList.remove('text-gray-400');
+                    } else {
+                        btn.classList.remove('bg-gray-700', 'text-gray-100');
+                        btn.classList.add('text-gray-400');
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if(document.getElementById('stimulus-pane').style.display !== 'none') dockStimulus(currentDockPos);
+        });
+
+        // --- Submit Logic ---
+        function confirmSubmit() {
+            showModal(
+                "Xác nhận nộp bài", 
+                "Hệ thống sẽ tiến hành chấm điểm. Thí sinh không thể thay đổi câu trả lời sau khi nộp.",
+                [
+                    { text: "Hủy bỏ", cls: "bg-gray-700 text-gray-200 border border-gray-600 hover:bg-gray-600", fn: "hideModal()" },
+                    { text: "Nộp bài", cls: "bg-blue-600 text-white hover:bg-blue-500", fn: "executeSubmit(false)" }
+                ]
+            );
+        }
+
+        function executeSubmit(isTimeout = false) {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            endTime = new Date();
+
+            if(isTimeout) {
+                // Tắt hộp thoại xác nhận nếu người dùng đang mở
+                document.getElementById('app-modal').style.display = 'none';
+
+                showModal("Thông báo hết giờ!", "Thời gian làm bài đã kết thúc. Hệ thống tự động thu bài.", [
+                    { text: "Xem kết quả bài thi", cls: "bg-blue-600 text-white hover:bg-blue-500", fn: "hideModal(); renderWorkspace('result');" }
+                ]);
+            } else {
+                hideModal();
+                renderWorkspace('result');
+            }
+        }
+
+        // --- Custom Modal ---
+        const modalBg = document.getElementById('app-modal');
+        const modalBox = document.getElementById('app-modal-box');
+
+        function showModal(title, desc, btns) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-desc').textContent = desc;
+            document.getElementById('modal-actions').innerHTML = btns.map(b => `<button onclick="${b.fn}" class="px-6 py-2.5 rounded-md font-medium transition-colors text-sm sm:text-base w-full sm:w-auto ${b.cls}">${b.text}</button>`).join('');
+            
+            modalBg.style.display = 'flex';
+            requestAnimationFrame(() => {
+                modalBg.classList.remove('opacity-0');
+                modalBox.classList.remove('scale-95');
+            });
+        }
+
+        function hideModal() {
+            modalBg.classList.add('opacity-0');
+            modalBox.classList.add('scale-95');
+            setTimeout(() => {
+                modalBg.style.display = 'none';
+            }, 200);
+        }
+
+        // --- Render Math ---
+        function renderMath() {
+            if (window.renderMathInElement) {
+                const conf = (examData && examData.katex_config) ? examData.katex_config : {
+                    delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\[',right:'\\]',display:true}]
+                };
+                renderMathInElement(document.body, conf);
+            }
+        }
+    </script>
+</body>
+</html>
