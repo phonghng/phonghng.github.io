@@ -95,7 +95,7 @@
 				},
 				"stem": {
 					"type": "string",
-					"description": "Phần dẫn của câu hỏi, hỗ trợ tích hợp mã HTML và cú pháp KaTeX theo cấu hình."
+					"description": "Nội dung câu hỏi (phần dẫn và yêu cầu), hỗ trợ HTML và KaTeX. Khuyến nghị đa dạng dạng thức (chọn, đúng/sai, ghép, sắp xếp, điền, v.v.). Phải quy định rõ quy cách trả lời: định dạng dữ liệu (số, chuỗi, làm tròn), cú pháp (thứ tự, phân tách) và ràng buộc (độ dài, số lượng) để đảm bảo chấm tự động chính xác. Với các đáp án có nhiều biến thể tương đương, cần quy định rõ cách biểu diễn hoặc điều chỉnh cách hỏi để tránh nhập nhằng."
 				},
 				"accepted_answers": {
 					"type": "array",
